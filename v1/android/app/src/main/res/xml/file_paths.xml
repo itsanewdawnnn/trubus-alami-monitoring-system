@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Exposes only app/src/.../filesDir/updates/ (where ApkDownloadManager
+    writes the downloaded update APK) to the system Package Installer via a
+    FileProvider content:// URI; see UpdateManager.launchInstall(). No
+    other app-private path is exported.
+-->
+<paths>
+    <files-path name="updates" path="updates/" />
+</paths>

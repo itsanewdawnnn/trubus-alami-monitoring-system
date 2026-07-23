@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Adaptive-icon background only (mipmap-anydpi-v26/ic_launcher*.xml).
+         The rest of the app's palette lives in ui/theme/Color.kt (Compose),
+         not here. Stock Android Studio template colors (purple_*, teal_*,
+         black) were removed as unused. -->
+    <color name="white">#FFFFFFFF</color>
+</resources>

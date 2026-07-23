@@ -1,0 +1,17 @@
+# Local environment overrides -- DB credentials belong in real env vars
+# (see database/credentials.php), never committed.
+.env
+.env.local
+
+# PHP dependency manager -- not in use yet, ignored defensively so an
+# accidental `composer install` doesn't get committed.
+vendor/
+
+# Local PHP error logs, if error_log ever gets pointed inside this folder.
+*.log
+
+# Editor state if this folder is opened as its own IDE project (e.g.
+# PhpStorm) rather than as part of the whole repo -- anchored to this
+# folder's root, same reasoning as the root .gitignore's own /.idea/ entry.
+/.idea/
+/.vscode/

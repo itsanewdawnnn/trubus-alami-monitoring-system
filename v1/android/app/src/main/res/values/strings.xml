@@ -1,0 +1,10 @@
+<resources>
+    <!-- Launcher/app label, kept short on purpose: this is what shows
+         under the home-screen icon and in the recents/app-switcher list,
+         where a long name gets truncated by the OS anyway. -->
+    <string name="app_name">TAMS</string>
+    <!-- Full, expanded name shown inside the app itself (TopAppBar title),
+         deliberately a separate string from app_name so lengthening this one
+         never affects the launcher icon label. -->
+    <string name="app_full_name">TAMS - Trubus Alami Monitoring System</string>
+</resources>

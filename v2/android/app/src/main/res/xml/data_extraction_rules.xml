@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+   Sample data extraction rules file; uncomment and customize as necessary.
+   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
+   for details.
+-->
+<data-extraction-rules>
+    <!--
+    Exclude the auth token/session prefs and the local offline-location queue
+    from both cloud backup and device-to-device transfer (API 31+). See
+    backup_rules.xml for the rationale (avoids restoring a stale session
+    token or another member's queued GPS history onto a different device).
+    -->
+    <cloud-backup>
+        <exclude domain="sharedpref" path="member_monitor_prefs.xml"/>
+        <exclude domain="database" path="member_monitor_local_db"/>
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="member_monitor_prefs.xml"/>
+        <exclude domain="database" path="member_monitor_local_db"/>
+    </device-transfer>
+</data-extraction-rules>

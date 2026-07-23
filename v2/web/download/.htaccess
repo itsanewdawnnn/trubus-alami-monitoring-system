@@ -1,0 +1,27 @@
+# Public download folder for the currently-published APK (TAMS.apk) --
+# see pages/ota_update.php / ajax/ota_update_save.php. Unlike every other
+# .htaccess in this project (database/, helpers/, layouts/, security/,
+# backend/includes/), this folder must stay directly, unauthenticated
+# reachable: the Android app's OTA update flow, and anyone testing a
+# download link by hand, both need this exact path with no login. This file
+# only hardens what CAN be served from here -- it never blocks access.
+
+# No directory listing -- don't expose file names/history to anyone who
+# browses the bare folder URL.
+Options -Indexes -ExecCGI -FollowSymLinks
+
+# Nothing here should ever be executed as a script -- the only file that
+# belongs in this folder is TAMS.apk. Guards against a PHP file somehow
+# ending up here (it never should: ajax/ota_update_save.php's upload
+# handler only accepts a ZIP-signature-verified file and always saves it as
+# a fixed "TAMS.apk" name, never the uploader's own filename/extension) ever
+# being executed instead of just downloaded.
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<FilesMatch "\.(php|phtml|php[0-9]|phar|cgi|pl)$">
+    Require all denied
+</FilesMatch>

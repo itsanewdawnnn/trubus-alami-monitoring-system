@@ -1,0 +1,1445 @@
+/*
+ * TAMS Admin Panel -- single stylesheet, no framework (four-page admin
+ * tool; splitting into multiple files would add overhead for no benefit).
+ * Sections: tokens -> reset -> layout -> components -> pages -> responsive.
+ */
+
+/* ---------------------------------------------------------------------- */
+/* 1. Design tokens                                                        */
+/* ---------------------------------------------------------------------- */
+:root {
+    --color-bg: #f5f6f8;
+    --color-surface: #ffffff;
+    --color-border: #e5e7eb;
+    --color-border-strong: #d1d5db;
+
+    --color-text: #1f2937;
+    --color-text-muted: #6b7280;
+    --color-text-faint: #9ca3af;
+
+    --color-primary: #2563eb;
+    --color-primary-hover: #1d4ed8;
+    --color-primary-soft: #eff4ff;
+
+    --color-success: #16a34a;
+    --color-success-soft: #f0fdf4;
+    --color-danger: #dc2626;
+    --color-danger-hover: #b91c1c;
+    --color-danger-soft: #fef2f2;
+    --color-warning: #d97706;
+    --color-warning-soft: #fffbeb;
+    /* Neutral/informational stat color (e.g. a plain count) -- kept separate
+       from --color-primary so primary stays reserved for navigation/actions. */
+    --color-info: #6366f1;
+    --color-info-soft: #eef2ff;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+
+    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+    --shadow-md: 0 2px 8px rgba(16, 24, 40, 0.08);
+    --shadow-lg: 0 8px 24px rgba(16, 24, 40, 0.12);
+
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+
+    --sidebar-width: 236px;
+    --topbar-height: 60px;
+
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    /* Deliberate type scale -- every font-size in this file is one of these
+       11 values, keeping text sizing consistent across the panel. */
+    --fs-2xs: 11px;  /* calendar weekday header */
+    --fs-xs: 12px;   /* secondary/meta text, hints, badges, table body */
+    --fs-sm: 13px;   /* dominant UI text: buttons, labels, nav, descriptions */
+    --fs-md: 14px;   /* body default, inputs */
+    --fs-lg: 15px;   /* sidebar brand, small section headings */
+    --fs-xl: 16px;   /* modal titles */
+    --fs-2xl: 17px;  /* topbar page title */
+    --fs-3xl: 18px;  /* login card title */
+    --fs-4xl: 24px;  /* stat card value */
+    --fs-5xl: 28px;  /* hero stat value */
+}
+
+/* ---------------------------------------------------------------------- */
+/* 2. Reset / base                                                         */
+/* ---------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    /* Defensive baseline against any element forcing horizontal scroll. */
+    overflow-x: hidden;
+}
+
+body {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-text);
+    background: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+h1, h2, h3, h4, p { margin: 0; }
+ul { margin: 0; padding: 0; list-style: none; }
+img { max-width: 100%; display: block; }
+
+.text-right { text-align: right; }
+
+::selection { background: var(--color-primary-soft); color: var(--color-primary-hover); }
+
+/* Compact, consistent focus ring instead of the browser default -- kept
+   visible (never `outline: none` with nothing replacing it) for keyboard
+   accessibility. */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* 3. App shell layout (sidebar + topbar + content)                        */
+/* ---------------------------------------------------------------------- */
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    flex-shrink: 0;
+    background: var(--color-surface);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    z-index: 40;
+}
+
+.sidebar__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.sidebar__brand-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--color-primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: var(--fs-lg);
+    flex-shrink: 0;
+}
+
+.sidebar__brand-name {
+    font-weight: 600;
+    font-size: var(--fs-lg);
+    letter-spacing: 0.01em;
+}
+
+.sidebar__nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-3);
+    flex: 1;
+}
+
+.sidebar__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-3);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-weight: 500;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar__link:hover {
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+
+.sidebar__link--active {
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+}
+
+.sidebar__icon { flex-shrink: 0; }
+
+.app-shell__backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    z-index: 30;
+}
+
+.main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar {
+    height: var(--topbar-height);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 0 var(--space-6);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.topbar__title {
+    font-size: var(--fs-2xl);
+    font-weight: 600;
+    flex: 1;
+    /* Ellipsis instead of wrap -- the topbar's fixed height would clip a
+       long title on a narrow phone if it wrapped to a second line. */
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.topbar__toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+.topbar__user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-2) var(--space-1) var(--space-1);
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.topbar__user:hover { background: var(--color-bg); }
+
+.topbar__user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: var(--fs-sm);
+    flex-shrink: 0;
+}
+
+.topbar__user-name {
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+.topbar__user-chevron { color: var(--color-text-faint); flex-shrink: 0; transition: transform 0.15s ease; }
+
+/* Account menu dropdown -- wraps .topbar__user so the dropdown can be
+   positioned relative to it. Owned by assets/js/account_menu.js; the My
+   Profile item inside it is still owned end-to-end by assets/js/profile.js
+   (see that file's header comment). Replaces the Logout link that used to
+   live in layouts/sidebar.php's now-removed .sidebar__footer. */
+.account-menu {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.account-menu--open .topbar__user-chevron { transform: rotate(180deg); }
+
+.account-menu__dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + var(--space-2));
+    right: 0;
+    min-width: 180px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-2);
+    z-index: 50;
+    animation: account-menu-in 0.15s ease;
+}
+
+.account-menu--open .account-menu__dropdown { display: block; }
+
+@keyframes account-menu-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.account-menu__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.account-menu__item:hover { background: var(--color-bg); }
+
+.account-menu__item--danger:hover {
+    background: var(--color-danger-soft);
+    color: var(--color-danger);
+}
+
+.account-menu__divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: var(--space-1) 0;
+}
+
+.page {
+    padding: var(--space-6);
+    flex: 1;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+    flex-wrap: wrap;
+}
+
+/* Muted description line under the topbar title -- pages shouldn't
+   repeat a heading or reach for an inline style to place this. */
+.page-header__desc {
+    color: var(--color-text-muted);
+    font-size: var(--fs-sm);
+    margin: 0;
+}
+
+/* Sub-heading above a titled block within a page (e.g. "Aksi Cepat" on the
+   dashboard) -- smaller/lighter than the topbar title to keep hierarchy clear. */
+.section-title {
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    margin: 0 0 var(--space-3);
+}
+
+/* ---------------------------------------------------------------------- */
+/* 4. Cards                                                                 */
+/* ---------------------------------------------------------------------- */
+.card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.card__body { padding: var(--space-5); }
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.stat-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.stat-card__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+}
+
+/* Icon size owned by CSS, not by whatever's hand-typed on the inline <svg>
+   -- keeps every stat card icon the same size regardless of markup source. */
+.stat-card__icon svg { width: 20px; height: 20px; }
+
+.stat-card--success .stat-card__icon { background: var(--color-success-soft); color: var(--color-success); }
+.stat-card--danger .stat-card__icon { background: var(--color-danger-soft); color: var(--color-danger); }
+.stat-card--info .stat-card__icon { background: var(--color-info-soft); color: var(--color-info); }
+
+.stat-card__value {
+    font-size: var(--fs-4xl);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.stat-card__label {
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+/* Lightweight "status strip" variant (Live Tracking's member/moving counts)
+   -- visibly smaller than the dashboard's primary stat cards. */
+.stat-grid--compact { margin-bottom: var(--space-4); }
+.stat-grid--compact .stat-card { padding: var(--space-3) var(--space-4); gap: var(--space-3); }
+.stat-grid--compact .stat-card__icon { width: 36px; height: 36px; }
+.stat-grid--compact .stat-card__icon svg { width: 17px; height: 17px; }
+.stat-grid--compact .stat-card__value { font-size: var(--fs-xl); }
+.stat-grid--compact .stat-card__label { font-size: var(--fs-xs); }
+
+/* ---------------------------------------------------------------------- */
+/* 5. Buttons                                                               */
+/* ---------------------------------------------------------------------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+}
+
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--color-primary-hover); }
+
+.btn-secondary {
+    background: var(--color-surface);
+    border-color: var(--color-border-strong);
+    color: var(--color-text);
+}
+.btn-secondary:hover:not(:disabled) { background: var(--color-bg); }
+
+.btn-danger { background: var(--color-danger); color: #fff; }
+.btn-danger:hover:not(:disabled) { background: var(--color-danger-hover); }
+
+.btn-icon {
+    /* Without its own explicit centering, this relies on the browser's
+       default <button> alignment for its child <svg> -- horizontal
+       centering happens to work (text-align), but vertical position
+       follows the SVG's baseline/line-height instead of the button box,
+       which shifts by a pixel or two depending on each icon's own shape
+       (unlike .btn above, which sets this explicitly and never has the
+       problem). Most icons are symmetric enough that this goes unnoticed,
+       but it's visible side-by-side -- e.g. the Members page's Actions
+       column, where the asymmetric Force (lightning bolt) icon sits next to
+       the Edit/Delete icons and previously didn't line up with them.
+       Setting the same display:flex/align-items/justify-content .btn
+       already uses makes every .btn-icon center its svg on the actual box,
+       independent of the icon's own shape -- fixes this everywhere
+       .btn-icon is used (Members, Member Log, Live Tracking, Member
+       History), not just the one column it was reported on. */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+}
+.btn-icon:hover { background: var(--color-bg); color: var(--color-text); }
+.btn-icon--danger:hover { background: var(--color-danger-soft); color: var(--color-danger); border-color: #fecaca; }
+.btn-icon:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* Members page Actions column: Force Override ON -- a persistent (not just
+   hover) tint so its state reads at a glance, unlike the momentary
+   hover-only feedback on every other .btn-icon. */
+.btn-icon--active,
+.btn-icon--active:hover {
+    background: var(--color-warning-soft);
+    color: var(--color-warning);
+    border-color: #fde68a;
+}
+
+.btn-sm { padding: var(--space-1) var(--space-3); font-size: var(--fs-xs); }
+
+/* ---------------------------------------------------------------------- */
+/* 6. Forms                                                                 */
+/* ---------------------------------------------------------------------- */
+.form-group { margin-bottom: var(--space-4); }
+
+.form-label {
+    display: block;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+    color: var(--color-text);
+}
+
+.form-label .form-optional {
+    font-weight: 400;
+    color: var(--color-text-faint);
+}
+
+.form-control {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--fs-md);
+    font-family: inherit;
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.form-hint {
+    font-size: var(--fs-xs);
+    color: var(--color-text-muted);
+    margin-top: var(--space-1);
+}
+
+.form-error {
+    font-size: var(--fs-xs);
+    color: var(--color-danger);
+    margin-top: var(--space-1);
+    display: none;
+}
+
+.form-group--invalid .form-control { border-color: var(--color-danger); }
+.form-group--invalid .form-error { display: block; }
+
+.form-row { display: flex; gap: var(--space-4); }
+.form-row > .form-group { flex: 1; min-width: 0; }
+
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--space-3) center;
+    padding-right: var(--space-8);
+}
+
+/* OTA Update page's APK upload control -- a dashed drop zone (drag & drop,
+   see ota_update.js) that's also just a big click target for the native
+   <input type="file"> (kept hidden -- this whole element stands in for it). */
+.file-dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    text-align: center;
+    padding: var(--space-5) var(--space-4);
+    border: 1.5px dashed var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.file-dropzone:hover {
+    border-color: var(--color-primary);
+}
+
+/* Applied while a dragged file is over the zone (see ota_update.js's
+   dragenter/dragleave handling) -- the same visual language as a focused
+   .form-control, so it reads as "this will accept it" rather than a
+   generic hover. */
+.file-dropzone--active {
+    border-color: var(--color-primary);
+    border-style: solid;
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+}
+
+.file-dropzone__icon { color: var(--color-text-faint); }
+.file-dropzone--active .file-dropzone__icon { color: var(--color-primary); }
+
+.file-dropzone__prompt {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    justify-content: center;
+    font-size: var(--fs-sm);
+}
+
+.file-dropzone__name {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    overflow-wrap: anywhere;
+}
+
+/* OTA Update page's Save progress -- a slim indeterminate-looking track
+   that fills to a real, XMLHttpRequest-reported upload percentage (see
+   ota_update.js's uploadForm() call), not just a spinner. [hidden] keeps
+   its layout space fully collapsed between saves rather than reserving an
+   empty track. */
+.progress-line {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--color-border);
+    overflow: hidden;
+    margin-top: var(--space-4);
+}
+
+.progress-line__bar {
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: var(--color-primary);
+    transition: width 0.2s ease;
+}
+
+/* ---------------------------------------------------------------------- */
+/* 7. Toolbar (search + actions row above the member table)                */
+/* ---------------------------------------------------------------------- */
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+    max-width: 320px;
+}
+
+.search-box svg {
+    position: absolute;
+    left: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-faint);
+    pointer-events: none;
+}
+
+.search-box input {
+    padding-left: 34px;
+}
+
+.toolbar__spacer { flex: 1; }
+
+/* Filter controls (select/date) that sit alongside .search-box in a
+   .toolbar -- overrides .form-control's width:100%, which would otherwise
+   make each one try to fill the whole flex row. Used by
+   pages/member_log.php's Activity Type / date-range filters. */
+.toolbar__select {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 140px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* 8. Table                                                                 */
+/* ---------------------------------------------------------------------- */
+.table-wrap {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow-x: auto;
+    position: relative;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--fs-sm);
+}
+
+thead th {
+    text-align: left;
+    padding: var(--space-3) var(--space-4);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+}
+
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable:hover { color: var(--color-text); }
+
+th.sortable .sort-arrow { display: inline-block; margin-left: var(--space-1); opacity: 0.4; font-size: 11px; }
+th.sortable.sort-active .sort-arrow { opacity: 1; color: var(--color-primary); }
+
+tbody td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--color-bg); }
+
+.cell-name { font-weight: 600; }
+.cell-muted { color: var(--color-text-muted); }
+
+.row-actions { display: flex; gap: var(--space-2); justify-content: flex-start; }
+
+.empty-state, .loading-state {
+    padding: var(--space-8) var(--space-4);
+    text-align: center;
+    color: var(--color-text-muted);
+}
+
+/* ---------------------------------------------------------------------- */
+/* 9. Badges                                                                */
+/* ---------------------------------------------------------------------- */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+}
+
+.badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.badge--success { background: var(--color-success-soft); color: var(--color-success); }
+.badge--danger { background: var(--color-danger-soft); color: var(--color-danger); }
+/* Member Version Monitoring's 🟡 (outdated but supported) / status-unknown
+   (never reported a version yet) indicators, alongside the green/red above. */
+.badge--warning { background: var(--color-warning-soft); color: var(--color-warning); }
+.badge--neutral { background: var(--color-border); color: var(--color-text-faint); }
+
+/* ---------------------------------------------------------------------- */
+/* 10. Pagination                                                          */
+/* ---------------------------------------------------------------------- */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--color-border);
+    flex-wrap: wrap;
+}
+
+.pagination__info { font-size: var(--fs-xs); color: var(--color-text-muted); }
+
+.pagination__pages { display: flex; gap: var(--space-1); }
+
+.pagination__btn {
+    min-width: 30px;
+    height: 30px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.pagination__btn:hover:not(:disabled) { background: var(--color-bg); color: var(--color-text); }
+.pagination__btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pagination__btn--active { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+
+/* ---------------------------------------------------------------------- */
+/* 11. Modal                                                                */
+/* ---------------------------------------------------------------------- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+    z-index: 100;
+}
+
+.modal-overlay--open { display: flex; }
+
+.modal {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 440px;
+    max-height: calc(100vh - 48px);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal--sm { max-width: 380px; }
+
+.modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-5) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.modal__title { font-size: var(--fs-xl); font-weight: 700; }
+
+.modal__close {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.modal__close:hover { background: var(--color-bg); color: var(--color-text); }
+
+.modal__body { padding: var(--space-5); overflow-y: auto; }
+
+/* Confirmation modals (e.g. delete member) skip .modal__header and go
+   straight to an icon + message -- extra top padding compensates. */
+.modal__body--headless { padding-top: var(--space-6); }
+
+/* Divides a form modal into sections (e.g. Profile modal's account-info vs.
+   change-password fields) with a plain top border, not a second header. */
+.modal__section-label {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+}
+
+.modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--color-border);
+}
+
+.modal__icon-warning {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-danger-soft);
+    color: var(--color-danger);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-4);
+}
+
+.modal__confirm-text { text-align: center; color: var(--color-text-muted); }
+.modal__confirm-text strong { color: var(--color-text); }
+
+/* ---------------------------------------------------------------------- */
+/* 12. Toast notifications                                                  */
+/* ---------------------------------------------------------------------- */
+.toast-stack {
+    position: fixed;
+    top: var(--space-5);
+    right: var(--space-5);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.toast {
+    background: var(--color-text);
+    color: #fff;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    max-width: 320px;
+    animation: toast-in 0.2s ease;
+}
+
+.toast--success { background: #14532d; }
+.toast--error { background: #7f1d1d; }
+
+@keyframes toast-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------------------------------------------------------------------- */
+/* 13. Login page                                                          */
+/* ---------------------------------------------------------------------- */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg);
+    padding: var(--space-4);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 360px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-8) var(--space-6);
+}
+
+.login-card__brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: var(--space-6);
+}
+
+.login-card__mark {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 20px;
+    margin-bottom: var(--space-3);
+}
+
+.login-card__title { font-size: var(--fs-3xl); font-weight: 700; }
+.login-card__subtitle { font-size: var(--fs-sm); color: var(--color-text-muted); margin-top: var(--space-1); }
+
+.login-alert {
+    background: var(--color-danger-soft);
+    color: var(--color-danger);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
+    font-size: var(--fs-sm);
+    margin-bottom: var(--space-4);
+}
+
+.btn-block { width: 100%; padding: var(--space-3); font-size: var(--fs-md); }
+
+/* ---------------------------------------------------------------------- */
+/* 14. Tabs (Live Tracking's "Active Members" / "Real-Time Map")            */
+/* ---------------------------------------------------------------------- */
+.tab-bar {
+    display: flex;
+    gap: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-4);
+}
+
+.tab-bar__item {
+    padding: var(--space-3) var(--space-4);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: var(--fs-sm);
+    font-family: inherit;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.tab-bar__item:hover { color: var(--color-text); }
+.tab-bar__item--active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+
+/* ---------------------------------------------------------------------- */
+/* 15. Member list (Live Tracking's "Member Aktif" panel)                  */
+/* ---------------------------------------------------------------------- */
+.member-list { list-style: none; margin: 0; padding: 0; }
+
+.member-list__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.member-list__item:last-child { border-bottom: none; }
+.member-list__item:hover { background: var(--color-bg); }
+
+.member-list__main { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
+
+.member-list__dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.member-list__dot--moving { background: var(--color-success); }
+.member-list__dot--idle { background: var(--color-warning); }
+
+/* min-width: 0 lets this flex child shrink below its content's natural
+   width, so a long name/note truncates instead of pushing __meta off-screen. */
+.member-list__body { min-width: 0; overflow: hidden; }
+
+.member-list__name {
+    font-weight: 600;
+    font-size: var(--fs-sm);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.member-list__note {
+    font-size: var(--fs-xs);
+    color: var(--color-text-muted);
+    margin-top: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.member-list__meta { font-size: var(--fs-xs); color: var(--color-text-muted); white-space: nowrap; flex-shrink: 0; }
+
+/* ---------------------------------------------------------------------- */
+/* 16. Map (Leaflet) containers, markers, and floating detail card          */
+/* ---------------------------------------------------------------------- */
+.map-container {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    /* Leaflet's own panes/controls use z-index up to 1000 (see leaflet.css
+       .leaflet-top/.leaflet-bottom), and .map-detail-card below uses 500.
+       Without a stacking context here, position:relative alone does NOT
+       contain those z-index values -- they compete directly against
+       page-level siblings like .modal-overlay (z-index: 100), so once a
+       route/markers are drawn the map paints on top of any modal opened
+       afterwards (e.g. history.php's date picker becomes unusable after
+       the first route is shown). isolation: isolate traps all of the
+       map's internal stacking inside this container, regardless of the
+       z-index values used inside it now or added later. */
+    isolation: isolate;
+}
+
+.map-canvas {
+    width: 100%;
+    height: 560px;
+    background: var(--color-bg);
+}
+
+/* Strips Leaflet's default divIcon box/border, which would otherwise show
+   as a faint square behind the custom circular marker markup below. */
+.tams-map-marker { background: transparent !important; border: none !important; }
+
+.map-detail-card {
+    position: absolute;
+    bottom: var(--space-4);
+    left: var(--space-4);
+    width: 280px;
+    max-width: calc(100% - 32px);
+    max-height: calc(100% - 32px);
+    overflow-y: auto;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-4);
+    z-index: 500;
+}
+
+.map-detail-card__close {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.map-detail-card__close:hover { background: var(--color-bg); color: var(--color-text); }
+
+.map-detail-card__title { font-weight: 700; font-size: var(--fs-md); padding-right: 24px; }
+.map-detail-card__subtitle { font-size: var(--fs-xs); color: var(--color-text-muted); margin-bottom: var(--space-2); }
+
+.map-detail-card__row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: var(--space-2) 0 var(--space-3);
+}
+
+.map-detail-card__movement { font-size: var(--fs-xs); font-weight: 600; color: var(--color-text-muted); }
+
+.map-detail-card__field {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    font-size: var(--fs-xs);
+    padding: var(--space-2) 0;
+    border-top: 1px solid var(--color-border);
+}
+.map-detail-card__field:first-of-type { border-top: none; padding-top: 0; }
+
+.map-detail-card__label { color: var(--color-text-muted); flex-shrink: 0; }
+.map-detail-card__value { font-weight: 600; text-align: right; word-break: break-word; }
+
+/* ---------------------------------------------------------------------- */
+/* 17. Member History: filter bar, stats, gap legend, calendar picker       */
+/* ---------------------------------------------------------------------- */
+.history-filter-card { margin-bottom: var(--space-5); }
+
+.history-filter-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.history-filter-bar__field { margin-bottom: 0; flex: 1; min-width: 180px; }
+
+.calendar__hint { text-align: center; margin-top: var(--space-3); }
+
+.history-stats {
+    display: flex;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+    flex-wrap: wrap;
+}
+
+.history-stats__hero {
+    background: var(--color-primary);
+    color: #fff;
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.history-stats__hero-value { font-size: var(--fs-5xl); font-weight: 700; line-height: 1.2; }
+.history-stats__hero-label { font-size: var(--fs-xs); opacity: 0.85; margin-top: 2px; }
+
+.history-stats__tiles { flex: 1; min-width: 280px; margin-bottom: 0; }
+
+.history-gap-legend {
+    margin-top: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-danger-soft);
+    color: var(--color-danger);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-xs);
+}
+
+.calendar__nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+}
+
+.calendar__month-label { font-weight: 700; font-size: var(--fs-sm); }
+
+.calendar__weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: var(--fs-2xs);
+    color: var(--color-text-muted);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+}
+
+.calendar__grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar__cell {
+    aspect-ratio: 1;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-xs);
+    font-family: inherit;
+    cursor: pointer;
+    color: var(--color-text);
+}
+
+.calendar__cell--empty { cursor: default; }
+.calendar__cell--disabled { color: var(--color-text-faint); cursor: not-allowed; }
+.calendar__cell--has-data { background: var(--color-primary-soft); color: var(--color-primary); font-weight: 600; }
+.calendar__cell--has-data:hover { background: var(--color-primary); color: #fff; }
+.calendar__cell--today { box-shadow: inset 0 0 0 1.5px var(--color-primary); }
+.calendar__cell--selected { background: var(--color-primary); color: #fff; }
+
+.calendar__loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--space-4);
+    color: var(--color-text-muted);
+    font-size: var(--fs-xs);
+}
+
+/* ---------------------------------------------------------------------- */
+/* 18. Quick actions (Dashboard's links to other pages)                    */
+/* ---------------------------------------------------------------------- */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-4);
+}
+
+.quick-action {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-5);
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.quick-action:hover { border-color: var(--color-primary); box-shadow: var(--shadow-md); }
+
+.quick-action__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.quick-action__icon svg { width: 19px; height: 19px; }
+
+.quick-action__body { flex: 1; min-width: 0; }
+.quick-action__title { font-weight: 600; font-size: var(--fs-sm); display: block; }
+.quick-action__desc { font-size: var(--fs-xs); color: var(--color-text-muted); display: block; margin-top: 2px; }
+.quick-action__chevron { color: var(--color-text-faint); flex-shrink: 0; }
+
+/* ---------------------------------------------------------------------- */
+/* 19. Responsive                                                          */
+/* ---------------------------------------------------------------------- */
+/* Tablet / off-canvas-sidebar tier -- also treated as touch-input territory:
+   tappable elements grow toward the ~40-44px touch-target size fingers need. */
+@media (max-width: 900px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: min(var(--sidebar-width), 82vw);
+        transform: translateX(-100%);
+        transition: transform 0.2s ease;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .app-shell--sidebar-open .sidebar { transform: translateX(0); }
+    .app-shell--sidebar-open .app-shell__backdrop { display: block; }
+    /* Prevents the page underneath the open drawer from also scrolling. */
+    .app-shell--sidebar-open { overflow: hidden; }
+
+    .topbar__toggle { display: flex; width: 40px; height: 40px; }
+    .sidebar__link { padding: var(--space-4) var(--space-3); }
+
+    .page { padding: var(--space-4); }
+
+    .form-row { flex-direction: column; gap: 0; }
+
+    .map-canvas { height: 420px; }
+
+    .map-detail-card { width: auto; right: var(--space-4); }
+
+    .history-stats__hero { min-width: 100%; }
+
+    /* Icon buttons go from a 32px mouse target to a 38-40px touch target. */
+    .btn-icon { width: 38px; height: 38px; }
+    .modal__close { width: 34px; height: 34px; }
+    .map-detail-card__close { width: 32px; height: 32px; }
+    .pagination__btn { min-width: 34px; height: 34px; }
+    .tab-bar__item { padding: var(--space-4); }
+
+    /* 16px avoids iOS Safari's auto-zoom on focusing a form field below that size. */
+    .form-control { font-size: 16px; }
+}
+
+@media (max-width: 560px) {
+    .topbar { padding: 0 var(--space-4); gap: var(--space-3); }
+    .topbar__user-name, .topbar__user-chevron { display: none; }
+    .topbar__user { padding: var(--space-1); }
+    .topbar__user-avatar { width: 34px; height: 34px; }
+    .row-actions { gap: var(--space-1); }
+    .pagination { flex-direction: column; align-items: stretch; text-align: center; }
+
+    /* Stacks the filter row to one column instead of wrapping two fields
+       that would otherwise fight for a 180px minimum on a narrow phone. */
+    .history-filter-bar { flex-direction: column; align-items: stretch; }
+    .history-filter-bar__field { min-width: 0; width: 100%; }
+    .history-filter-bar > .btn-icon { align-self: flex-end; }
+
+    /* Same reasoning: gives the search box the full row instead of letting
+       it fight the refresh button for space. */
+    .search-box { flex-basis: 100%; max-width: none; min-width: 0; }
+
+    .history-stats__tiles { min-width: 0; width: 100%; }
+
+    /* Member table -> stacked cards: every column matters here, so a
+       horizontal scroller (which hides the actions column) is worse than
+       a card layout. members.js emits a data-label attribute per <td>,
+       read via ::before below, so each field stays labeled without the
+       (now hidden) header row. */
+    .table-wrap { overflow-x: visible; background: transparent; border: none; box-shadow: none; }
+    table, tbody, tr, td { display: block; width: 100%; }
+    thead { display: none; }
+
+    tbody tr {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        padding: 0 var(--space-4);
+        margin-bottom: var(--space-3);
+    }
+    tbody tr:last-child { margin-bottom: 0; }
+    tbody tr:hover { background: var(--color-surface); }
+
+    tbody td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        padding: var(--space-3) 0;
+        border-bottom: 1px solid var(--color-border);
+        text-align: right;
+    }
+    tbody td:last-child { border-bottom: none; }
+    tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--color-text-muted);
+        text-align: left;
+    }
+    /* NOTE: was "Aksi" (Indonesian) until the project's English-only pass --
+       members.js has emitted data-label="Actions" for a while, so this
+       selector silently stopped matching anything and the Actions column's
+       label wasn't actually being hidden/right-aligned on narrow screens.
+       It's the "row of icon buttons, no label needed" shape -- the Members
+       page's Force Override button lives in this same Actions column now,
+       there is no separate Control column anymore. */
+    tbody td[data-label="Actions"] { justify-content: flex-end; }
+    tbody td[data-label="Actions"]::before { display: none; }
+
+    .pagination {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+    }
+}
+
+/* Small phones -- tightens spacing/density further, no new layout logic. */
+@media (max-width: 480px) {
+    .page { padding: var(--space-3); }
+    .card__body { padding: var(--space-4); }
+    .stat-card { padding: var(--space-4); }
+    .modal__body { padding: var(--space-4); }
+    .modal__header, .modal__footer { padding-left: var(--space-4); padding-right: var(--space-4); }
+
+    thead th, tbody td { padding: var(--space-2) var(--space-3); }
+
+    /* Two-across instead of stacked full-width: short number cards read
+       fine at half-width and halve the scroll to reach page content. */
+    .stat-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+    .stat-card { gap: var(--space-3); }
+
+    .map-canvas { height: 340px; }
+
+    .history-stats__hero { padding: var(--space-4); }
+    .history-stats__hero-value { font-size: var(--fs-4xl); }
+
+    .quick-action { padding: var(--space-3) var(--space-4); }
+}

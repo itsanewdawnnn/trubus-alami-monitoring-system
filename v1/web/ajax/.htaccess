@@ -1,0 +1,25 @@
+# Raises the upload size ceiling for this folder so
+# ajax/ota_update_save.php's APK upload (see pages/ota_update.php) isn't
+# rejected by PHP's own default limits (commonly 2-8M) before the script
+# ever runs -- every other file here is a plain JSON/form POST far under
+# this, so a higher ceiling changes nothing for them.
+#
+# Only takes effect under mod_php -- guarded so it's a harmless no-op rather
+# than a fatal "Internal Server Error" on PHP-FPM hosting (a common setup
+# for shared hosting), where php_value/php_flag in .htaccess isn't
+# supported at all. On that kind of hosting, raise upload_max_filesize and
+# post_max_size (post_max_size must be >= upload_max_filesize) via the
+# hosting control panel or a .user.ini file instead -- see web/README.md's
+# "OTA Update" section.
+<IfModule mod_php.c>
+    php_value upload_max_filesize 150M
+    php_value post_max_size 160M
+    php_value max_execution_time 300
+    php_value memory_limit 256M
+</IfModule>
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 150M
+    php_value post_max_size 160M
+    php_value max_execution_time 300
+    php_value memory_limit 256M
+</IfModule>

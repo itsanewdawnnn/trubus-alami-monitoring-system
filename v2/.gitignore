@@ -1,0 +1,17 @@
+# Repo-wide ignores. Module-specific ignores (build output, local.properties,
+# etc.) live in android/.gitignore and web/.gitignore instead -- keep those
+# concerns scoped to the module that generates them.
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editors. Anchored to the repo root (leading /) so this only covers the
+# case of opening the whole monorepo as one IDE project -- android/.gitignore
+# already handles android/.idea/ with its own, more selective rules (it
+# deliberately keeps a few shared-config files tracked), and an unanchored
+# pattern here would silently override that.
+/.vscode/
+/.idea/
+*.swp

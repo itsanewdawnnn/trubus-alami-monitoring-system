@@ -1,0 +1,5 @@
+# .sql files are not PHP and would otherwise be served as a plain-text
+# download by Apache -- that would hand out the full schema to anyone who
+# requests this path directly. Same "block by folder" pattern as security/,
+# helpers/, layouts/, and backend/includes/.
+Require all denied

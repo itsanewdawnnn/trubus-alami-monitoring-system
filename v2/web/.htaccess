@@ -1,0 +1,9 @@
+# config.php sits at the root alongside the public entry points (index.php,
+# login.php, logout.php) so it can't be blocked with a blanket "Require all
+# denied" the way security/, helpers/, layouts/, and backend/includes/ are --
+# that would also block the files it must sit next to. Block just this one
+# file by name instead; it has no auth guard of its own (it IS what auth
+# depends on), so it's safer blocked outright than relying on that alone.
+<Files "config.php">
+    Require all denied
+</Files>

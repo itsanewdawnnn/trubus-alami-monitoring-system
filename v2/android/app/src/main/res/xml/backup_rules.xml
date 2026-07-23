@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+   Sample backup rules file; uncomment and customize as necessary.
+   See https://developer.android.com/guide/topics/data/autobackup
+   for details.
+   Note: This file is ignored for devices older than API 31
+   See https://developer.android.com/about/versions/12/backup-restore
+-->
+<full-backup-content>
+    <!--
+    Exclude the auth token/session prefs and the local offline-location queue
+    (which may contain another member's queued GPS history) from Android's
+    legacy full-data backup (devices on API < 31). Restoring a stale/foreign
+    session token or someone else's queued coordinates to a different device
+    would be both a privacy and a correctness problem.
+    -->
+    <exclude domain="sharedpref" path="member_monitor_prefs.xml"/>
+    <exclude domain="database" path="member_monitor_local_db"/>
+</full-backup-content>

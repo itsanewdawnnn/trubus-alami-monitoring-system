@@ -1,0 +1,6 @@
+# Defense in depth: these files are only ever meant to be `require`d by
+# api.php, never requested directly by a browser. config.php in particular
+# has no auth guard of its own (it's what everything else depends on), so
+# it's better blocked outright than relying on that alone -- same rationale
+# as the admin panel's own config/.htaccess and includes/.htaccess.
+Require all denied

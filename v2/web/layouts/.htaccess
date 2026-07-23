@@ -1,0 +1,4 @@
+# See config/.htaccess for rationale -- these files are only ever included
+# by pages under pages/, never requested directly, and have no auth guard of
+# their own (the including page is responsible for that).
+Require all denied
