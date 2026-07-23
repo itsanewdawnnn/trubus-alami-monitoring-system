@@ -1,0 +1,552 @@
+{
+  "android/app/build.gradle.kts": {
+    "mtime": 1784724356.0,
+    "ast_hash": "958af5c6c474016ae2224e71b75a3e5e",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/MainActivity.kt": {
+    "mtime": 1783366392.0,
+    "ast_hash": "376c452ea57dba499893ead9cc11a0e1",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/data/api/ApiService.kt": {
+    "mtime": 1784371504.0,
+    "ast_hash": "94ccdf39f759b9a3acfcbb08c0e39b82",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/data/geocoding/AddressSearchService.kt": {
+    "mtime": 1784724454.0,
+    "ast_hash": "26afe884b6344586cc1c4fe63142dbd0",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/data/geocoding/ForwardGeocodingProvider.kt": {
+    "mtime": 1784629516.0,
+    "ast_hash": "5ab609a755a5c14b395ea609ac2f4134",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/data/geocoding/NominatimSearchService.kt": {
+    "mtime": 1784630000.0,
+    "ast_hash": "1852142bbc002568adc0ffd064f2310f",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/data/geocoding/PhotonSearchService.kt": {
+    "mtime": 1784630026.0,
+    "ast_hash": "c253031e57ac8a88e15b41b272c94303",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/data/geocoding/ReverseGeocodingService.kt": {
+    "mtime": 1784525418.0,
+    "ast_hash": "89065d70fd9715a1eb0467b3f7a63036",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/data/local/AppDatabase.kt": {
+    "mtime": 1784712612.0,
+    "ast_hash": "421db5a42b37d4a9fe054ba173108eb4",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/data/model/Models.kt": {
+    "mtime": 1784712606.0,
+    "ast_hash": "0c5db4aac7b09afa3ba4640d9d7326cc",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/data/repository/ActivityLogRepository.kt": {
+    "mtime": 1784109470.0,
+    "ast_hash": "416bfd9caf0297f77a85a34cbe7b86b9",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/data/repository/MemberRepository.kt": {
+    "mtime": 1784790683.0476031,
+    "ast_hash": "077a88e9fcd2e656ee2238623bbcadb5",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/data/repository/RemoteConfigRepository.kt": {
+    "mtime": 1784113550.0,
+    "ast_hash": "6cecc079a9f8f4a214bb7e5c7585e5f5",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/data/repository/UpdateRepository.kt": {
+    "mtime": 1784003104.0,
+    "ast_hash": "67d0a91d2e8024ae332792d80c9dd34c",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/data/update/ApkDownloadManager.kt": {
+    "mtime": 1783998506.0,
+    "ast_hash": "d2152f576d3d30853e5fe5a6cdd11fe5",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/data/update/UpdateManager.kt": {
+    "mtime": 1783755762.0,
+    "ast_hash": "88cf8e53ab190e0a293cab6fdf187457",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/service/BootCompletedReceiver.kt": {
+    "mtime": 1783650614.0,
+    "ast_hash": "924226a4a56bffdb39ca8f54f7c06aee",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/service/MemberLocationService.kt": {
+    "mtime": 1784771858.0,
+    "ast_hash": "502e0bd56a187c9e8f81698cc92b9e57",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/ui/screens/MainAppScreen.kt": {
+    "mtime": 1784721956.0,
+    "ast_hash": "47b87774c5e1c11265705e566ab95bca",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/ui/screens/OsmMap.kt": {
+    "mtime": 1783930270.0,
+    "ast_hash": "2928828dc56d25cb3a170d7aeda7e9f3",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/ui/screens/OutletScreen.kt": {
+    "mtime": 1784707880.0,
+    "ast_hash": "f3ea125cce8d736544e8f66ff86b4778",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/ui/screens/SplashScreen.kt": {
+    "mtime": 1783992852.0,
+    "ast_hash": "169c69f7c39566dccccbfef602d6b2ac",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/ui/screens/UpdateDialog.kt": {
+    "mtime": 1783755708.0,
+    "ast_hash": "f3136c7e8f8d3c47e4ab406d81b6c913",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/ui/theme/Color.kt": {
+    "mtime": 1783405990.0,
+    "ast_hash": "b173cf81be5249ccb413e8242f403df1",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/ui/theme/Theme.kt": {
+    "mtime": 1783658168.0,
+    "ast_hash": "d2a40cc20e1f13f99970ad18b1429390",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/ui/theme/Type.kt": {
+    "mtime": 1783658160.0,
+    "ast_hash": "b2c5ee9de069672d6a7008d7b1f77d94",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/ui/viewmodel/MainViewModel.kt": {
+    "mtime": 1784621914.0,
+    "ast_hash": "11454536015229c734e51cc7ee52e222",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/util/OneShotLocationProvider.kt": {
+    "mtime": 1784707820.0,
+    "ast_hash": "bac82f09a9fcbd06c26a3e95b58af962",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/util/TrackingHealth.kt": {
+    "mtime": 1784722908.0,
+    "ast_hash": "518f838d274a96f67056ca5e4ba33f24",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/util/WibTime.kt": {
+    "mtime": 1783650624.0,
+    "ast_hash": "d9fb976c37a0a3a8fd6eebf15ceae35f",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/java/com/trubus/tams/worker/LocationSyncWorker.kt": {
+    "mtime": 1784721754.0,
+    "ast_hash": "1ddf7eeb3099552d2ad635e8ad063d68",
+    "semantic_hash": ""
+  },
+  "android/app/src/test/java/com/trubus/tams/data/geocoding/AddressSearchServiceTest.kt": {
+    "mtime": 1784724474.0,
+    "ast_hash": "5b6b71c22b6328ec032f137c1aa9db4e",
+    "semantic_hash": ""
+  },
+  "android/app/src/test/java/com/trubus/tams/data/repository/FakeApiService.kt": {
+    "mtime": 1784724588.0,
+    "ast_hash": "e8fe77f0293e4d3abfcdb231502dd9e8",
+    "semantic_hash": ""
+  },
+  "android/app/src/test/java/com/trubus/tams/data/repository/FakeOfflineLocationDao.kt": {
+    "mtime": 1784724570.0,
+    "ast_hash": "91e3203935981afc8c60f32c2d36c7ea",
+    "semantic_hash": ""
+  },
+  "android/app/src/test/java/com/trubus/tams/data/repository/MemberRepositoryTest.kt": {
+    "mtime": 1784773394.0,
+    "ast_hash": "67dbd9d3721d3fc397d6de7fa4de423d",
+    "semantic_hash": ""
+  },
+  "android/app/src/test/java/com/trubus/tams/data/repository/ShadowWorkManagerInitializer.kt": {
+    "mtime": 1784773826.0,
+    "ast_hash": "5f5579efb839c49310ec962cdb13ed09",
+    "semantic_hash": ""
+  },
+  "android/app/src/test/java/com/trubus/tams/util/TrackingHealthTest.kt": {
+    "mtime": 1784724394.0,
+    "ast_hash": "bd9ee579f86c566c1dfdb2980d3600e6",
+    "semantic_hash": ""
+  },
+  "android/build.gradle.kts": {
+    "mtime": 1783764142.0,
+    "ast_hash": "75809bf11bc735003b62ad6df6f69f22",
+    "semantic_hash": ""
+  },
+  "android/gradlew": {
+    "mtime": 1784770374.0,
+    "ast_hash": "a43be8432bac3ffd05b3769aa42fe996",
+    "semantic_hash": ""
+  },
+  "android/settings.gradle.kts": {
+    "mtime": 1783503318.0,
+    "ast_hash": "7e45de804e3d5730ac51f90dcbfbe80a",
+    "semantic_hash": ""
+  },
+  "web/ajax/history.php": {
+    "mtime": 1784712983.301852,
+    "ast_hash": "712a85bc1f35283db0fd7da2056310ea",
+    "semantic_hash": ""
+  },
+  "web/ajax/history_dates.php": {
+    "mtime": 1784109356.5987694,
+    "ast_hash": "1c23a4333cdadc6f6e18ed856702d33a",
+    "semantic_hash": ""
+  },
+  "web/ajax/history_members.php": {
+    "mtime": 1784092111.5528855,
+    "ast_hash": "98809b5c04602b02a6125b19750e820c",
+    "semantic_hash": ""
+  },
+  "web/ajax/live_tracking.php": {
+    "mtime": 1784712972.5877337,
+    "ast_hash": "b7fcfcdcfb4ded25edb42f73b35d25a1",
+    "semantic_hash": ""
+  },
+  "web/ajax/member_log_list.php": {
+    "mtime": 1784530629.9874885,
+    "ast_hash": "8bd5d93864eb00db157588df73472287",
+    "semantic_hash": ""
+  },
+  "web/ajax/members_delete.php": {
+    "mtime": 1784532046.0936306,
+    "ast_hash": "0972579578b3170df70deb921f027dac",
+    "semantic_hash": ""
+  },
+  "web/ajax/members_force_toggle.php": {
+    "mtime": 1784165974.225158,
+    "ast_hash": "1fcd56bd90dd32d0e95d0ea8c08e79cf",
+    "semantic_hash": ""
+  },
+  "web/ajax/members_list.php": {
+    "mtime": 1784530621.786516,
+    "ast_hash": "5934bbe253f0f9fc68309a89e9d58094",
+    "semantic_hash": ""
+  },
+  "web/ajax/members_save.php": {
+    "mtime": 1784113485.382081,
+    "ast_hash": "3995e800bbd2d400f74aec7df1a0cceb",
+    "semantic_hash": ""
+  },
+  "web/ajax/ota_update_save.php": {
+    "mtime": 1784003008.135301,
+    "ast_hash": "d5696c12bf998f54f380e968993b6577",
+    "semantic_hash": ""
+  },
+  "web/ajax/outlet_approve.php": {
+    "mtime": 1784370616.3197453,
+    "ast_hash": "b00f8a208a8442beb95a58cca5c1d1d7",
+    "semantic_hash": ""
+  },
+  "web/ajax/outlet_create.php": {
+    "mtime": 1784531955.996649,
+    "ast_hash": "a3f05a2c510343eca10891bedc6e0822",
+    "semantic_hash": ""
+  },
+  "web/ajax/outlet_delete.php": {
+    "mtime": 1784532034.1737657,
+    "ast_hash": "9286b14037ad24888e4e278c370610d8",
+    "semantic_hash": ""
+  },
+  "web/ajax/outlet_list.php": {
+    "mtime": 1784535521.6925404,
+    "ast_hash": "186a897296efa795c62262d75a1777c7",
+    "semantic_hash": ""
+  },
+  "web/ajax/outlet_merge.php": {
+    "mtime": 1784532029.2511048,
+    "ast_hash": "2891323236c8462a436ed6bb0228e92d",
+    "semantic_hash": ""
+  },
+  "web/ajax/outlet_reject.php": {
+    "mtime": 1784370629.0079834,
+    "ast_hash": "59d300a403cb9a6a3e52705b87feb534",
+    "semantic_hash": ""
+  },
+  "web/ajax/outlet_update.php": {
+    "mtime": 1784531979.2188458,
+    "ast_hash": "4cb34db12837ba93408c314add2cbedf",
+    "semantic_hash": ""
+  },
+  "web/ajax/outlet_visit_report.php": {
+    "mtime": 1784542943.257463,
+    "ast_hash": "6223a1396bb07e9359798c0d8afc8740",
+    "semantic_hash": ""
+  },
+  "web/ajax/profile_update.php": {
+    "mtime": 1784113487.0928798,
+    "ast_hash": "162cc2f410ea32bf23d0c6c5446a1f1b",
+    "semantic_hash": ""
+  },
+  "web/ajax/remote_management_save.php": {
+    "mtime": 1784113480.795474,
+    "ast_hash": "114e2f172e23e55a18dc17a69e28b6fe",
+    "semantic_hash": ""
+  },
+  "web/ajax/reverse_geocode.php": {
+    "mtime": 1783736770.8558478,
+    "ast_hash": "0e7b594e77c4ee701e3bad3e4aac6edc",
+    "semantic_hash": ""
+  },
+  "web/assets/js/account_menu.js": {
+    "mtime": 1784105467.4698632,
+    "ast_hash": "c885ea365fb7c8f6afa41ffe747d02a0",
+    "semantic_hash": ""
+  },
+  "web/assets/js/app.js": {
+    "mtime": 1784166689.578257,
+    "ast_hash": "a4a1c90233e95bd79129553d5d859f15",
+    "semantic_hash": ""
+  },
+  "web/assets/js/history.js": {
+    "mtime": 1784713027.732957,
+    "ast_hash": "a9f7a4b0295038ed350a50db54f50f59",
+    "semantic_hash": ""
+  },
+  "web/assets/js/live_tracking.js": {
+    "mtime": 1784713011.88699,
+    "ast_hash": "a35b9032ba51c05b78c7c1f3d7131e21",
+    "semantic_hash": ""
+  },
+  "web/assets/js/map.js": {
+    "mtime": 1784087446.4571552,
+    "ast_hash": "31acfbbcc7abd4163622a5f2f20d839a",
+    "semantic_hash": ""
+  },
+  "web/assets/js/member_log.js": {
+    "mtime": 1784085005.0886655,
+    "ast_hash": "a61ae50ec9506ba519938a0215c692f9",
+    "semantic_hash": ""
+  },
+  "web/assets/js/members.js": {
+    "mtime": 1784166033.7463,
+    "ast_hash": "36a4bbf2ad497519ab1a50fb4202cca0",
+    "semantic_hash": ""
+  },
+  "web/assets/js/ota_update.js": {
+    "mtime": 1784001960.2326481,
+    "ast_hash": "71db4136052b86aea67608c4536acdf4",
+    "semantic_hash": ""
+  },
+  "web/assets/js/outlet.js": {
+    "mtime": 1784543017.030619,
+    "ast_hash": "c073407908ec67090155216fd9646cb6",
+    "semantic_hash": ""
+  },
+  "web/assets/js/profile.js": {
+    "mtime": 1784104325.0663188,
+    "ast_hash": "93e0d58295920a6001165d8fd9b22f8c",
+    "semantic_hash": ""
+  },
+  "web/assets/js/remote_management.js": {
+    "mtime": 1784113582.4859545,
+    "ast_hash": "f2e75a3670dabfdd50348ad7a43182e1",
+    "semantic_hash": ""
+  },
+  "web/backend/api.php": {
+    "mtime": 1784713209.7610576,
+    "ast_hash": "e03918943ffefbc97afbfd2283e287be",
+    "semantic_hash": ""
+  },
+  "web/backend/includes/config.php": {
+    "mtime": 1783754341.0668204,
+    "ast_hash": "3459e119ba3d41912d48401686e0686b",
+    "semantic_hash": ""
+  },
+  "web/backend/includes/middleware.php": {
+    "mtime": 1783675870.5346198,
+    "ast_hash": "aeeeb4d12b9b80b19580911b7330acf4",
+    "semantic_hash": ""
+  },
+  "web/config.php": {
+    "mtime": 1784109328.1578698,
+    "ast_hash": "6c1bab43e2eb49f423a122d6e8b67074",
+    "semantic_hash": ""
+  },
+  "web/database/credentials.php": {
+    "mtime": 1784790737.339855,
+    "ast_hash": "24932e3ea8e49fd981976ffeebfccdaa",
+    "semantic_hash": ""
+  },
+  "web/database/schema.sql": {
+    "mtime": 1784791656.663648,
+    "ast_hash": "292597e5eabd17f2aee01b610190de55",
+    "semantic_hash": ""
+  },
+  "web/helpers/functions.php": {
+    "mtime": 1784526354.0595772,
+    "ast_hash": "5560dd29a9b2bb6339009a846540d588",
+    "semantic_hash": ""
+  },
+  "web/helpers/outlet_functions.php": {
+    "mtime": 1784531927.5607073,
+    "ast_hash": "c96c8889702d1e57d41682f2bfbd7cd9",
+    "semantic_hash": ""
+  },
+  "web/index.php": {
+    "mtime": 1783650941.633263,
+    "ast_hash": "da708b9e5b74980d7a3b455dd47acbd0",
+    "semantic_hash": ""
+  },
+  "web/layouts/footer.php": {
+    "mtime": 1784104337.664072,
+    "ast_hash": "144782df64f0807739c5b7cca4f9c53f",
+    "semantic_hash": ""
+  },
+  "web/layouts/header.php": {
+    "mtime": 1784105474.4789586,
+    "ast_hash": "1c05a0c7b23ad4745d7d5faa8b57d79a",
+    "semantic_hash": ""
+  },
+  "web/layouts/sidebar.php": {
+    "mtime": 1784370544.1997313,
+    "ast_hash": "3be76285bf600dc19a3620d9df5b2a85",
+    "semantic_hash": ""
+  },
+  "web/login.php": {
+    "mtime": 1783757714.5732548,
+    "ast_hash": "fc1e0aca284ed689db1fdf37dd961a2f",
+    "semantic_hash": ""
+  },
+  "web/logout.php": {
+    "mtime": 1783650943.8817775,
+    "ast_hash": "cf8596f7dab82dd61cac94c9cf7818e2",
+    "semantic_hash": ""
+  },
+  "web/pages/dashboard.php": {
+    "mtime": 1784086019.840638,
+    "ast_hash": "bf9adda9ddc5d0bb60461fb93baaa11c",
+    "semantic_hash": ""
+  },
+  "web/pages/history.php": {
+    "mtime": 1784713023.3534844,
+    "ast_hash": "a647a3aac6c5192872a9266a94c30b0c",
+    "semantic_hash": ""
+  },
+  "web/pages/live_tracking.php": {
+    "mtime": 1784713281.189131,
+    "ast_hash": "248ab392afecf10359113594c10f1417",
+    "semantic_hash": ""
+  },
+  "web/pages/member_log.php": {
+    "mtime": 1784113491.0657575,
+    "ast_hash": "bfd7474b1ad92e5fa0d17383123e90fd",
+    "semantic_hash": ""
+  },
+  "web/pages/members.php": {
+    "mtime": 1784165990.37449,
+    "ast_hash": "16d22965cf170b50df2090ef7929c641",
+    "semantic_hash": ""
+  },
+  "web/pages/ota_update.php": {
+    "mtime": 1784002983.8734028,
+    "ast_hash": "93486bafa18afea167d0b0691324f286",
+    "semantic_hash": ""
+  },
+  "web/pages/outlet.php": {
+    "mtime": 1784543109.9352884,
+    "ast_hash": "eb9f76e8ad05cbfc972d12f599b7f9c2",
+    "semantic_hash": ""
+  },
+  "web/pages/remote_management.php": {
+    "mtime": 1784113565.878782,
+    "ast_hash": "0b40e7b3de79edf276d8355ca70be644",
+    "semantic_hash": ""
+  },
+  "web/security/auth.php": {
+    "mtime": 1783736435.940837,
+    "ast_hash": "232ef2d4004bf99a308b8c49ee949b8e",
+    "semantic_hash": ""
+  },
+  "web/security/csrf.php": {
+    "mtime": 1783736439.045,
+    "ast_hash": "53b8b41b14732ee628db0af1ffaff45b",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1784790689.902652,
+    "ast_hash": "a9a5bb6c9bf7d8baedc9e6b3fe10efeb",
+    "semantic_hash": ""
+  },
+  "android/README.md": {
+    "mtime": 1784790689.8946521,
+    "ast_hash": "0d6cfaf806e73cf137f8d241ebba723c",
+    "semantic_hash": ""
+  },
+  "web/README.md": {
+    "mtime": 1784790689.9176521,
+    "ast_hash": "cdc4c3bc5614e90e534ad632bce9e315",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/res/drawable-nodpi/logo_splash.png": {
+    "mtime": 1783762014.0,
+    "ast_hash": "b6c3e6ef81e7a3373e16e6706f8bfdaf",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/res/mipmap-hdpi/ic_launcher.webp": {
+    "mtime": 1783764440.0,
+    "ast_hash": "da9dd3869af4e762ae40c57407a93d47",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/res/mipmap-hdpi/ic_launcher_round.webp": {
+    "mtime": 1783764440.0,
+    "ast_hash": "7691442e32005e76910265e710d526e2",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/res/mipmap-mdpi/ic_launcher.webp": {
+    "mtime": 1783764440.0,
+    "ast_hash": "7666fcb25f5078c2a6e9309c2419df0e",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/res/mipmap-mdpi/ic_launcher_round.webp": {
+    "mtime": 1783764440.0,
+    "ast_hash": "c954aafa8c45dc2c706fdf78cc3591bc",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/res/mipmap-xhdpi/ic_launcher.webp": {
+    "mtime": 1783764440.0,
+    "ast_hash": "e972bbb404ee224b0267f9a63f234dd3",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp": {
+    "mtime": 1783764440.0,
+    "ast_hash": "641183bed3bf2d71525d122c61496392",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/res/mipmap-xxhdpi/ic_launcher.webp": {
+    "mtime": 1783764440.0,
+    "ast_hash": "a2e8288506f24c4b8672addb8fa69036",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp": {
+    "mtime": 1783764440.0,
+    "ast_hash": "df6e9c0139e931fac6532181206cc754",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp": {
+    "mtime": 1783764440.0,
+    "ast_hash": "e5d595a97528ab46e52c8ea090d3d8c4",
+    "semantic_hash": ""
+  },
+  "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp": {
+    "mtime": 1783764440.0,
+    "ast_hash": "dfda7fa5c0753307317ce8757a6905d3",
+    "semantic_hash": ""
+  }
+}
