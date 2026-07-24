@@ -55,8 +55,8 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/repository/MemberRepository.kt": {
-    "mtime": 1784874394.0,
-    "ast_hash": "ec3d0af2825d38730a748d09aee91a3f",
+    "mtime": 1784876078.0,
+    "ast_hash": "fadad2c2a688ce18de17cbf56cf70aa1",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/repository/RemoteConfigRepository.kt": {
@@ -90,8 +90,8 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/screens/MainAppScreen.kt": {
-    "mtime": 1784874544.0,
-    "ast_hash": "a3518bdd0c1f04dcada2db7537663574",
+    "mtime": 1784876192.0,
+    "ast_hash": "de93ccc46560c3d47d89a8eea3715cfc",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/screens/OsmMap.kt": {
@@ -130,8 +130,8 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/viewmodel/MainViewModel.kt": {
-    "mtime": 1784874426.0,
-    "ast_hash": "35e5657b5a604d6a400286234d57ac55",
+    "mtime": 1784876118.0,
+    "ast_hash": "80e0a03c3649fba55f8078aae8c2f8ff",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/util/OneShotLocationProvider.kt": {

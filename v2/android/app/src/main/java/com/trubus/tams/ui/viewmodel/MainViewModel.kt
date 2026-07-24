@@ -146,6 +146,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // Manual escape hatch for the battery-optimization card: on some OEM ROMs
+    // (observed: iQOO/vivo OriginOS 6), PowerManager#isIgnoringBatteryOptimizations()
+    // can keep reporting "not exempt" even after it's genuinely granted. Not
+    // the primary path -- only matters when the automatic check + retry is still wrong.
+    private val _batteryOptimizationCardDismissed = MutableStateFlow(repository.batteryOptimizationCardDismissed)
+    val batteryOptimizationCardDismissed: StateFlow<Boolean> = _batteryOptimizationCardDismissed.asStateFlow()
+
+    fun setBatteryOptimizationCardDismissed(dismissed: Boolean) {
+        repository.batteryOptimizationCardDismissed = dismissed
+        _batteryOptimizationCardDismissed.value = dismissed
+    }
+
     // --- Profile Editing (Member) ---
     private val _isEditingProfile = MutableStateFlow(false)
     val isEditingProfile: StateFlow<Boolean> = _isEditingProfile.asStateFlow()

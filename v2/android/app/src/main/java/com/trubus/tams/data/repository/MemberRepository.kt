@@ -95,6 +95,7 @@ class MemberRepository(
         private const val PREF_LAST_LOC_ACC = "last_loc_acc"
         private const val PREF_LAST_LOC_SPEED = "last_loc_speed"
         private const val PREF_LAST_LOC_TIME = "last_loc_time"
+        private const val PREF_BATTERY_OPT_CARD_DISMISSED = "battery_opt_card_dismissed"
         private const val PREF_SERVICE_HEARTBEAT_AT = "service_heartbeat_at"
 
         private const val DEFAULT_BASE_URL = "https://tams.sbstrans.net/backend/"
@@ -223,6 +224,19 @@ class MemberRepository(
                 }
             }
         }
+
+    /**
+     * Manual escape hatch for the battery-optimization card on
+     * MemberDashboard. `PowerManager.isIgnoringBatteryOptimizations()` is the
+     * correct API, but some OEM ROMs (observed on iQOO/Vivo OriginOS) don't
+     * reliably sync its return value with what the user actually granted.
+     * Lets a member who's sure they granted it hide the card and start 
+     * tracking anyway; auto-cleared the moment the real check reports true, 
+     * so it can never mask a genuine regression.
+     */
+    var batteryOptimizationCardDismissed: Boolean
+        get() = prefs.getBoolean(PREF_BATTERY_OPT_CARD_DISMISSED, false)
+        set(value) = prefs.edit { putBoolean(PREF_BATTERY_OPT_CARD_DISMISSED, value) }
 
     // --- Preferences & Configuration ---
 

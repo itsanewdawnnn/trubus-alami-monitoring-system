@@ -665,6 +665,16 @@ fun MemberDashboard(viewModel: MainViewModel) {
         onPauseOrDispose {}
     }
 
+    val batteryOptimizationCardDismissed by viewModel.batteryOptimizationCardDismissed.collectAsState()
+
+    // Auto-clear the manual dismiss the instant the real check succeeds --
+    // it only exists to unstick a lagging/misreporting device.
+    LaunchedEffect(isIgnoringBatteryOptimizations) {
+        if (isIgnoringBatteryOptimizations && batteryOptimizationCardDismissed) {
+            viewModel.setBatteryOptimizationCardDismissed(false)
+        }
+    }
+
     // Bounded, one-shot -- not a polling loop.
     var batteryOptimizationRecheckTrigger by remember { mutableIntStateOf(0) }
     LaunchedEffect(batteryOptimizationRecheckTrigger) {
@@ -788,11 +798,18 @@ fun MemberDashboard(viewModel: MainViewModel) {
     // notification requires POST_NOTIFICATIONS at runtime, asked for first.
     // Falls through to location permissions either way -- tracking must
     // still work even if notifications are denied.
+    // Entry point for the Start button: on API 33+, a foreground service's
+    // notification requires POST_NOTIFICATIONS at runtime, asked for first.
+    // Falls through to location permissions either way -- tracking must
+    // still work even if notifications are denied.
     fun beginStartTrackingFlow() {
         // Final re-check before starting tracking flow.
-        val isOptimized = !isIgnoringBatteryOptimizations(context)
+        val currentCheck = isIgnoringBatteryOptimizations(context)
+        isIgnoringBatteryOptimizations = currentCheck
         
-        if (isOptimized) {
+        val batteryOptimizationCardDismissed = viewModel.batteryOptimizationCardDismissed.value
+
+        if (!currentCheck && !batteryOptimizationCardDismissed) {
             Toast.makeText(
                 context,
                 "Battery optimization must be ignored to start tracking. Tap the 'Ignore Battery Optimization' card on your dashboard.",
@@ -865,7 +882,7 @@ fun MemberDashboard(viewModel: MainViewModel) {
         }
 
         // Only shown while there's still something for the member to do.
-        if (!isIgnoringBatteryOptimizations) {
+        if (!isIgnoringBatteryOptimizations && !batteryOptimizationCardDismissed) {
             item {
                 BatteryOptimizationCard(
                     onRequestExemption = {
@@ -877,7 +894,8 @@ fun MemberDashboard(viewModel: MainViewModel) {
                         } catch (e: Exception) {
                             Log.e("MemberDashboard", "Battery optimization intent failed: ${e.message}")
                         }
-                    }
+                    },
+                    onDismiss = { viewModel.setBatteryOptimizationCardDismissed(true) }
                 )
             }
         }
@@ -1077,7 +1095,9 @@ private fun TripSummaryCard(summary: HistoryResponseDto?) {
  * MemberDashboard); this composable is pure UI.
  */
 @Composable
-private fun BatteryOptimizationCard(onRequestExemption: () -> Unit) {
+private fun BatteryOptimizationCard(onRequestExemption: () -> Unit, onDismiss: () -> Unit) {
+    var exemptionRequested by remember { mutableStateOf(false) }
+
     Card(
         shape = ContentCardShape,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
@@ -1101,12 +1121,26 @@ private fun BatteryOptimizationCard(onRequestExemption: () -> Unit) {
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedButton(
-                onClick = onRequestExemption,
+                onClick = {
+                    exemptionRequested = true
+                    onRequestExemption()
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(Icons.Default.BatteryAlert, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Ignore Battery Optimization")
+            }
+
+            if (exemptionRequested) {
+                // Escape hatch for the rare case where the automatic check keeps
+                // disagreeing. Low-emphasis text action -- most members never need it.
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("I've already configured this, start anyway")
+                }
             }
         }
     }
