@@ -344,11 +344,11 @@ WHERE `status` = 'offline' AND `latitude` IS NOT NULL AND `updated_at` IS NOT NU
   AND `updated_at` >= (NOW() - INTERVAL 5 MINUTE);
 
 -- Undo the earlier bcrypt migration for any database that already ran it:
--- restores the seed accounts below to plain-text 'CHANGE_ME', matching
+-- restores the seed accounts below to plain-text 'password', matching
 -- backend/api.php's plain-text comparison (hash_equals() there is only a
 -- constant-time string compare, not a hash).
 UPDATE `tams_users`
-SET `password` = 'CHANGE_ME'
+SET `password` = 'password'
 WHERE `username` IN ('member1', 'member2', 'admin1')
   AND `password` LIKE '$2%$%';
 
@@ -562,9 +562,9 @@ ALTER TABLE `tams_member_history_locations`
 -- Passwords are stored and compared as plain text, per project requirement.
 -- ---------------------------------------------------------------------
 INSERT INTO `tams_users` (`name`, `note`, `username`, `password`, `role`, `is_active`) VALUES
-('Member One', '', 'member1', 'CHANGE_ME', 'member', 1),
-('Member Two', '', 'member2', 'CHANGE_ME', 'member', 1),
-('Admin', '', 'admin1', 'CHANGE_ME', 'admin', 1)
+('Member One', '', 'member1', 'password1', 'member', 1),
+('Member Two', '', 'member2', 'password2', 'member', 1),
+('Admin', '', 'admin', 'password', 'admin', 1)
 ON DUPLICATE KEY UPDATE `is_active` = 1;
 
 -- Guarantees the single settings row (id=1) always exists so

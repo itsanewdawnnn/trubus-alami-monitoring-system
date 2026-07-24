@@ -80,7 +80,7 @@ class MemberRepository(private val context: Context) {
         private const val PREF_LAST_LOC_TIME = "last_loc_time"
         private const val PREF_BATTERY_OPT_CARD_DISMISSED = "battery_opt_card_dismissed"
 
-        private const val DEFAULT_BASE_URL = "https://your-tams-domain.example/backend/"
+        private const val DEFAULT_BASE_URL = "https://your-domain.example/backend/"
 
         // Caps the local offline-location queue so a device left offline for
         // an extended period doesn't accumulate unbounded local storage.
@@ -381,7 +381,7 @@ class MemberRepository(private val context: Context) {
      * unlike every other failure branch above, there's no server-provided
      * `message` to fall back on here, so without this the exception's own
      * `.message` (e.g. `UnknownHostException: Unable to resolve host
-     * "your-tams-domain.example"...`) would reach the login screen, member list, or
+     * "your-domain.example"...`) would reach the login screen, member list, or
      * trip history UI verbatim. That's technically accurate but not
      * something a Member or Admin should have to read, and was previously
      * inconsistent with [validateSessionOnStartup]'s own connectivity-error

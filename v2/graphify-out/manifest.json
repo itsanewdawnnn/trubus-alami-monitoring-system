@@ -5,18 +5,18 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/MainActivity.kt": {
-    "mtime": 1783366392.0,
-    "ast_hash": "376c452ea57dba499893ead9cc11a0e1",
+    "mtime": 1784804152.0,
+    "ast_hash": "26177fc566fd78cc146904e153ef713c",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/api/ApiService.kt": {
-    "mtime": 1784371504.0,
-    "ast_hash": "94ccdf39f759b9a3acfcbb08c0e39b82",
+    "mtime": 1784803640.0,
+    "ast_hash": "aaf119db9781b97d9a934bbca1144840",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/geocoding/AddressSearchService.kt": {
-    "mtime": 1784724454.0,
-    "ast_hash": "26afe884b6344586cc1c4fe63142dbd0",
+    "mtime": 1784803728.0,
+    "ast_hash": "42c736e80788498ff74d63a298715947",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/geocoding/ForwardGeocodingProvider.kt": {
@@ -25,58 +25,58 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/geocoding/NominatimSearchService.kt": {
-    "mtime": 1784630000.0,
-    "ast_hash": "1852142bbc002568adc0ffd064f2310f",
+    "mtime": 1784804176.0,
+    "ast_hash": "0a3db97a1f5f2f5c255970580933e2ce",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/geocoding/PhotonSearchService.kt": {
-    "mtime": 1784630026.0,
-    "ast_hash": "c253031e57ac8a88e15b41b272c94303",
+    "mtime": 1784804200.0,
+    "ast_hash": "e59f0c11cb8540ca32d2976048c6d4df",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/geocoding/ReverseGeocodingService.kt": {
-    "mtime": 1784525418.0,
-    "ast_hash": "89065d70fd9715a1eb0467b3f7a63036",
+    "mtime": 1784803772.0,
+    "ast_hash": "f72e6d4d7f3c5c5a9808cc97e4828bbe",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/local/AppDatabase.kt": {
-    "mtime": 1784712612.0,
-    "ast_hash": "421db5a42b37d4a9fe054ba173108eb4",
+    "mtime": 1784859974.0,
+    "ast_hash": "b67fbe820aee18da48c7950407af2a37",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/model/Models.kt": {
-    "mtime": 1784712606.0,
-    "ast_hash": "0c5db4aac7b09afa3ba4640d9d7326cc",
+    "mtime": 1784859958.0,
+    "ast_hash": "aba67de4dedbc7238baec105545bc9dc",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/repository/ActivityLogRepository.kt": {
-    "mtime": 1784109470.0,
-    "ast_hash": "416bfd9caf0297f77a85a34cbe7b86b9",
+    "mtime": 1784803872.0,
+    "ast_hash": "8530a9eb06a443c53e972cdf408545ae",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/repository/MemberRepository.kt": {
-    "mtime": 1784790683.0476031,
-    "ast_hash": "077a88e9fcd2e656ee2238623bbcadb5",
+    "mtime": 1784859992.0,
+    "ast_hash": "4f6aae00707782f37ee0f0b0fc7448f1",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/repository/RemoteConfigRepository.kt": {
-    "mtime": 1784113550.0,
-    "ast_hash": "6cecc079a9f8f4a214bb7e5c7585e5f5",
+    "mtime": 1784803920.0,
+    "ast_hash": "ce7d83e4eb6d8eec2f1be5b8eeb2ff5e",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/repository/UpdateRepository.kt": {
-    "mtime": 1784003104.0,
-    "ast_hash": "67d0a91d2e8024ae332792d80c9dd34c",
+    "mtime": 1784803976.0,
+    "ast_hash": "ee98c596fb342755f80b00a436110f48",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/update/ApkDownloadManager.kt": {
-    "mtime": 1783998506.0,
-    "ast_hash": "d2152f576d3d30853e5fe5a6cdd11fe5",
+    "mtime": 1784803992.0,
+    "ast_hash": "6fc7413c65176d02fae5374c1fb0e401",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/update/UpdateManager.kt": {
-    "mtime": 1783755762.0,
-    "ast_hash": "88cf8e53ab190e0a293cab6fdf187457",
+    "mtime": 1784804038.0,
+    "ast_hash": "acc9299c8f774e3530a5fb4084702e58",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/service/BootCompletedReceiver.kt": {
@@ -85,33 +85,33 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/service/MemberLocationService.kt": {
-    "mtime": 1784771858.0,
-    "ast_hash": "502e0bd56a187c9e8f81698cc92b9e57",
+    "mtime": 1784860008.0,
+    "ast_hash": "39c57c2cb9671365d0db9f6e798c31dd",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/screens/MainAppScreen.kt": {
-    "mtime": 1784721956.0,
-    "ast_hash": "47b87774c5e1c11265705e566ab95bca",
+    "mtime": 1784804372.0,
+    "ast_hash": "2319a120cf74c4b66e89ba874fe37465",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/screens/OsmMap.kt": {
-    "mtime": 1783930270.0,
-    "ast_hash": "2928828dc56d25cb3a170d7aeda7e9f3",
+    "mtime": 1784804134.0,
+    "ast_hash": "162a51ab69aa07ee72820319e895dfc6",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/screens/OutletScreen.kt": {
-    "mtime": 1784707880.0,
-    "ast_hash": "f3ea125cce8d736544e8f66ff86b4778",
+    "mtime": 1784857558.0,
+    "ast_hash": "228047e54c34f7b734512e291132ff13",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/screens/SplashScreen.kt": {
-    "mtime": 1783992852.0,
-    "ast_hash": "169c69f7c39566dccccbfef602d6b2ac",
+    "mtime": 1784804066.0,
+    "ast_hash": "9aa02510a40ff063428c0daeb39a9af3",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/screens/UpdateDialog.kt": {
-    "mtime": 1783755708.0,
-    "ast_hash": "f3136c7e8f8d3c47e4ab406d81b6c913",
+    "mtime": 1784804102.0,
+    "ast_hash": "52183f2a7a735588ce647afe8b82884b",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/theme/Color.kt": {
@@ -120,38 +120,38 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/theme/Theme.kt": {
-    "mtime": 1783658168.0,
-    "ast_hash": "d2a40cc20e1f13f99970ad18b1429390",
+    "mtime": 1784804248.0,
+    "ast_hash": "38df4cd7b6e46dbba944c19752d95e7d",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/theme/Type.kt": {
-    "mtime": 1783658160.0,
-    "ast_hash": "b2c5ee9de069672d6a7008d7b1f77d94",
+    "mtime": 1784804264.0,
+    "ast_hash": "70f5bd6be0b77d60b7e4cb5a9a24dc1b",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/viewmodel/MainViewModel.kt": {
-    "mtime": 1784621914.0,
-    "ast_hash": "11454536015229c734e51cc7ee52e222",
+    "mtime": 1784803572.0,
+    "ast_hash": "5a5143298072ed78c7c395ca697f84d1",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/util/OneShotLocationProvider.kt": {
-    "mtime": 1784707820.0,
-    "ast_hash": "bac82f09a9fcbd06c26a3e95b58af962",
+    "mtime": 1784803694.0,
+    "ast_hash": "a26ad2c2c7ef0506fa4984989b17a392",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/util/TrackingHealth.kt": {
-    "mtime": 1784722908.0,
-    "ast_hash": "518f838d274a96f67056ca5e4ba33f24",
+    "mtime": 1784859874.0,
+    "ast_hash": "09bf5387806172a50d348f32a92e1b4c",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/util/WibTime.kt": {
-    "mtime": 1783650624.0,
-    "ast_hash": "d9fb976c37a0a3a8fd6eebf15ceae35f",
+    "mtime": 1784802476.0,
+    "ast_hash": "8f1e98e4d653e913c9e6c371e23af4b4",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/worker/LocationSyncWorker.kt": {
-    "mtime": 1784721754.0,
-    "ast_hash": "1ddf7eeb3099552d2ad635e8ad063d68",
+    "mtime": 1784803624.0,
+    "ast_hash": "d5047d77f668b829838abf248eb972ff",
     "semantic_hash": ""
   },
   "android/app/src/test/java/com/trubus/tams/data/geocoding/AddressSearchServiceTest.kt": {
@@ -160,8 +160,8 @@
     "semantic_hash": ""
   },
   "android/app/src/test/java/com/trubus/tams/data/repository/FakeApiService.kt": {
-    "mtime": 1784724588.0,
-    "ast_hash": "e8fe77f0293e4d3abfcdb231502dd9e8",
+    "mtime": 1784797704.0,
+    "ast_hash": "dd3abbab09f5312fd28c57903785214a",
     "semantic_hash": ""
   },
   "android/app/src/test/java/com/trubus/tams/data/repository/FakeOfflineLocationDao.kt": {
@@ -265,8 +265,8 @@
     "semantic_hash": ""
   },
   "web/ajax/outlet_list.php": {
-    "mtime": 1784535521.6925404,
-    "ast_hash": "186a897296efa795c62262d75a1777c7",
+    "mtime": 1784858376.091666,
+    "ast_hash": "153b0d1d7c44b37a2c8fed28bdd2e35c",
     "semantic_hash": ""
   },
   "web/ajax/outlet_merge.php": {
@@ -360,8 +360,8 @@
     "semantic_hash": ""
   },
   "web/backend/api.php": {
-    "mtime": 1784713209.7610576,
-    "ast_hash": "e03918943ffefbc97afbfd2283e287be",
+    "mtime": 1784799758.0688014,
+    "ast_hash": "9f61e7ebd64d3c53856fd5ed26723bc8",
     "semantic_hash": ""
   },
   "web/backend/includes/config.php": {
@@ -380,13 +380,13 @@
     "semantic_hash": ""
   },
   "web/database/credentials.php": {
-    "mtime": 1784790737.339855,
-    "ast_hash": "24932e3ea8e49fd981976ffeebfccdaa",
+    "mtime": 1783668662.4695113,
+    "ast_hash": "2b4658d4ad65247f3449627a6e632b13",
     "semantic_hash": ""
   },
   "web/database/schema.sql": {
-    "mtime": 1784791656.663648,
-    "ast_hash": "292597e5eabd17f2aee01b610190de55",
+    "mtime": 1784802660.9180522,
+    "ast_hash": "47cfa64327efeb5f0b9a4ca6def6bd9d",
     "semantic_hash": ""
   },
   "web/helpers/functions.php": {
@@ -480,18 +480,18 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1784790689.902652,
-    "ast_hash": "a9a5bb6c9bf7d8baedc9e6b3fe10efeb",
+    "mtime": 1784781159.6163392,
+    "ast_hash": "8ed36c55dfac7ec70c00fd9781dcb00f",
     "semantic_hash": ""
   },
   "android/README.md": {
-    "mtime": 1784790689.8946521,
-    "ast_hash": "0d6cfaf806e73cf137f8d241ebba723c",
+    "mtime": 1784860482.0,
+    "ast_hash": "29fe720de8f55df5d551bf15c46edfb0",
     "semantic_hash": ""
   },
   "web/README.md": {
-    "mtime": 1784790689.9176521,
-    "ast_hash": "cdc4c3bc5614e90e534ad632bce9e315",
+    "mtime": 1784858455.7899287,
+    "ast_hash": "616c90fe979c786e9fadcfc2526f6805",
     "semantic_hash": ""
   },
   "android/app/src/main/res/drawable-nodpi/logo_splash.png": {

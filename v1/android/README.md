@@ -252,7 +252,7 @@ for the server side.
 
 | What | Where |
 |---|---|
-| Backend API base URL | Defaults to `https://your-tams-domain.example/backend/` (`DEFAULT_BASE_URL` in `MemberRepository.kt`). `MemberRepository.baseUrl` supports being changed at runtime and persisted to SharedPreferences, but no screen currently calls that setter -- there's no in-app UI for it yet. To point at a different backend, edit `DEFAULT_BASE_URL` and rebuild. |
+| Backend API base URL | Defaults to `https://your-domain.example/backend/` (`DEFAULT_BASE_URL` in `MemberRepository.kt`). `MemberRepository.baseUrl` supports being changed at runtime and persisted to SharedPreferences, but no screen currently calls that setter -- there's no in-app UI for it yet. To point at a different backend, edit `DEFAULT_BASE_URL` and rebuild. |
 | Application ID / namespace | `com.trubus.tams`, set in `app/build.gradle.kts`. |
 | Permissions & components | `AndroidManifest.xml` -- location (fine/coarse/background), foreground service, boot receiver, notifications, wake lock, `REQUEST_INSTALL_PACKAGES` + the `FileProvider` entry for OTA updates. |
 | OTA update FileProvider paths | `res/xml/file_paths.xml` -- exposes only `filesDir/updates/` (where the downloaded APK lands) to the system installer; nothing else in app storage is shared. |

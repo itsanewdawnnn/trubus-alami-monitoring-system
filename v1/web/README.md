@@ -52,7 +52,7 @@ web/
 A small PHP-native (no framework, no router, no build step) web app for
 staff to manage members and watch their live location -- the web
 equivalent of the Android app's own Admin role. Deployed to
-`https://your-tams-domain.example/`.
+`https://your-domain.example/`.
 
 | Folder      | Responsibility |
 |-------------|----------------|
@@ -352,7 +352,7 @@ on the same machine.
 
 **Why `backend/` keeps its name, and stays a sibling of the Admin Panel
 instead of living in its own top-level folder:** the Android app has
-`https://your-tams-domain.example/backend/api.php` hardcoded as its default API
+`https://your-domain.example/backend/api.php` hardcoded as its default API
 URL (`MemberRepository.kt`'s `DEFAULT_BASE_URL`). Renaming or moving this
 folder would break every already-installed copy of the app until it were
 manually reconfigured, so restructuring intentionally leaves this one path
@@ -372,7 +372,7 @@ already say.
 
 There's no CI/CD here -- deployment is a manual upload (FTP / cPanel File
 Manager) of this entire `web/` folder's contents to the hosting account's
-document root for `your-tams-domain.example`. Both apps go up together, as
+document root for `your-domain.example`. Both apps go up together, as
 siblings, exactly as they sit here locally (i.e. don't flatten or rename
 anything on the way up -- the Android app's hardcoded URL depends on
 `backend/` staying exactly where it is).
