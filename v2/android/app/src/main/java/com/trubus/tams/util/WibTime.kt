@@ -7,8 +7,8 @@ import java.util.TimeZone
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * Every timestamp in this system, server- and client-generated, is WIB
- * (Asia/Jakarta, GMT+7) wall-clock time regardless of the device's own
+ * Every timestamp in this system, server- and client-generated, is GMT+7
+ * (Asia/Jakarta) wall-clock time regardless of the device's own
  * timezone setting -- centralized here instead of copy-pasting the same
  * "Asia/Jakarta" + SimpleDateFormat construction across the codebase.
  *
@@ -36,9 +36,9 @@ object WibTime {
         return threadLocal.get()!!
     }
 
-    /** Today's WIB calendar date as "yyyy-MM-dd" (matches the backend's DATE(recorded_at) filter). */
+    /** Today's GMT+7 calendar date as "yyyy-MM-dd" (matches the backend's DATE(recorded_at) filter). */
     fun today(): String = formatter("yyyy-MM-dd").format(Date())
 
-    /** Current WIB timestamp as "dd/MM HH:mm:ss", used for the "last sync" display. */
+    /** Current GMT+7 timestamp as "dd/MM HH:mm:ss", used for the "last sync" display. */
     fun nowShort(): String = formatter("dd/MM HH:mm:ss").format(Date())
 }

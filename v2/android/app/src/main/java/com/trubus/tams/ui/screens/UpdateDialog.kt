@@ -135,7 +135,7 @@ private fun UpdateDialogBody(state: UpdateFlowState, info: VersionInfoDto) {
             Spacer(Modifier.height(12.dp))
             info.release_notes.forEach { note ->
                 Row(modifier = Modifier.padding(vertical = 2.dp)) {
-                    Text("•  ", style = MaterialTheme.typography.bodyMedium)
+                    Text("-  ", style = MaterialTheme.typography.bodyMedium)
                     Text(note, style = MaterialTheme.typography.bodyMedium)
                 }
             }

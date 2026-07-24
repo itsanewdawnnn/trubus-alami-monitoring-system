@@ -14,6 +14,8 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import androidx.core.location.GnssStatusCompat
 import androidx.core.location.LocationCompat
 import androidx.core.location.LocationManagerCompat
@@ -187,7 +189,7 @@ class MemberLocationService : Service() {
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         createNotificationChannel()
 
-        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        val powerManager = getSystemService(POWER_SERVICE) as PowerManager
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG).apply {
             setReferenceCounted(false)
         }
@@ -426,8 +428,8 @@ class MemberLocationService : Service() {
             }
         }
 
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if ((ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
+            (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
             Log.e(TAG, "Location permissions missing. Stopping service.")
             locationCallback = null
             repository.isTrackingEnabled = false
@@ -491,7 +493,7 @@ class MemberLocationService : Service() {
         if (stalenessWatchdogJob != null) return@synchronized
         stalenessWatchdogJob = serviceScope.launch {
             while (true) {
-                delay(STALENESS_CHECK_INTERVAL_MS)
+                delay(STALENESS_CHECK_INTERVAL_MS.milliseconds)
                 // This loop runs for as long as tracking stays active --
                 // potentially many hours in one continuous stretch -- and
                 // nothing in this app installs a CoroutineExceptionHandler,

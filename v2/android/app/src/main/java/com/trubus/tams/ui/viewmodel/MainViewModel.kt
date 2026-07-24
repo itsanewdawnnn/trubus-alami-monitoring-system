@@ -22,12 +22,10 @@ import com.trubus.tams.data.update.UpdateManager
 import com.trubus.tams.service.MemberLocationService
 import com.trubus.tams.util.WibTime
 import com.trubus.tams.worker.LocationSyncWorker
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import java.io.File
+import java.util.Date
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -89,13 +87,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // user to retype credentials for what might be a transient blip. False
     // after a server-confirmed-invalid token, since the token is gone and a
     // retry would have nothing to check.
-    private val _canRetrySessionValidation = MutableStateFlow(false)
+    private val _canRetrySessionValidation = MutableStateFlow(value = false)
     val canRetrySessionValidation: StateFlow<Boolean> = _canRetrySessionValidation.asStateFlow()
 
-    private val _baseUrl = MutableStateFlow(repository.baseUrl)
-    val baseUrl: StateFlow<String> = _baseUrl.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
+    private val _isLoading = MutableStateFlow(value = false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val _loginError = MutableStateFlow<String?>(null)
@@ -135,7 +130,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     // Backing state for the "Trip Detail" card. Deliberately fetched
     // from the same /location/history endpoint Admin's Trip History
-    // uses (for today's WIB date), not computed client-side -- single source
+    // uses (for today's GMT+7 date), not computed client-side -- single source
     // of truth, so a Member always sees the same figures an Admin would.
     // Keeps showing the last trip's numbers after Stop until the next fix.
     private val _memberTripSummary = MutableStateFlow<HistoryResponseDto?>(null)
@@ -149,18 +144,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             // the last successfully fetched summary.
             result.onSuccess { _memberTripSummary.value = it }
         }
-    }
-
-    // Manual escape hatch for the battery-optimization card: on some OEM ROMs
-    // (observed: iQOO/vivo OriginOS 6), PowerManager#isIgnoringBatteryOptimizations()
-    // can keep reporting "not exempt" even after it's genuinely granted. Not
-    // the primary path -- only matters when the automatic check + retry is still wrong.
-    private val _batteryOptimizationCardDismissed = MutableStateFlow(repository.batteryOptimizationCardDismissed)
-    val batteryOptimizationCardDismissed: StateFlow<Boolean> = _batteryOptimizationCardDismissed.asStateFlow()
-
-    fun setBatteryOptimizationCardDismissed(dismissed: Boolean) {
-        repository.batteryOptimizationCardDismissed = dismissed
-        _batteryOptimizationCardDismissed.value = dismissed
     }
 
     // --- Profile Editing (Member) ---
@@ -417,7 +400,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedMemberForHistory = MutableStateFlow<UserDto?>(null)
     val selectedMemberForHistory: StateFlow<UserDto?> = _selectedMemberForHistory.asStateFlow()
 
-    // Defaults to "today" in WIB specifically -- the backend filters by WIB
+    // Defaults to "today" in GMT+7 specifically -- the backend filters by GMT+7
     // calendar date, so the picker must agree with that zone, not the device's.
     private val _historyDate = MutableStateFlow(WibTime.today())
     val historyDate: StateFlow<String> = _historyDate.asStateFlow()
@@ -909,8 +892,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      * Writes one Log entry per changed field (Username, Note), matching the
-     * spec's example format ("`[Date]` Wawan changed Username from member01
-     * to member_surabaya"), plus one entry for a password change --
+     * spec's example format ("`[Date]` member changed Username from old
+     * to new"), plus one entry for a password change --
      * NEVER the password value itself, only the bare fact that it changed.
      * Logged with [succeeded]'s actual outcome (not assumed success) for
      * both the field-level entries and the password entry, since a
@@ -1015,7 +998,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (status != null && !status.tracking_allowed) {
                 onResult(
                     "Tracking is only allowed between ${status.operational_hours_start} " +
-                        "and ${status.operational_hours_end} WIB."
+                        "and ${status.operational_hours_end} GMT+7."
                 )
                 return@launch
             }
@@ -1079,7 +1062,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         pollingJob = viewModelScope.launch {
             while (true) {
                 fetchCurrentLocations()
-                delay(5000L)
+                delay(kotlin.time.Duration.parse("5s"))
             }
         }
     }

@@ -1,11 +1,11 @@
 # Graph Report - v2  (2026-07-24)
 
 ## Corpus Check
-- 99 files · ~125,361 words
+- 99 files · ~125,107 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 671 nodes · 1104 edges · 80 communities (71 shown, 9 thin omitted)
+- 670 nodes · 1103 edges · 80 communities (71 shown, 9 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 25 edges (avg confidence: 0.74)
 - Token cost: 0 input · 0 output
 
@@ -47,7 +47,7 @@
 - authenticateUser
 
 ## God Nodes (most connected - your core abstractions)
-1. `MainViewModel` - 61 edges
+1. `MainViewModel` - 60 edges
 2. `ApiResponse` - 39 edges
 3. `MemberRepository` - 36 edges
 4. `MemberLocationService` - 29 edges
@@ -190,7 +190,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `MemberRepository` connect `MemberRepository` to `ApiResponse`, `MainViewModel`, `MemberLocationService`, `FakeOfflineLocationDao`, `MemberRepositoryTest`?**
   _High betweenness centrality (0.119) - this node is a cross-community bridge._
 - **Why does `MainViewModel` connect `MainViewModel` to `MemberRepository`, `MainAppScreen.kt`, `OutletScreen.kt`, `UpdateManager`?**
-  _High betweenness centrality (0.113) - this node is a cross-community bridge._
+  _High betweenness centrality (0.112) - this node is a cross-community bridge._
 - **Why does `UserDto` connect `MemberRepository` to `ApiResponse`, `MainViewModel`, `MainAppScreen.kt`?**
   _High betweenness centrality (0.049) - this node is a cross-community bridge._
 - **What connects `None`, `Overview`, `Project structure` to the rest of the system?**
@@ -198,6 +198,6 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `ApiResponse` be split into smaller, more focused modules?**
   _Cohesion score 0.11312217194570136 - nodes in this community are weakly interconnected._
 - **Should `MainViewModel` be split into smaller, more focused modules?**
-  _Cohesion score 0.061224489795918366 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06292517006802721 - nodes in this community are weakly interconnected._
 - **Should `MemberLocationService` be split into smaller, more focused modules?**
   _Cohesion score 0.06382978723404255 - nodes in this community are weakly interconnected._

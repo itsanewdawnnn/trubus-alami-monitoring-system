@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -226,6 +228,8 @@ private fun OutletListScreen(
     // landing mid-drag can never race the gesture's own in-progress edits.
     val reorderEnabled = searchQuery.isBlank() && !loading
     val listState = rememberLazyListState()
+    val thresholdPx = with(LocalDensity.current) { 60.dp.toPx() }
+
     var draggedOutletId by remember { mutableStateOf<Int?>(null) }
     // Fixed the instant the drag starts: this item's own rest offset (px,
     // LazyColumn's own coordinate space) at that moment. Deliberately never
@@ -273,23 +277,12 @@ private fun OutletListScreen(
         }
     }
 
-    fun startDrag(outletId: Int) {
-        val info = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == outletId } ?: return
-        previewOrder = filteredOutletsRef.value
-        draggedStartOrder = filteredOutletsRef.value
-        draggedOutletId = outletId
-        draggedStartOffset = info.offset.toFloat()
-        draggedDistance = 0f
-        draggedRenderOffset = 0f
-    }
-
-    fun onDragDelta(deltaY: Float) {
+    fun updateDragState() {
         val order = previewOrder ?: return
         val draggedId = draggedOutletId ?: return
-        draggedDistance += deltaY
-
         val visibleItems = listState.layoutInfo.visibleItemsInfo
         val draggedInfo = visibleItems.firstOrNull { it.key == draggedId } ?: return
+
         // Fixed reference frame (draggedStartOffset) plus the total raw
         // finger movement since drag-start -- recomputed fresh every call,
         // never incrementally adjusted, so this stays correct regardless of
@@ -312,9 +305,9 @@ private fun OutletListScreen(
         // onDrag callbacks (fired continuously while the finger moves) pick
         // up any remaining distance on their own next call instead.
         val swapTarget = visibleItems.firstOrNull { candidate ->
-            candidate.key != draggedId &&
-                targetCenter >= candidate.offset.toFloat() &&
-                targetCenter <= (candidate.offset + candidate.size).toFloat()
+            (candidate.key != draggedId) &&
+                (targetCenter >= candidate.offset.toFloat()) &&
+                (targetCenter <= (candidate.offset + candidate.size).toFloat())
         } ?: return
 
         val draggedIndex = order.indexOfFirst { it.id == draggedId }
@@ -325,6 +318,51 @@ private fun OutletListScreen(
         val item = moved.removeAt(draggedIndex)
         moved.add(targetIndex, item)
         previewOrder = moved
+    }
+
+    // --- Auto-scroll while dragging at edges -------------------------------
+    LaunchedEffect(draggedOutletId) {
+        if (draggedOutletId == null) return@LaunchedEffect
+        while (true) {
+            val layoutInfo = listState.layoutInfo
+            val viewportHeight = layoutInfo.viewportSize.height
+            if (viewportHeight > 0) {
+                val top = draggedStartOffset + draggedDistance
+                val visibleItems = layoutInfo.visibleItemsInfo
+                val draggedInfo = visibleItems.firstOrNull { it.key == draggedOutletId }
+
+                if (draggedInfo != null) {
+                    val bottom = top + draggedInfo.size
+                    // Scroll faster as the finger moves further beyond the threshold.
+                    val scrollAmount = when {
+                        top < thresholdPx -> (top - thresholdPx) / 5f
+                        bottom > viewportHeight - thresholdPx -> (bottom - (viewportHeight - thresholdPx)) / 5f
+                        else -> 0f
+                    }
+
+                    if (scrollAmount != 0f) {
+                        listState.scrollBy(scrollAmount)
+                        updateDragState()
+                    }
+                }
+            }
+            delay(16L) // ~60fps
+        }
+    }
+
+    fun startDrag(outletId: Int) {
+        val info = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == outletId } ?: return
+        previewOrder = filteredOutletsRef.value
+        draggedStartOrder = filteredOutletsRef.value
+        draggedOutletId = outletId
+        draggedStartOffset = info.offset.toFloat()
+        draggedDistance = 0f
+        draggedRenderOffset = 0f
+    }
+
+    fun onDragDelta(deltaY: Float) {
+        draggedDistance += deltaY
+        updateDragState()
     }
 
     fun endDrag() {
@@ -640,7 +678,7 @@ private fun OutletCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = formatToWIB(outlet.created_at).split(" ").firstOrNull() ?: "",
+                    text = formatTimestamp(outlet.created_at).split(" ").firstOrNull() ?: "",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 )

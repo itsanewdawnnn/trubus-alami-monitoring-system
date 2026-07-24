@@ -12,11 +12,9 @@ import com.trubus.tams.data.local.OfflineLocationDao
 import com.trubus.tams.data.model.*
 import com.trubus.tams.util.TrackingHealth
 import com.trubus.tams.util.WibTime
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import retrofit2.Response
 
 /**
@@ -97,7 +95,6 @@ class MemberRepository(
         private const val PREF_LAST_LOC_ACC = "last_loc_acc"
         private const val PREF_LAST_LOC_SPEED = "last_loc_speed"
         private const val PREF_LAST_LOC_TIME = "last_loc_time"
-        private const val PREF_BATTERY_OPT_CARD_DISMISSED = "battery_opt_card_dismissed"
         private const val PREF_SERVICE_HEARTBEAT_AT = "service_heartbeat_at"
 
         private const val DEFAULT_BASE_URL = "https://tams.sbstrans.net/backend/"
@@ -204,7 +201,7 @@ class MemberRepository(
                 longitude = lng,
                 accuracy = prefs.getFloat(PREF_LAST_LOC_ACC, 0f),
                 speed = prefs.getFloat(PREF_LAST_LOC_SPEED, 0f),
-                time = time
+                time = time,
             )
         }
         set(value) {
@@ -226,19 +223,6 @@ class MemberRepository(
                 }
             }
         }
-
-    /**
-     * Manual escape hatch for the battery-optimization card on
-     * MemberDashboard. `PowerManager.isIgnoringBatteryOptimizations()` is the
-     * correct API, but some OEM ROMs (observed on iQOO/Vivo OriginOS) don't
-     * reliably sync its return value with what the user actually granted.
-     * Lets a member who's sure they granted it hide the card manually;
-     * auto-cleared the moment the real check reports true, so it can never
-     * mask a genuine regression.
-     */
-    var batteryOptimizationCardDismissed: Boolean
-        get() = prefs.getBoolean(PREF_BATTERY_OPT_CARD_DISMISSED, false)
-        set(value) = prefs.edit { putBoolean(PREF_BATTERY_OPT_CARD_DISMISSED, value) }
 
     // --- Preferences & Configuration ---
 
@@ -361,23 +345,23 @@ class MemberRepository(
      * separate `errorBody()` read side by side (the second read would
      * always come back empty/closed).
      */
-    private fun parseErrorBody(response: Response<*>, default: String): Pair<String, String?> {
+    private fun parseErrorBody(response: Response<*>, fallbackMessage: String): Pair<String, String?> {
         val raw = try {
             response.errorBody()?.string()
         } catch (_: Exception) {
             null
         }
-        val fallbackMessage = "$default (HTTP ${response.code()})"
+        val defaultMsg = "$fallbackMessage (HTTP ${response.code()})"
         if (raw.isNullOrBlank()) {
-            return fallbackMessage to null
+            return defaultMsg to null
         }
         return try {
             val json = org.json.JSONObject(raw)
-            val message = json.optString("message", "").ifBlank { fallbackMessage }
+            val message = json.optString("message", "").ifBlank { defaultMsg }
             val errorCode = json.optString("error_code", "").ifBlank { null }
             message to errorCode
         } catch (_: Exception) {
-            fallbackMessage to null
+            defaultMsg to null
         }
     }
 

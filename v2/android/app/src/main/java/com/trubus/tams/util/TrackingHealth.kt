@@ -32,7 +32,7 @@ object TrackingHealth {
         (gpsIntervalSeconds * 3_000L).coerceAtLeast(STALE_THRESHOLD_FLOOR_MS)
 
     /**
-     * Milliseconds between [fixTime] ("yyyy-MM-dd HH:mm:ss", WIB -- the same
+     * Milliseconds between [fixTime] ("yyyy-MM-dd HH:mm:ss", GMT+7 -- the same
      * format every recorded_at/lastKnownLocation timestamp in this app uses,
      * see [WibTime]) and now, or null if [fixTime] can't be parsed. Never
      * throws -- an unparseable/legacy value fails safe (treated by callers as
@@ -81,7 +81,7 @@ object TrackingHealth {
     }
 
     /**
-     * Parses a `recorded_at`-shaped timestamp ("yyyy-MM-dd HH:mm:ss", WIB --
+     * Parses a `recorded_at`-shaped timestamp ("yyyy-MM-dd HH:mm:ss", GMT+7 --
      * see [elapsedMillisSince]'s own doc comment) to epoch millis, or null if
      * it can't be parsed. Extracted out of [elapsedMillisSince] so any other
      * caller needing the raw parsed instant -- not an elapsed duration --

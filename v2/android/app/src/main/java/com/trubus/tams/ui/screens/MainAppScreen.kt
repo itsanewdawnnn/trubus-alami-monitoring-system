@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
@@ -74,8 +73,10 @@ import com.trubus.tams.util.TrackingHealth
 import com.trubus.tams.util.WibTime
 import kotlinx.coroutines.delay
 import org.osmdroid.util.GeoPoint
+import java.text.DateFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.time.Duration.Companion.seconds
 
 // --- Shared Design Tokens ---
 // One consistent corner-radius scale for the whole app instead of several
@@ -574,8 +575,6 @@ fun MemberDashboard(viewModel: MainViewModel) {
     val memberTripSummary by viewModel.memberTripSummary.collectAsState()
     val trackingAutoStoppedMessage by viewModel.trackingAutoStoppedMessage.collectAsState()
 
-    var showBackgroundPermissionDialog by remember { mutableStateOf(false) }
-
     // Force Location's ON->OFF auto-revoke: MemberLocationService can stop
     // tracking on its own (see MainViewModel.handleTrackingNotAllowedByService's
     // doc comment) with no button press involved -- this is the one place
@@ -606,7 +605,7 @@ fun MemberDashboard(viewModel: MainViewModel) {
             while (true) {
                 viewModel.refreshLastKnownLocation()
                 nowMillis = System.currentTimeMillis()
-                delay(3000L)
+                delay(3.seconds)
             }
         }
     }
@@ -666,20 +665,7 @@ fun MemberDashboard(viewModel: MainViewModel) {
         onPauseOrDispose {}
     }
 
-    val batteryOptimizationCardDismissed by viewModel.batteryOptimizationCardDismissed.collectAsState()
-
-    // Auto-clear the manual dismiss the instant the real check succeeds --
-    // it only exists to unstick a lagging/misreporting device.
-    LaunchedEffect(isIgnoringBatteryOptimizations) {
-        if (isIgnoringBatteryOptimizations && batteryOptimizationCardDismissed) {
-            viewModel.setBatteryOptimizationCardDismissed(false)
-        }
-    }
-
-    // Bumped when the member returns from the battery-optimization Settings
-    // screen; drives one extra delayed re-check since some OEM ROMs
-    // (observed: iQOO/vivo OriginOS 6) take a moment to propagate a
-    // just-granted exemption. Bounded, one-shot -- not a polling loop.
+    // Bounded, one-shot -- not a polling loop.
     var batteryOptimizationRecheckTrigger by remember { mutableIntStateOf(0) }
     LaunchedEffect(batteryOptimizationRecheckTrigger) {
         if (batteryOptimizationRecheckTrigger > 0) {
@@ -729,6 +715,39 @@ fun MemberDashboard(viewModel: MainViewModel) {
         }
     }
 
+    val backgroundLocationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.requestStartTracking { errorMessage ->
+                errorMessage?.let {
+                    Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                }
+            }
+        } else {
+            // Check if it's actually granted (sometimes the result is false even if the user
+            // granted it in Settings and came back).
+            val check = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (check) {
+                viewModel.requestStartTracking { errorMessage ->
+                    errorMessage?.let {
+                        Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                    }
+                }
+            } else {
+                Toast.makeText(
+                    context,
+                    "Background location permission (Allow all the time) is required to track in the background.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -737,29 +756,18 @@ fun MemberDashboard(viewModel: MainViewModel) {
         
         if (fineGranted || coarseGranted) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val bgGranted = ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-                
-                if (!bgGranted) {
-                    showBackgroundPermissionDialog = true
-                } else {
-                    viewModel.requestStartTracking { errorMessage ->
-                        errorMessage?.let {
-                            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                        }
-                    }
-                }
+                // Directly launch the background permission request (settings on Android 11+)
+                // without an intermediary guidance popup.
+                backgroundLocationPermissionLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
             } else {
                 viewModel.requestStartTracking { errorMessage ->
-                    if (errorMessage != null) {
-                        Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                    errorMessage?.let {
+                        Toast.makeText(context, it, Toast.LENGTH_LONG).show()
                     }
                 }
             }
         } else {
-            Toast.makeText(context, "Location permission is required for the app to work properly.", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Location permission is required for the app to function properly.", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -781,6 +789,17 @@ fun MemberDashboard(viewModel: MainViewModel) {
     // Falls through to location permissions either way -- tracking must
     // still work even if notifications are denied.
     fun beginStartTrackingFlow() {
+        // Final re-check before starting tracking flow.
+        val isOptimized = !isIgnoringBatteryOptimizations(context)
+        
+        if (isOptimized) {
+            Toast.makeText(
+                context,
+                "Battery optimization must be ignored to start tracking. Tap the 'Ignore Battery Optimization' card on your dashboard.",
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val notifGranted = ContextCompat.checkSelfPermission(
                 context,
@@ -846,10 +865,10 @@ fun MemberDashboard(viewModel: MainViewModel) {
         }
 
         // Only shown while there's still something for the member to do.
-        if (!isIgnoringBatteryOptimizations && !batteryOptimizationCardDismissed) {
+        if (!isIgnoringBatteryOptimizations) {
             item {
                 BatteryOptimizationCard(
-                            onRequestExemption = {
+                    onRequestExemption = {
                         try {
                             val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
                                 data = "package:${context.packageName}".toUri()
@@ -858,56 +877,10 @@ fun MemberDashboard(viewModel: MainViewModel) {
                         } catch (e: Exception) {
                             Log.e("MemberDashboard", "Battery optimization intent failed: ${e.message}")
                         }
-                    },
-                    onDismiss = { viewModel.setBatteryOptimizationCardDismissed(true) }
+                    }
                 )
             }
         }
-    }
-
-    if (showBackgroundPermissionDialog) {
-        AlertDialog(
-            onDismissRequest = { showBackgroundPermissionDialog = false },
-            // Matches OverlayCardShape, used by every other floating surface
-            // in the app, instead of Material3's default 28dp dialog shape.
-            shape = OverlayCardShape,
-            title = { Text("Allow Background Location") },
-            text = {
-                Text(
-                    "The app needs 'Allow all the time' location access so location data keeps sending when the app is minimized or the screen is locked.\n\n" +
-                    "Please tap 'Settings', select 'Permissions', then set location to 'Allow all the time'."
-                )
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        showBackgroundPermissionDialog = false
-                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.fromParts("package", context.packageName, null)
-                        }
-                        context.startActivity(intent)
-                    }
-                ) {
-                    Text("SETTINGS")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        showBackgroundPermissionDialog = false
-                        // Makes the requirement explicit instead of a silent
-                        // dead end where START appears to do nothing.
-                        Toast.makeText(
-                            context,
-                            "'Allow all the time' location access is required for location sending to keep running.",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                ) {
-                    Text("CANCEL")
-                }
-            }
-        )
     }
 }
 
@@ -953,7 +926,7 @@ private fun TrackingStatusCard(isTrackingActive: Boolean, onToggleClick: () -> U
                             .clip(RoundedCornerShape(4.dp))
                             // Idle is a normal, expected state, not a problem -- uses a
                             // neutral tone, reserving error/red for things actually wrong.
-                            .background(if (isTrackingActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline)
+                        .background(if (isTrackingActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline)
                     )
                     Text(
                         text = if (isTrackingActive) "Active" else "Inactive",
@@ -1088,11 +1061,11 @@ private fun TripSummaryCard(summary: HistoryResponseDto?) {
                 )
             } else {
                 // Same formatting as Admin's HistoryStatTile, for consistency.
-                val rangeText = "${timeOfDay(summary.start_time)}–${timeOfDay(summary.end_time)}"
+                val rangeText = "${timeOfDay(summary.start_time)}-${timeOfDay(summary.end_time)}"
 
                 DetailRow("Total Distance", "${summary.total_distance_km} km")
                 DetailRow("Duration", summary.duration_formatted)
-                DetailRow("Time Range", "$rangeText WIB")
+                DetailRow("Time Range", "$rangeText GMT+7")
             }
         }
     }
@@ -1104,7 +1077,7 @@ private fun TripSummaryCard(summary: HistoryResponseDto?) {
  * MemberDashboard); this composable is pure UI.
  */
 @Composable
-private fun BatteryOptimizationCard(onRequestExemption: () -> Unit, onDismiss: () -> Unit) {
+private fun BatteryOptimizationCard(onRequestExemption: () -> Unit) {
     Card(
         shape = ContentCardShape,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
@@ -1134,26 +1107,6 @@ private fun BatteryOptimizationCard(onRequestExemption: () -> Unit, onDismiss: (
                 Icon(Icons.Default.BatteryAlert, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Ignore Battery Optimization")
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = "For Xiaomi/Redmi/POCO (MIUI/HyperOS), OPPO/realme (ColorOS), " +
-                        "vivo (FuntouchOS/OriginOS), or Huawei/Honor (EMUI) devices, enable " +
-                        "\"Autostart\" and set battery usage to " +
-                        "\"No restrictions\" so the system doesn't stop " +
-                        "the app while it runs in the background.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            // Escape hatch for the rare case where the automatic check keeps
-            // disagreeing. Low-emphasis text action -- most members never need it.
-            TextButton(
-                onClick = onDismiss,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("I've already granted it, hide this reminder")
             }
         }
     }
@@ -1684,7 +1637,7 @@ private fun ActiveMemberListItem(loc: MemberCurrentLocationDto, onClick: () -> U
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
-                    text = "Last update: ${formatToWIB(loc.updated_at)} WIB",
+                    text = "Last update: ${formatTimestamp(loc.updated_at)} GMT+7",
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -1909,7 +1862,7 @@ fun AdminMapScreen(
                             // at a glance than a lat/lng pair. Keyed on
                             // coordinates rounded to 4 decimals (~11m), backed
                             // by ReverseGeocodingService's cache, so this
-                            // doesn't fire a fresh request on every 5s poll --
+                            // doesn't fire a request on every 5s poll --
                             // only when the rounded position actually changes.
                             var nearbyLabel by remember(loc.user_id) { mutableStateOf<String?>(null) }
                             val roundedLat = loc.latitude?.let { kotlin.math.round(it * 10000.0) }
@@ -1941,10 +1894,10 @@ fun AdminMapScreen(
 
                             HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
 
-                            DetailRow("Latitude", loc.latitude?.toString() ?: "-")
-                            DetailRow("Longitude", loc.longitude?.toString() ?: "-")
-                            DetailRow("GPS Accuracy", if (loc.accuracy != null) "±%.1f m".format(loc.accuracy) else "-")
-                            DetailRow("Last Updated", "${formatToWIB(loc.updated_at)} WIB")
+                DetailRow("Latitude", loc.latitude?.toString() ?: "-")
+                DetailRow("Longitude", loc.longitude?.toString() ?: "-")
+                DetailRow("GPS Accuracy", if (loc.accuracy != null) "+/-%.1f m".format(loc.accuracy) else "-")
+                DetailRow("Last Updated", "${formatTimestamp(loc.updated_at)} GMT+7")
                         }
                     }
                 }
@@ -1989,7 +1942,7 @@ private fun RoutePointDetailCard(point: HistoryPointDto, onClose: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "${formatToWIB(point.recorded_at)} WIB",
+                    text = "${formatTimestamp(point.recorded_at)} GMT+7",
                     fontWeight = FontWeight.Bold,
                     fontSize = 13.sp
                 )
@@ -2024,7 +1977,7 @@ private fun RoutePointDetailCard(point: HistoryPointDto, onClose: () -> Unit) {
 
             DetailRow("Latitude", point.latitude.toString())
             DetailRow("Longitude", point.longitude.toString())
-            DetailRow("GPS Accuracy", "±%.1f m".format(point.accuracy))
+            DetailRow("GPS Accuracy", "+/-%.1f m".format(point.accuracy))
             DetailRow("Status", if (point.is_moving) "Moving" else "Stationary")
         }
     }
@@ -2059,7 +2012,7 @@ private fun HistoryEmptyHint(icon: androidx.compose.ui.graphics.vector.ImageVect
     }
 }
 
-@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminHistoryScreen(viewModel: MainViewModel) {
     val memberList by viewModel.memberList.collectAsState()
@@ -2324,7 +2277,7 @@ fun AdminHistoryScreen(viewModel: MainViewModel) {
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    OsmMap(
+                OsmMap(
                         modifier = Modifier.fillMaxSize(),
                         routePoints = routePoints,
                         routeGapAfterIndices = gapIndices,
@@ -2498,6 +2451,20 @@ private fun SimpleMonthCalendar(
     }
     val todayKey = remember { WibTime.today() }
 
+    val dayNames = remember {
+        val symbols = DateFormatSymbols.getInstance(Locale.US)
+        val shortWeekdays = symbols.shortWeekdays
+        listOf(
+            shortWeekdays[Calendar.MONDAY],
+            shortWeekdays[Calendar.TUESDAY],
+            shortWeekdays[Calendar.WEDNESDAY],
+            shortWeekdays[Calendar.THURSDAY],
+            shortWeekdays[Calendar.FRIDAY],
+            shortWeekdays[Calendar.SATURDAY],
+            shortWeekdays[Calendar.SUNDAY]
+        )
+    }
+
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -2524,7 +2491,7 @@ private fun SimpleMonthCalendar(
         }
 
         Row(modifier = Modifier.fillMaxWidth()) {
-            listOf("Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min").forEach { label ->
+            dayNames.forEach { label ->
                 Text(
                     text = label,
                     modifier = Modifier.weight(1f),
@@ -2608,22 +2575,20 @@ private fun monthTitleLabel(yearMonth: String): String {
         clear()
         set(year, month - 1, 1)
     }
-    val indonesian = Locale.Builder().setLanguage("id").setRegion("ID").build()
-    return SimpleDateFormat("MMMM yyyy", indonesian).apply { timeZone = WibTime.ZONE }.format(cal.time)
+    return SimpleDateFormat("MMMM yyyy", Locale.US).apply { timeZone = WibTime.ZONE }.format(cal.time)
 }
 
 /**
  * Formats a "yyyy-MM-dd" date key (as stored/queried) into a compact,
- * human-friendly Indonesian label for display, e.g. "07 Jul 2026". Falls
+ * human-friendly label for display, e.g. "07 Jul 2026". Falls
  * back to the raw string if it doesn't parse, so a malformed value never
  * disappears from the UI.
  */
 private fun formatDateDisplay(dateKey: String): String {
     return try {
         val date = WibTime.formatter("yyyy-MM-dd").parse(dateKey) ?: return dateKey
-        val indonesian = Locale.Builder().setLanguage("id").setRegion("ID").build()
-        SimpleDateFormat("dd MMM yyyy", indonesian).apply { timeZone = WibTime.ZONE }.format(date)
-    } catch (e: Exception) {
+        SimpleDateFormat("dd MMM yyyy", Locale.US).apply { timeZone = WibTime.ZONE }.format(date)
+    } catch (_: Exception) {
         dateKey
     }
 }
@@ -2678,7 +2643,7 @@ private fun HistoryStatsCard(stats: HistoryResponseDto, dateLabel: String) {
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Total Distance · $dateLabel",
+                        text = "Total Distance / $dateLabel",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1
@@ -2707,7 +2672,7 @@ private fun HistoryStatsCard(stats: HistoryResponseDto, dateLabel: String) {
                 HistoryStatTile(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Outlined.AccessTime,
-                    value = "${timeOfDay(stats.start_time)}–${timeOfDay(stats.end_time)}",
+                    value = "${timeOfDay(stats.start_time)}-${timeOfDay(stats.end_time)}",
                     label = "Time Range"
                 )
             }
@@ -2787,13 +2752,13 @@ private fun DetailRow(label: String, value: String, valueColor: Color = Material
  */
 fun movementSnippet(loc: MemberCurrentLocationDto): String {
     return when {
-        loc.status != "active" -> "OFFLINE (last update ${formatToWIB(loc.updated_at)})"
+        loc.status != "active" -> "OFFLINE (last update ${formatTimestamp(loc.updated_at)} GMT+7)"
         loc.is_moving -> "ACTIVE - Moving"
         else -> "ACTIVE - Stationary"
     }
 }
 
-// Every timestamp the backend stores/returns is already WIB wall-clock time
+// Every timestamp the backend stores/returns is already GMT+7 wall-clock time
 // (backend/config.php sets Asia/Jakarta as the default timezone), and the
 // Member app formats its own GPS timestamps in Asia/Jakarta too -- nothing
 // in this system ever transmits UTC. Both parser and formatter must use the
@@ -2835,17 +2800,17 @@ private fun computeHistoryGapIndices(points: List<HistoryPointDto>): Set<Int> {
 }
 
 /**
- * Validates a "yyyy-MM-dd HH:mm:ss" WIB timestamp for display, falling back
+ * Validates a "yyyy-MM-dd HH:mm:ss" timestamp for display, falling back
  * to the raw string if it doesn't parse, or "-" if there's nothing to show.
  * Parses once purely to validate rather than parsing and reformatting with
  * an identical pattern, which would just be a wasted round trip.
  */
-fun formatToWIB(wibTimeString: String?): String {
-    if (wibTimeString == null) return "-"
+fun formatTimestamp(timestampString: String?): String {
+    if (timestampString == null) return "-"
     return try {
-        WibTime.formatter("yyyy-MM-dd HH:mm:ss").parse(wibTimeString)
-        wibTimeString
+        WibTime.formatter("yyyy-MM-dd HH:mm:ss").parse(timestampString)
+        timestampString
     } catch (_: Exception) {
-        wibTimeString
+        timestampString
     }
 }
