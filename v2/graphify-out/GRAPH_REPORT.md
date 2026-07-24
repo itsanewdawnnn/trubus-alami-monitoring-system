@@ -1,11 +1,11 @@
 # Graph Report - v2  (2026-07-24)
 
 ## Corpus Check
-- 99 files · ~125,419 words
+- 98 files · ~123,770 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 671 nodes · 1104 edges · 80 communities (71 shown, 9 thin omitted)
+- 659 nodes · 1091 edges · 80 communities (71 shown, 9 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 25 edges (avg confidence: 0.74)
 - Token cost: 0 input · 0 output
 
@@ -92,8 +92,8 @@ Cohesion: 0.11
 Nodes (40): HistoryPointDto, HistoryResponseDto, MemberCurrentLocationDto, ActiveMemberListItem(), ActiveMemberScreen(), AdminDashboard(), AdminHistoryScreen(), AdminMapScreen() (+32 more)
 
 ### Community 4 - "TAMS Web"
-Cohesion: 0.05
-Nodes (36): App workflow, Architecture & Reliability Principles, Background Tracking Reliability, Building & Running, Folder structure, Package layout (`app/src/main/java/com/trubus/tams/`), Remote Management, TAMS Android (+28 more)
+Cohesion: 0.07
+Nodes (25): App workflow, Architecture & Reliability Principles, Background Tracking Reliability, Folder structure, Package layout (`app/src/main/java/com/trubus/tams/`), Remote Management, TAMS Android, Troubleshooting (+17 more)
 
 ### Community 5 - "MemberRepository"
 Cohesion: 0.12
@@ -180,7 +180,7 @@ Cohesion: 0.83
 Nodes (3): gradlew script, die(), warn()
 
 ## Knowledge Gaps
-- **31 isolated node(s):** `None`, `Overview`, `Project structure`, `How Android and Web relate`, `Technology stack` (+26 more)
+- **21 isolated node(s):** `None`, `Package layout (`app/src/main/java/com/trubus/tams/`)`, `Architecture & Reliability Principles`, `App workflow`, `Remote Management` (+16 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -188,13 +188,13 @@ Nodes (3): gradlew script, die(), warn()
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `MemberRepository` connect `MemberRepository` to `ApiResponse`, `MainViewModel`, `MemberLocationService`, `FakeOfflineLocationDao`, `MemberRepositoryTest`?**
-  _High betweenness centrality (0.119) - this node is a cross-community bridge._
+  _High betweenness centrality (0.123) - this node is a cross-community bridge._
 - **Why does `MainViewModel` connect `MainViewModel` to `MemberRepository`, `MainAppScreen.kt`, `OutletScreen.kt`, `UpdateManager`?**
-  _High betweenness centrality (0.113) - this node is a cross-community bridge._
+  _High betweenness centrality (0.118) - this node is a cross-community bridge._
 - **Why does `UserDto` connect `MemberRepository` to `ApiResponse`, `MainViewModel`, `MainAppScreen.kt`?**
-  _High betweenness centrality (0.049) - this node is a cross-community bridge._
-- **What connects `None`, `Overview`, `Project structure` to the rest of the system?**
-  _31 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _High betweenness centrality (0.051) - this node is a cross-community bridge._
+- **What connects `None`, `Package layout (`app/src/main/java/com/trubus/tams/`)`, `Architecture & Reliability Principles` to the rest of the system?**
+  _21 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `ApiResponse` be split into smaller, more focused modules?**
   _Cohesion score 0.11312217194570136 - nodes in this community are weakly interconnected._
 - **Should `MainViewModel` be split into smaller, more focused modules?**
