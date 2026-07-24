@@ -95,7 +95,7 @@ class ApkDownloadManager(private val context: Context) {
         var lastError: String? = null
         var succeeded = false
 
-        while (attempt < MAX_ATTEMPTS && !succeeded) {
+        while (attempt < MAX_ATTEMPTS && (!succeeded)) {
             attempt++
             var call: Call? = null
             try {

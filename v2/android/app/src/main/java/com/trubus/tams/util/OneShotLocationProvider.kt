@@ -18,7 +18,7 @@ import kotlin.coroutines.resume
  * foreground Service's own tracking lifecycle; this is for callers that just
  * need one coordinate right now and then stop.
  *
- * Originally private to [com.trubus.tams.ui.screens.OutletScreen]'s "Use
+ * Originally private to `com.trubus.tams.ui.screens.OutletScreen`'s "Use
  * Current Location" button; extracted here unchanged so
  * [com.trubus.tams.worker.LocationSyncWorker] can reuse the exact same
  * implementation for its stale-fix stopgap instead of duplicating it -- see
@@ -54,7 +54,7 @@ object OneShotLocationProvider {
                     .addOnFailureListener {
                         if (continuation.isActive) continuation.resume(null)
                     }
-            } catch (e: SecurityException) {
+            } catch (_: SecurityException) {
                 // Permission revoked between the check above and this call --
                 // narrow enough a race that failing closed (null) is correct.
                 if (continuation.isActive) continuation.resume(null)

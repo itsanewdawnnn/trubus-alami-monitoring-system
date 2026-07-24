@@ -74,9 +74,9 @@ private val UpdateFlowState.versionInfo: VersionInfoDto?
  * only thing visible, which was the original bypass this whole flow now
  * closes structurally (see MainAppScreen's isForced-gated content).
  *
- * A force update's dialog has no dismiss path at all: [onDismissRequest] is
+ * A force update's dialog has no dismiss path at all: `onDismissRequest` is
  * only wired to the backdrop/back-press when [UpdateFlowState.isForced] is
- * false, and the Later button is never rendered for a forced update -- the
+ * false, and the Later button (which calls `onLaterClick`) is never
  * rest of the app underneath stays inert the whole time since Compose's
  * Dialog already captures all touch input while it's on screen (and, as of
  * this dialog's ReadyToInstall handling above, MainAppScreen's structural
@@ -89,10 +89,10 @@ fun UpdateDialog(
     onUpdateClick: () -> Unit,
     onRetryClick: () -> Unit,
     onOpenSettingsClick: () -> Unit,
-    onInstallClick: () -> Unit
+    onInstallClick: () -> Unit,
 ) {
     if (state is UpdateFlowState.None) return
-    if (state is UpdateFlowState.ReadyToInstall && !state.isForced) return
+    if (state is UpdateFlowState.ReadyToInstall && (!state.isForced)) return
 
     val info = state.versionInfo ?: return
     val forced = state.isForced

@@ -14,15 +14,14 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import androidx.core.location.GnssStatusCompat
 import androidx.core.location.LocationCompat
 import androidx.core.location.LocationManagerCompat
-import com.trubus.tams.R
 import com.trubus.tams.data.repository.ActivityLogRepository
 import com.trubus.tams.data.repository.MemberRepository
 import com.trubus.tams.data.repository.RemoteConfigRepository
 import com.trubus.tams.util.TrackingHealth
+import com.trubus.tams.util.WibTime
 import com.google.android.gms.location.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -32,7 +31,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
-import java.text.SimpleDateFormat
 import java.util.*
 
 class MemberLocationService : Service() {
@@ -83,15 +81,6 @@ class MemberLocationService : Service() {
     @Volatile
     private var lastGnssStatusElapsedRealtimeMs: Long = 0L
 
-    // Reused across every fix instead of constructing a new SimpleDateFormat
-    // per callback -- fixes arrive every 10-15s for hours at a stretch, so
-    // that allocation adds up on low-end devices. Safe to share because
-    // onLocationResult always runs on the main looper (see
-    // Looper.getMainLooper() below) -- only one thread ever touches it.
-    private val recordedAtFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).apply {
-        timeZone = TimeZone.getTimeZone("Asia/Jakarta")
-    }
-
     // SystemClock.elapsedRealtime() (survives deep sleep, unaffected by clock
     // changes) of the last real GPS fix delivered to onLocationResult. Used
     // by the staleness watchdog below to detect a case LocationSyncWorker's
@@ -102,6 +91,13 @@ class MemberLocationService : Service() {
     private var lastFixElapsedRealtimeMs: Long = 0L
 
     private var stalenessWatchdogJob: Job? = null
+
+    // Dedicated thread for location callbacks to avoid blocking the main thread.
+    private var locationHandlerThread: android.os.HandlerThread? = null
+
+    // Dedicated executor for GNSS status updates to keep the main thread
+    // responsive on low-end devices. Satellite status can fire every second.
+    private val gnssExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
 
     // Held only for the few seconds it takes to hand a fresh fix to the
     // network. Play services already wakes the CPU briefly to deliver the
@@ -177,14 +173,18 @@ class MemberLocationService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        locationHandlerThread = android.os.HandlerThread(
+            "LocationCallbacks",
+            android.os.Process.THREAD_PRIORITY_FOREGROUND
+        ).apply { start() }
         repository = MemberRepository(applicationContext)
         remoteConfigRepository = RemoteConfigRepository(applicationContext) { repository.baseUrl }
         activityLogRepository = ActivityLogRepository(
             baseUrlProvider = { repository.baseUrl },
-            tokenProvider = { repository.authToken }
+            tokenProvider = { repository.authToken },
         )
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         createNotificationChannel()
 
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -249,8 +249,8 @@ class MemberLocationService : Service() {
     }
 
     private fun hasLocationPermission(): Boolean {
-        return ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        return (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) ||
+            (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
     }
 
     /**
@@ -355,14 +355,16 @@ class MemberLocationService : Service() {
 
         // Just a state statement, not a status dashboard -- exists only
         // because Android requires a foreground service to show one.
-        // Per-fix details are shown on the member's own dashboard instead.
+        // Priority DEFAULT instead of MIN/LOW to ensure the OS treats this as a
+        // real active task and keeps it visible on the lock screen/shade,
+        // which helps prevent Low Memory Kills on RAM-constrained devices.
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("TAMS - Trubus Alami Monitoring System")
             .setContentText("System runtime and dependencies are operating normally.")
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
-            .setPriority(NotificationCompat.PRIORITY_MIN)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setShowWhen(false)
             .build()
@@ -374,30 +376,32 @@ class MemberLocationService : Service() {
     private fun startLocationTracking() = synchronized(this) {
         if (locationCallback != null) return@synchronized // Already tracking
 
-        // Balanced-power interval, tunable via Remote Management (default
-        // 15s target / 10s fastest-if-available) without a new APK build --
-        // see RemoteConfigRepository.gpsIntervalSeconds. A tighter interval
-        // than the default was evaluated and reverted -- it triples the GPS
-        // chip's duty cycle and upload count, a real battery cost this app's
-        // low-end-device priority doesn't justify; an Administrator who still
-        // wants tighter tracking can lower this from the Admin Panel.
         val intervalMs = remoteConfigRepository.gpsIntervalSeconds * 1000L
-        // Fastest-if-available stays 5s ahead of the target, same absolute
-        // gap as the original 15s/10s default, floored at 1s so a very short
-        // configured interval never produces a zero/negative value.
         val fastestIntervalMs = (intervalMs - 5000L).coerceAtLeast(1000L)
+        
+        // Reliability-First: tighter delivery delay. While batching saves
+        // battery, delivering sooner ensures coordinates reach disk WAL 
+        // quickly, reducing loss risk during abrupt process death.
+        val maxWaitTimeMs = intervalMs
+
         val locationRequest = LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY,
             intervalMs
         ).apply {
             setMinUpdateIntervalMillis(fastestIntervalMs)
-            setWaitForAccurateLocation(false)
+            setMaxUpdateDelayMillis(maxWaitTimeMs)
+            // Reliability-First: Wait for accurate location. In Indonesian
+            // urban/canyon environments, wait-for-accuracy significantly
+            // reduces discarded fixes and "zig-zag" effects.
+            setWaitForAccurateLocation(true)
         }.build()
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
-                val lastLocation = locationResult.lastLocation ?: return
-                handleNewLocation(lastLocation)
+                // Process ALL locations in the result.
+                locationResult.locations.forEach { location ->
+                    handleNewLocation(location)
+                }
             }
 
             override fun onLocationAvailability(availability: LocationAvailability) {
@@ -436,10 +440,15 @@ class MemberLocationService : Service() {
         }
 
         try {
+            // Re-arm the staleness clock and heartbeat immediately.
+            lastFixElapsedRealtimeMs = SystemClock.elapsedRealtime()
+            repository.serviceHeartbeatAt = SystemClock.elapsedRealtime()
+
+            val looper = locationHandlerThread?.looper ?: Looper.getMainLooper()
             fusedLocationClient.requestLocationUpdates(
                 locationRequest,
                 locationCallback!!,
-                Looper.getMainLooper()
+                looper
             )
             Log.d(TAG, "Requested location updates successfully.")
             // Start the staleness clock now, not only when a fix arrives, so
@@ -498,6 +507,12 @@ class MemberLocationService : Service() {
                 // either way since `delay` at the top starts the next
                 // iteration regardless of what happened in this one.
                 try {
+                    // Holding a brief wake lock for the heartbeat and staleness
+                    // check ensures the loop isn't suspended by Doze/Deep-Sleep
+                    // mid-iteration, which would delay the recovery action.
+                    // 15s ensures even the slowest I/O on 2GB devices completes.
+                    wakeLock?.acquire(15000L)
+
                     // Refreshed on every tick (roughly every 30s) for as
                     // long as this loop keeps running -- proof by itself
                     // that the service process and its coroutine scope are
@@ -546,6 +561,10 @@ class MemberLocationService : Service() {
                     throw e
                 } catch (e: Exception) {
                     Log.e(TAG, "Staleness watchdog pass failed: ${e.message}")
+                } finally {
+                    if (wakeLock?.isHeld == true) {
+                        wakeLock?.release()
+                    }
                 }
             }
         }
@@ -595,20 +614,17 @@ class MemberLocationService : Service() {
                 null // No sufficiently-recent GNSS status reading -- unknown, not zero.
             }
 
-        // "Stale" means the GPS subscription stopped producing callbacks, not
-        // "the last send failed" -- reaching this function at all proves it's alive.
+        // Stale-check and heartbeat update on every delivered fix.
         lastFixElapsedRealtimeMs = SystemClock.elapsedRealtime()
         repository.serviceHeartbeatAt = SystemClock.elapsedRealtime()
 
-        // See TrackingHealth.MAX_USABLE_ACCURACY_M's doc comment. Common
-        // right after Start while the GPS chip is still acquiring
-        // satellites; the next fixes typically improve on their own.
         if (accuracy > TrackingHealth.MAX_USABLE_ACCURACY_M) {
             Log.d(TAG, "Discarding fix with unusable accuracy: ${accuracy}m (Lat $lat, Lng $lng)")
             return
         }
 
-        val timeStr = recordedAtFormat.format(Date(location.time))
+        // Use thread-safe WibTime formatter instead of shared instance.
+        val timeStr = WibTime.formatter("yyyy-MM-dd HH:mm:ss").format(Date(location.time))
 
         Log.d(TAG, "New coordinates: Lat $lat, Lng $lng, Acc $accuracy, Time $timeStr")
 
@@ -620,7 +636,12 @@ class MemberLocationService : Service() {
 
         serviceScope.launch {
             try {
-                val result = repository.postLocation(lat, lng, accuracy, speed, timeStr, isMockLocation, gnssSatellitesUsed)
+                val result = repository.postLocation(
+                    lat, lng, accuracy, speed, timeStr,
+                    recordedAtMillis = location.time,
+                    isMock = isMockLocation,
+                    gnssSatellitesUsed = gnssSatellitesUsed
+                )
 
                 val isSuccess = result.isSuccess
                 val rejection = result.exceptionOrNull()
@@ -723,6 +744,7 @@ class MemberLocationService : Service() {
      * of spoofing. Called from within [startLocationTracking]'s own
      * synchronized(this) block, so no separate locking is needed here.
      */
+    @android.annotation.SuppressLint("MissingPermission")
     private fun registerGnssStatusCallback() {
         if (gnssStatusCallback != null) return // Already registered.
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -741,7 +763,7 @@ class MemberLocationService : Service() {
         try {
             LocationManagerCompat.registerGnssStatusCallback(
                 locationManager,
-                ContextCompat.getMainExecutor(this),
+                gnssExecutor,
                 callback
             )
             gnssStatusCallback = callback
@@ -947,6 +969,8 @@ class MemberLocationService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         removeLocationUpdates()
+        locationHandlerThread?.quitSafely()
+        gnssExecutor.shutdown()
         // Best-effort only: unlike ACTION_STOP, onDestroy() offers no
         // guarantee of extra run time, so this fires without awaiting it.
         // Deliberately NOT serviceScope: serviceJob.cancel() below would

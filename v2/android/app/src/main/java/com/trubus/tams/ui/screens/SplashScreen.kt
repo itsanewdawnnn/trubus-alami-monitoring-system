@@ -36,7 +36,7 @@ fun SplashScreen() {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFFDFDFD)),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo_splash),

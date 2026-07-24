@@ -45,7 +45,7 @@ private class UnitJsonAdapter : JsonAdapter<Unit>() {
 interface ApiService {
     @POST("api.php?route=/auth/login")
     suspend fun login(
-        @Body body: Map<String, String>
+        @Body body: Map<String, String>,
     ): Response<ApiResponse<LoginData>>
 
     @POST("api.php?route=/auth/logout")
@@ -135,6 +135,16 @@ interface ApiService {
 
     @POST("api.php?route=/outlet/delete")
     suspend fun deleteOutlet(
+        @Body body: Map<String, @JvmSuppressWildcards Any>
+    ): Response<ApiResponse<Unit>>
+
+    // Persists the Member's own manual sort order for their outlet list (both
+    // self-created and Admin-assigned outlets they can see) -- see
+    // MemberRepository.reorderOutlets's own doc comment and backend/api.php's
+    // /outlet/reorder route comment for why this is scoped by member_id, not
+    // created_by_user_id, unlike update/delete above.
+    @POST("api.php?route=/outlet/reorder")
+    suspend fun reorderOutlets(
         @Body body: Map<String, @JvmSuppressWildcards Any>
     ): Response<ApiResponse<Unit>>
 

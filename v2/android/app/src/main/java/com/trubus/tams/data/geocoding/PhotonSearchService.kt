@@ -59,65 +59,54 @@ object PhotonSearchService : ForwardGeocodingProvider {
      * own doc comment for why. [AddressSearchService] is what decides whether
      * to try this provider at all.
      */
-    override suspend fun search(query: String): List<AddressSearchResult> {
+    override suspend fun search(query: String): List<AddressSearchResult> = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
         val trimmed = query.trim()
-        if (trimmed.length < MIN_QUERY_LENGTH) return emptyList()
+        if (trimmed.length < MIN_QUERY_LENGTH) return@withContext emptyList()
 
         val url = "https://photon.komoot.io/api/" +
             "?q=${URLEncoder.encode(trimmed, "UTF-8")}" +
             "&limit=$MAX_RESULTS" +
-            // Same Indonesia scoping as NominatimSearchService, in Photon's
-            // own param shape: singular "countrycode", ISO 3166-1 alpha-2,
-            // uppercase (Nominatim's &countrycodes=id is lowercase and its
-            // own separate param name -- the two APIs are not wire-compatible).
             "&countrycode=ID"
         val request = Request.Builder()
             .url(url)
-            // Same courtesy header Nominatim's usage policy requires --
-            // applied here too since Komoot's demo server asks for
-            // "reasonable" use, and an identifiable client is part of that.
             .header("User-Agent", "TAMS-TrubusAlamiMonitoring/1.0")
             .build()
 
-        // Same suspendCancellableCoroutine + Call.enqueue pattern as
-        // NominatimSearchService.search -- see that function's own doc
-        // comment for why (aborts the in-flight HTTP call on cancellation
-        // instead of leaving it running for nothing).
-        val results = suspendCancellableCoroutine<List<AddressSearchResult>> { continuation ->
+        suspendCancellableCoroutine { continuation ->
             val call = client.newCall(request)
             continuation.invokeOnCancellation { call.cancel() }
-            call.enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    if (call.isCanceled()) return
-                    Log.w(TAG, "Address search (fallback) failed: ${e.message}")
-                    continuation.resume(emptyList())
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    response.use {
-                        if (!it.isSuccessful) {
-                            Log.w(TAG, "Address search (fallback) HTTP ${it.code}")
-                            continuation.resume(emptyList())
-                            return
-                        }
-                        val body = it.body?.string()
-                        if (body == null) {
-                            continuation.resume(emptyList())
-                            return
-                        }
-                        val parsed = try {
-                            parseResults(body)
-                        } catch (e: org.json.JSONException) {
-                            Log.w(TAG, "Address search (fallback): malformed JSON response")
-                            emptyList()
-                        }
-                        continuation.resume(parsed)
+            call.enqueue(
+                object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        if (call.isCanceled()) return
+                        Log.w(TAG, "Address search (fallback) failed: ${e.message}")
+                        continuation.resume(emptyList())
                     }
-                }
-            })
-        }
 
-        return results
+                    override fun onResponse(call: Call, response: Response) {
+                        response.use {
+                            if (!it.isSuccessful) {
+                                Log.w(TAG, "Address search (fallback) HTTP ${it.code}")
+                                continuation.resume(emptyList())
+                                return
+                            }
+                            val body = it.body?.string()
+                            if (body == null) {
+                                continuation.resume(emptyList())
+                                return
+                            }
+                            val parsed = try {
+                                parseResults(body)
+                            } catch (_: org.json.JSONException) {
+                                Log.w(TAG, "Address search (fallback): malformed JSON response")
+                                emptyList()
+                            }
+                            continuation.resume(parsed)
+                        }
+                    }
+                },
+            )
+        }
     }
 
     /**
@@ -163,6 +152,7 @@ object PhotonSearchService : ForwardGeocodingProvider {
         val state = properties.optString("state", "").trim()
         val country = properties.optString("country", "").trim()
         return listOf(name, streetLine, city, state, country)
+            .asSequence()
             .filter { it.isNotEmpty() }
             .distinct()
             .joinToString(", ")

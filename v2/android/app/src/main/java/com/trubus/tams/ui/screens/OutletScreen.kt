@@ -10,9 +10,11 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -26,16 +28,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.trubus.tams.data.geocoding.AddressSearchResult
 import com.trubus.tams.data.geocoding.AddressSearchService
 import com.trubus.tams.data.geocoding.ReverseGeocodingService
@@ -150,7 +156,14 @@ fun MemberOutletScreen(viewModel: MainViewModel) {
                 viewModel.deleteOutlet(outlet.id) { _, message ->
                     Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                 }
-            }
+            },
+            onReorder = { orderedIds ->
+                viewModel.reorderOutlets(orderedIds) { success, message ->
+                    if (!success) {
+                        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                    }
+                }
+            },
         )
         OUTLET_VIEW_FORM -> OutletFormScreen(
             viewModel = viewModel,
@@ -170,15 +183,171 @@ private fun OutletListScreen(
     onRefresh: () -> Unit,
     onAddClick: () -> Unit,
     onEditClick: (OutletDto) -> Unit,
-    onDeleteConfirmed: (OutletDto) -> Unit
+    onDeleteConfirmed: (OutletDto) -> Unit,
+    onReorder: (List<Int>) -> Unit
 ) {
     var pendingDelete by remember { mutableStateOf<OutletDto?>(null) }
+
+    // --- Search (Member's own outlet list) ---------------------------------
+    // Pure client-side filter over the already-fetched [outlets] -- no
+    // separate search endpoint or server round trip, since a Member's own
+    // outlet list is small enough that filtering it in memory is instant.
+    // Purpose (per the feature request this was built for): a Member with
+    // many registered outlets can quickly check whether one they're about
+    // to (re-)register already exists, before tapping Add and duplicating
+    // it. Matches name OR address, case-insensitively.
+    var searchQuery by remember { mutableStateOf("") }
+    val filteredOutlets = remember(outlets, searchQuery) {
+        val trimmed = searchQuery.trim()
+        if (trimmed.isEmpty()) {
+            outlets
+        } else {
+            outlets.filter {
+                it.name.contains(trimmed, ignoreCase = true) || it.address.contains(trimmed, ignoreCase = true)
+            }
+        }
+    }
+    // Refreshed every recomposition so a drag gesture that started a while
+    // ago (see startDrag below) always snapshots the CURRENT list, never a
+    // stale one captured back when this composable's pointerInput block was
+    // first constructed -- same "ref updated unconditionally every
+    // recomposition" pattern OutletMapPicker's onCenterChangedRef already
+    // uses further down in this file, and for the identical reason.
+    val filteredOutletsRef = remember { mutableStateOf(filteredOutlets) }
+    filteredOutletsRef.value = filteredOutlets
+
+    // --- Drag-to-reorder (handle icon only -- see OutletCard) ---------------
+    // Persists to the server via onReorder (MainViewModel.reorderOutlets)
+    // once the gesture ends. Deliberately disabled while a search is active:
+    // dragging within a FILTERED subset would leave every hidden (filtered-
+    // out) outlet's own position ambiguous, so reordering only ever
+    // operates on the Member's full, unfiltered list -- clear the search
+    // first. Also disabled while a fetch is in flight, so a server refresh
+    // landing mid-drag can never race the gesture's own in-progress edits.
+    val reorderEnabled = searchQuery.isBlank() && !loading
+    val listState = rememberLazyListState()
+    var draggedOutletId by remember { mutableStateOf<Int?>(null) }
+    // Fixed the instant the drag starts: this item's own rest offset (px,
+    // LazyColumn's own coordinate space) at that moment. Deliberately never
+    // adjusted after a swap -- see onDragDelta's own comment below for why
+    // recomputing "current finger target" from this FIXED reference point
+    // plus the raw cumulative drag distance is what keeps the item locked to
+    // the finger smoothly across any number of swaps, instead of drifting.
+    var draggedStartOffset by remember { mutableFloatStateOf(0f) }
+    var draggedDistance by remember { mutableFloatStateOf(0f) }
+    // The actual graphicsLayer translationY applied to the dragged card.
+    // NOT the same as draggedDistance: once at least one swap has happened,
+    // the dragged item's own rest position (from LazyColumn's key-based
+    // placement) has moved by one item's worth of space, so drawing it at
+    // the raw finger delta would leave it visibly off by that same amount.
+    // This is recomputed every onDragDelta call as
+    // (fixed target position) - (item's current measured rest position),
+    // which is what actually keeps the card glued to the finger across any
+    // number of swaps -- see onDragDelta for the derivation.
+    var draggedRenderOffset by remember { mutableFloatStateOf(0f) }
+    // Snapshot of the order at drag-start, kept only to detect a no-op drag
+    // (finger pressed and released with no net reordering) so we don't fire
+    // a pointless save to the server in endDrag().
+    var draggedStartOrder by remember { mutableStateOf<List<OutletDto>?>(null) }
+    // Non-null only for the duration of an active drag -- a full snapshot of
+    // [filteredOutletsRef]'s value at drag-start, mutated in place (via swaps)
+    // as the finger moves, and handed to onReorder once the drag ends.
+    var previewOrder by remember { mutableStateOf<List<OutletDto>?>(null) }
+    val displayList = previewOrder ?: filteredOutlets
+
+    // If reordering becomes disabled mid-gesture (e.g. a refresh starts, or
+    // in principle a second finger edits the search box while the first is
+    // still dragging), the drag handle Icon is removed from composition,
+    // which cancels its pointerInput coroutine WITHOUT invoking onDragEnd/
+    // onDragCancel. Without this, previewOrder/draggedOutletId would be
+    // left stuck forever, permanently overriding displayList with a stale
+    // mid-drag snapshot. This guarantees drag state always resets, even
+    // when the gesture is interrupted rather than deliberately finished.
+    LaunchedEffect(reorderEnabled) {
+        if (!reorderEnabled) {
+            draggedOutletId = null
+            draggedDistance = 0f
+            draggedRenderOffset = 0f
+            previewOrder = null
+            draggedStartOrder = null
+        }
+    }
+
+    fun startDrag(outletId: Int) {
+        val info = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == outletId } ?: return
+        previewOrder = filteredOutletsRef.value
+        draggedStartOrder = filteredOutletsRef.value
+        draggedOutletId = outletId
+        draggedStartOffset = info.offset.toFloat()
+        draggedDistance = 0f
+        draggedRenderOffset = 0f
+    }
+
+    fun onDragDelta(deltaY: Float) {
+        val order = previewOrder ?: return
+        val draggedId = draggedOutletId ?: return
+        draggedDistance += deltaY
+
+        val visibleItems = listState.layoutInfo.visibleItemsInfo
+        val draggedInfo = visibleItems.firstOrNull { it.key == draggedId } ?: return
+        // Fixed reference frame (draggedStartOffset) plus the total raw
+        // finger movement since drag-start -- recomputed fresh every call,
+        // never incrementally adjusted, so this stays correct regardless of
+        // how many swaps have already happened.
+        val targetTop = draggedStartOffset + draggedDistance
+        // draggedInfo.offset reflects the item's rest position as of the
+        // last measured frame -- which already accounts for any prior swap,
+        // since LazyColumn repositions items to their new key-based slot as
+        // soon as previewOrder changes. Subtracting it from targetTop yields
+        // exactly the extra translation needed to land the card at the
+        // finger's target position, regardless of how far its own rest slot
+        // has shifted so far this gesture.
+        draggedRenderOffset = targetTop - draggedInfo.offset.toFloat()
+        val targetCenter = targetTop + (draggedInfo.size / 2f)
+
+        // At most one swap per call -- visibleItemsInfo reflects only the
+        // LAST MEASURED frame, so re-checking again within this same call
+        // (after mutating previewOrder) would still see the pre-swap
+        // layout and could swap the same pair back and forth. Subsequent
+        // onDrag callbacks (fired continuously while the finger moves) pick
+        // up any remaining distance on their own next call instead.
+        val swapTarget = visibleItems.firstOrNull { candidate ->
+            candidate.key != draggedId &&
+                targetCenter >= candidate.offset.toFloat() &&
+                targetCenter <= (candidate.offset + candidate.size).toFloat()
+        } ?: return
+
+        val draggedIndex = order.indexOfFirst { it.id == draggedId }
+        val targetIndex = order.indexOfFirst { it.id == swapTarget.key }
+        if (draggedIndex < 0 || targetIndex < 0 || draggedIndex == targetIndex) return
+
+        val moved = order.toMutableList()
+        val item = moved.removeAt(draggedIndex)
+        moved.add(targetIndex, item)
+        previewOrder = moved
+    }
+
+    fun endDrag() {
+        val finalOrder = previewOrder
+        val startOrder = draggedStartOrder
+        draggedOutletId = null
+        draggedDistance = 0f
+        draggedRenderOffset = 0f
+        previewOrder = null
+        draggedStartOrder = null
+        // Skip the network round-trip entirely if the drag ended exactly
+        // where it started (e.g. a tap-and-release, or a single-outlet list
+        // where no swap target ever exists) -- nothing actually changed.
+        if (finalOrder != null && finalOrder.map { it.id } != startOrder?.map { it.id }) {
+            onReorder(finalOrder.map { it.id })
+        }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -191,19 +360,50 @@ private fun OutletListScreen(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onRefresh, modifier = Modifier.size(40.dp)) {
+                IconButton(onClick = onRefresh, modifier = Modifier.size(36.dp)) {
                     if (loading) {
                         CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                     } else {
-                        Icon(Icons.Default.Refresh, contentDescription = "Reload outlets")
+                        Icon(Icons.Default.Refresh, contentDescription = "Reload outlets", modifier = Modifier.size(20.dp))
                     }
                 }
-                Button(onClick = onAddClick, shape = RoundedCornerShape(14.dp)) {
-                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                Button(
+                    onClick = onAddClick,
+                    shape = RoundedCornerShape(12.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                    modifier = Modifier.height(36.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Add")
+                    Text("Add", fontSize = 13.sp)
                 }
             }
+        }
+
+        // Shown whenever the Member has at least one outlet -- including
+        // when a search is currently narrowing the list to zero results, so
+        // clearing the query is always reachable from the same place.
+        if (outlets.isNotEmpty()) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = { Text("Search outlets...", fontSize = 14.sp) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { searchQuery = "" }, modifier = Modifier.size(24.dp)) {
+                            Icon(Icons.Default.Close, contentDescription = "Clear search", modifier = Modifier.size(16.dp))
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 2.dp)
+                    .height(48.dp),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                textStyle = LocalTextStyle.current.copy(fontSize = 14.sp)
+            )
         }
 
         when {
@@ -253,17 +453,60 @@ private fun OutletListScreen(
                     }
                 }
             }
+            // Distinct from the empty-state above: outlets is non-empty here
+            // (ruled out by the branch above), so this is specifically "the
+            // search matched nothing," not "you have no outlets at all."
+            filteredOutlets.isEmpty() && !loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Outlined.SearchOff,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(36.dp)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "No outlets match \"${searchQuery.trim()}\".",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
             else -> {
                 LazyColumn(
+                    state = listState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(outlets, key = { it.id }) { outlet ->
+                    items(displayList, key = { it.id }) { outlet ->
+                        val isDragged = outlet.id == draggedOutletId
                         OutletCard(
                             outlet = outlet,
+                            reorderEnabled = reorderEnabled,
+                            isDragged = isDragged,
+                            dragOffsetPx = if (isDragged) draggedRenderOffset else 0f,
+                            onDragStart = { startDrag(outlet.id) },
+                            onDragDelta = ::onDragDelta,
+                            onDragEnd = ::endDrag,
                             onEditClick = { onEditClick(outlet) },
-                            onDeleteClick = { pendingDelete = outlet }
+                            onDeleteClick = { pendingDelete = outlet },
+                            // The dragged item gets zIndex so it draws above
+                            // its neighbors while lifted. No item-placement
+                            // animation modifier here: the exact Foundation
+                            // version bundled by this project's pinned
+                            // Compose BOM could not be confirmed to expose
+                            // Modifier.animateItem(), so plain (instant,
+                            // unanimated) repositioning is used instead --
+                            // a cosmetic tradeoff only, the underlying
+                            // key-based reordering is unaffected.
+                            modifier = if (isDragged) Modifier.zIndex(1f) else Modifier
                         )
                     }
                 }
@@ -278,10 +521,12 @@ private fun OutletListScreen(
             title = { Text("Delete Outlet") },
             text = { Text("Delete \"${outlet.name}\"? This cannot be undone.") },
             confirmButton = {
-                TextButton(onClick = {
-                    onDeleteConfirmed(outlet)
-                    pendingDelete = null
-                }) {
+                TextButton(
+                    onClick = {
+                        onDeleteConfirmed(outlet)
+                        pendingDelete = null
+                    },
+                ) {
                     Text("Delete", color = MaterialTheme.colorScheme.error)
                 }
             },
@@ -293,132 +538,129 @@ private fun OutletListScreen(
 }
 
 @Composable
-private fun OutletCard(outlet: OutletDto, onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
+private fun OutletCard(
+    outlet: OutletDto,
+    reorderEnabled: Boolean,
+    isDragged: Boolean,
+    dragOffsetPx: Float,
+    onDragStart: () -> Unit,
+    onDragDelta: (Float) -> Unit,
+    onDragEnd: () -> Unit,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .graphicsLayer { translationY = dragOffsetPx },
         shape = ContentCardShape,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(
+            containerColor = if (isDragged) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isDragged) 6.dp else 0.dp),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.Top,
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = outlet.name,
                         style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = outlet.address,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                OutletStatusBadge(status = outlet.status)
-            }
-
-            if (outlet.status == "APPROVED" && outlet.has_pending_edit) {
-                Spacer(modifier = Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Outlined.HourglassEmpty,
-                        contentDescription = null,
-                        tint = OutletStatusPendingColor,
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "Changes pending Admin approval",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = OutletStatusPendingColor
-                    )
+                    OutletStatusBadge(status = outlet.status)
+                    if (reorderEnabled) {
+                        Box(
+                            modifier = Modifier
+                                .padding(start = 4.dp)
+                                .size(32.dp)
+                                .pointerInput(outlet.id) {
+                                    detectDragGestures(
+                                        onDragStart = { onDragStart() },
+                                        onDrag = { change, dragAmount ->
+                                            change.consume()
+                                            onDragDelta(dragAmount.y)
+                                        },
+                                        onDragEnd = { onDragEnd() },
+                                        onDragCancel = { onDragEnd() },
+                                    )
+                                },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.DragHandle,
+                                contentDescription = "Drag to reorder",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+                    }
                 }
             }
 
-            if (outlet.status == "REJECTED" && !outlet.rejection_reason.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Reason: ${outlet.rejection_reason}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error
-                )
+            if ((outlet.status == "APPROVED" && outlet.has_pending_edit) ||
+                (outlet.status == "REJECTED" && !outlet.rejection_reason.isNullOrBlank()) ||
+                (outlet.status == "APPROVED" && !outlet.last_edit_rejection_reason.isNullOrBlank())
+            ) {
+                Spacer(modifier = Modifier.height(4.dp))
+                val (msg, color, icon) = when {
+                    outlet.status == "REJECTED" -> Triple("Rejected: ${outlet.rejection_reason}", MaterialTheme.colorScheme.error, Icons.Default.Error)
+                    outlet.has_pending_edit -> Triple("Changes pending approval", OutletStatusPendingColor, Icons.Default.History)
+                    else -> Triple("Last edit rejected: ${outlet.last_edit_rejection_reason}", MaterialTheme.colorScheme.error, Icons.Default.Error)
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(imageVector = icon, contentDescription = null, tint = color, modifier = Modifier.size(12.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = msg, style = MaterialTheme.typography.labelSmall, color = color, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
             }
 
-            // Distinct from the block above -- this outlet is APPROVED (its
-            // own status was never REJECTED), but the Member's last proposed
-            // EDIT to it was. Gated on !has_pending_edit so a fresh
-            // resubmission's "Changes pending Admin approval" note (above)
-            // takes priority instead of showing both at once.
-            if (outlet.status == "APPROVED" && !outlet.has_pending_edit &&
-                !outlet.last_edit_rejection_reason.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Text(
-                    text = "Last edit rejected: ${outlet.last_edit_rejection_reason}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error
+                    text = formatToWIB(outlet.created_at).split(" ").firstOrNull() ?: "",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 )
-            }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Registered ${formatToWIB(outlet.created_at)}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-            if (!outlet.is_own_outlet) {
-                // Assigned by Admin -- edit/delete rights follow
-                // created_by_user_id server-side (see backend/api.php's
-                // /outlet/update and /outlet/delete own ownership checks),
-                // so a Member merely assigned to this outlet can only view
-                // it, never edit/delete it. No buttons shown at all, rather
-                // than shown-then-rejected -- the UI should never offer an
-                // action the server is guaranteed to refuse.
-                AssistChip(
-                    onClick = {},
-                    enabled = false,
-                    label = { Text("Assigned by Admin", style = MaterialTheme.typography.labelSmall) },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Outlined.AdminPanelSettings,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
-                )
-            } else {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(
-                        onClick = onEditClick,
-                        modifier = Modifier.height(34.dp),
-                        contentPadding = PaddingValues(horizontal = 12.dp)
-                    ) {
-                        Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(14.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Edit", style = MaterialTheme.typography.labelMedium)
-                    }
-                    // Only a PENDING/REJECTED outlet is deletable server-side
-                    // (see MemberRepository.deleteOutlet's doc comment) -- an
-                    // APPROVED outlet may already have visit history, so
-                    // Delete is hidden entirely rather than offered and
-                    // rejected.
-                    if (outlet.status == "PENDING" || outlet.status == "REJECTED") {
-                        OutlinedButton(
-                            onClick = onDeleteClick,
-                            modifier = Modifier.height(34.dp),
-                            contentPadding = PaddingValues(horizontal = 12.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                        ) {
-                            Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(14.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Delete", style = MaterialTheme.typography.labelMedium)
+                if (!outlet.is_own_outlet) {
+                    Text(
+                        text = "Assigned by Admin",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        IconButton(onClick = onEditClick, modifier = Modifier.size(32.dp)) {
+                            Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
+                        }
+                        if (outlet.status == "PENDING" || outlet.status == "REJECTED") {
+                            IconButton(onClick = onDeleteClick, modifier = Modifier.size(32.dp)) {
+                                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
+                            }
                         }
                     }
                 }
@@ -432,12 +674,12 @@ private fun OutletStatusBadge(status: String) {
     val color = outletStatusColor(status)
     Box(
         modifier = Modifier
-            .background(color.copy(alpha = 0.12f), RoundedCornerShape(8.dp))
-            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .background(color.copy(alpha = 0.12f), RoundedCornerShape(6.dp))
+            .padding(horizontal = 6.dp, vertical = 2.dp)
     ) {
         Text(
             text = outletStatusLabel(status),
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
             fontWeight = FontWeight.Bold,
             color = color
         )
@@ -475,7 +717,7 @@ private fun OutletFormScreen(
     val formLoading by viewModel.outletFormLoading.collectAsState()
     val formError by viewModel.outletFormError.collectAsState()
 
-    var locatingCurrentPosition by remember { mutableStateOf(false) }
+    var locatingCurrentPosition by remember { mutableStateOf(value = false) }
 
     // [zoom] is null for Search Address's own selection below -- that call
     // site's behavior is unchanged, recenter only. Non-null for
@@ -574,7 +816,7 @@ private fun OutletFormScreen(
             return@LaunchedEffect
         }
         searching = true
-        delay(500)
+        delay(500L)
         searchResults = AddressSearchService.search(trimmed)
         searching = false
     }
@@ -656,7 +898,7 @@ private fun OutletFormScreen(
         if (pickedLat == lastAuthoritativeLat && pickedLng == lastAuthoritativeLng) {
             return@LaunchedEffect
         }
-        delay(500)
+        delay(500L)
         // Retyped during the debounce wait -- skip the network call
         // entirely rather than fetch a label only to discard it; saves a
         // request and avoids flashing the resolving spinner for nothing.
@@ -718,7 +960,7 @@ private fun OutletFormScreen(
                 .padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (isEditing && editingOutlet?.status == "APPROVED") {
+            if (isEditing && editingOutlet.status == "APPROVED") {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = ContentCardShape,
@@ -958,7 +1200,7 @@ private fun OutletFormScreen(
 
             Button(
                 onClick = {
-                    if (isEditing && editingOutlet != null) {
+                    if (isEditing) {
                         viewModel.submitOutletEdit(
                             id = editingOutlet.id,
                             currentStatus = editingOutlet.status,

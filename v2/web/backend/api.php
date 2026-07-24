@@ -114,6 +114,12 @@ define('OUTLET_MIN_DWELL_SECONDS_UPPER_BOUND', 3600);
 define('OUTLET_NAME_MAX_LENGTH', 150);
 define('OUTLET_ADDRESS_MAX_LENGTH', 255);
 
+// Generous upper bound on /outlet/reorder's outlet_ids payload -- far above
+// any real Member's outlet count, just to reject a pathologically large
+// array outright rather than locking/updating an unbounded number of rows
+// per request.
+define('OUTLET_REORDER_MAX_IDS', 1000);
+
 $route = isset($_GET['route']) ? $_GET['route'] : '';
 if (empty($route)) {
     $path_info = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '';
@@ -1688,6 +1694,13 @@ try {
             // (their past visits still exist in tams_outlet_visits regardless,
             // untouched by this filter).
             //
+            // Ordered by the Member's own manual display_order first (see that
+            // column's schema.sql comment), created_at DESC as the tie-break --
+            // every outlet ties at display_order=0 until this Member has used
+            // POST /outlet/reorder at least once, so this is the exact same
+            // newest-first order the app has always shown until a Member
+            // actually drags something.
+            //
             // has_pending_edit is derived here via EXISTS, never stored -- see
             // tams_outlets.status's own schema.sql comment on why an outlet's
             // lifecycle status is never repurposed to signal this.
@@ -1726,7 +1739,7 @@ try {
                 FROM tams_outlets o
                 WHERE o.member_id = :member_id
                   AND o.deleted_at IS NULL
-                ORDER BY o.created_at DESC
+                ORDER BY o.display_order ASC, o.created_at DESC
             ");
             $stmt->execute([':member_id' => $user['id']]);
             $rows = $stmt->fetchAll();
@@ -1932,6 +1945,111 @@ try {
             echo json_encode([
                 "success" => true,
                 "message" => "Outlet deleted.",
+                "data" => null
+            ]);
+            break;
+
+        case '/outlet/reorder':
+            if ($method !== 'POST') {
+                throw new Exception("Method Not Allowed", 405);
+            }
+            $user = authenticateUser($pdo, ['member']);
+            $payload = getJsonPayload();
+
+            $rawIds = $payload['outlet_ids'] ?? null;
+            if (!is_array($rawIds) || count($rawIds) === 0) {
+                throw new Exception("outlet_ids must be a non-empty array.", 400);
+            }
+            if (count($rawIds) > OUTLET_REORDER_MAX_IDS) {
+                throw new Exception("outlet_ids exceeds the maximum of " . OUTLET_REORDER_MAX_IDS . " entries.", 400);
+            }
+
+            // Sanitize to distinct positive ints, preserving the submitted
+            // (i.e. the Member's desired) order. A duplicate or non-numeric
+            // entry is silently dropped rather than rejecting the whole
+            // request -- the client always resubmits its own full current
+            // list, so a malformed single entry shouldn't block the rest of
+            // an otherwise-valid reorder.
+            $orderedIds = [];
+            foreach ($rawIds as $rawId) {
+                $id = (int) $rawId;
+                if ($id > 0 && !in_array($id, $orderedIds, true)) {
+                    $orderedIds[] = $id;
+                }
+            }
+            if (count($orderedIds) === 0) {
+                throw new Exception("outlet_ids must contain at least one valid id.", 400);
+            }
+
+            $pdo->beginTransaction();
+            try {
+                // Scoped to member_id, deliberately NOT created_by_user_id --
+                // this endpoint only ever changes display_order (a personal
+                // view preference), never the outlet's own data, so unlike
+                // /outlet/update and /outlet/delete above, a Member reordering
+                // an Admin-assigned outlet they can only view (is_own_outlet
+                // false, see GET /outlet/list) is fully allowed here. Locks
+                // every row this Member could legitimately reorder before
+                // writing, so a concurrent duplicate submission (e.g. a fast
+                // double-drag, or a network retry racing itself) can't
+                // interleave two different final orders.
+                // ORDER BY id ASC matches ajax/outlet_merge.php's own
+                // convention for locking multiple rows: always ascending by
+                // id, so two overlapping concurrent reorders always
+                // acquire their locks in the same relative order instead of
+                // potentially deadlocking against each other.
+                $placeholders = implode(',', array_fill(0, count($orderedIds), '?'));
+                $lock_stmt = $pdo->prepare("
+                    SELECT id FROM tams_outlets
+                    WHERE member_id = ? AND deleted_at IS NULL AND id IN ($placeholders)
+                    ORDER BY id ASC
+                    FOR UPDATE
+                ");
+                $lock_stmt->execute(array_merge([$user['id']], $orderedIds));
+                $ownIds = array_flip(array_map('intval', array_column($lock_stmt->fetchAll(), 'id')));
+
+                // Any id in the submitted array that doesn't currently belong
+                // to this Member (stale client state from before an Admin
+                // reassigned it away, or a tampered payload) is silently
+                // skipped rather than failing the whole batch -- positions
+                // are assigned only to ids this Member can actually see,
+                // 0..N-1 with no gaps, in the order submitted.
+                $update_stmt = $pdo->prepare("
+                    UPDATE tams_outlets SET display_order = :position
+                    WHERE id = :id AND member_id = :member_id
+                ");
+                $position = 0;
+                foreach ($orderedIds as $id) {
+                    if (isset($ownIds[$id])) {
+                        $update_stmt->execute([
+                            ':position' => $position,
+                            ':id' => $id,
+                            ':member_id' => $user['id'],
+                        ]);
+                        $position++;
+                    }
+                }
+
+                // Every submitted id was stale/foreign (none belonged to
+                // this Member) -- nothing was actually written. Report this
+                // as a failure rather than a silent no-op "success", so the
+                // Android client's failure path re-syncs from the server
+                // instead of trusting an optimistic order that never saved.
+                if ($position === 0) {
+                    throw new Exception("None of the submitted outlet_ids belong to this member.", 400);
+                }
+
+                $pdo->commit();
+            } catch (Throwable $inner) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                throw $inner;
+            }
+
+            echo json_encode([
+                "success" => true,
+                "message" => "Outlet order saved.",
                 "data" => null
             ]);
             break;

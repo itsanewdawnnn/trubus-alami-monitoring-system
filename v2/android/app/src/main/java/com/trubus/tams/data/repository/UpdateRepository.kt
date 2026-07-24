@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
  * work even before the user has ever logged in (no auth token yet, and a
  * force-update needs to be able to block the app pre-login), and folding an
  * unauthenticated, update-only concern into the auth-heavy MemberRepository
- * would blur what that class is responsible for. [MainViewModel] owns one
+ * would blur what that class is responsible for. `MainViewModel` owns one
  * instance of each side by side, the same way it already owns [MemberRepository].
  */
 class UpdateRepository(private val baseUrlProvider: () -> String) {
@@ -38,7 +38,7 @@ class UpdateRepository(private val baseUrlProvider: () -> String) {
             val service = ApiService.create(baseUrlProvider()) { null }
             val response = service.getAppVersion()
             val body = response.body()
-            if (response.isSuccessful && body?.success == true && body.data != null) {
+            if (response.isSuccessful && (body?.success == true) && (body.data != null)) {
                 Result.success(body.data)
             } else {
                 Result.failure(Exception(body?.message ?: "Failed to check app version (HTTP ${response.code()})"))

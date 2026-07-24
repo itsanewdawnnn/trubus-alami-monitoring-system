@@ -17,7 +17,7 @@ import kotlin.coroutines.resume
 data class AddressSearchResult(
     val label: String,
     val latitude: Double,
-    val longitude: Double
+    val longitude: Double,
 )
 
 /**
@@ -73,66 +73,54 @@ object NominatimSearchService : ForwardGeocodingProvider {
      * you-type affordance, not a required step (a Member can still place the
      * pin manually or use their current location).
      */
-    override suspend fun search(query: String): List<AddressSearchResult> {
+    override suspend fun search(query: String): List<AddressSearchResult> = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
         val trimmed = query.trim()
-        if (trimmed.length < MIN_QUERY_LENGTH) return emptyList()
+        if (trimmed.length < MIN_QUERY_LENGTH) return@withContext emptyList()
 
         val url = "https://nominatim.openstreetmap.org/search" +
             "?format=jsonv2&q=${URLEncoder.encode(trimmed, "UTF-8")}" +
             "&addressdetails=0&limit=$MAX_RESULTS" +
-            // Scoped to Indonesia -- TAMS's outlets are all field-sales
-            // locations within Indonesia (matches the Web Admin's own
-            // Jakarta-centered default map view, assets/js/map.js), so this
-            // cuts irrelevant results and speeds up typical queries instead
-            // of searching the whole planet for a short local place name.
             "&countrycodes=id"
         val request = Request.Builder()
             .url(url)
-            // Required by Nominatim's usage policy, same value
-            // ReverseGeocodingService already uses.
             .header("User-Agent", "TAMS-TrubusAlamiMonitoring/1.0")
             .build()
 
-        // suspendCancellableCoroutine + Call.enqueue (not a blocking call) so
-        // cancelling the caller (e.g. the Member kept typing and a newer
-        // debounced search superseded this one) actually aborts the
-        // in-flight HTTP call instead of leaving it running for nothing --
-        // same pattern as ReverseGeocodingService.getNearbyLabel.
-        val results = suspendCancellableCoroutine<List<AddressSearchResult>> { continuation ->
+        suspendCancellableCoroutine { continuation ->
             val call = client.newCall(request)
             continuation.invokeOnCancellation { call.cancel() }
-            call.enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    if (call.isCanceled()) return
-                    Log.w(TAG, "Address search failed: ${e.message}")
-                    continuation.resume(emptyList())
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    response.use {
-                        if (!it.isSuccessful) {
-                            Log.w(TAG, "Address search HTTP ${it.code}")
-                            continuation.resume(emptyList())
-                            return
-                        }
-                        val body = it.body?.string()
-                        if (body == null) {
-                            continuation.resume(emptyList())
-                            return
-                        }
-                        val parsed = try {
-                            parseResults(body)
-                        } catch (e: org.json.JSONException) {
-                            Log.w(TAG, "Address search: malformed JSON response")
-                            emptyList()
-                        }
-                        continuation.resume(parsed)
+            call.enqueue(
+                object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        if (call.isCanceled()) return
+                        Log.w(TAG, "Address search failed: ${e.message}")
+                        continuation.resume(emptyList())
                     }
-                }
-            })
-        }
 
-        return results
+                    override fun onResponse(call: Call, response: Response) {
+                        response.use {
+                            if (!it.isSuccessful) {
+                                Log.w(TAG, "Address search HTTP ${it.code}")
+                                continuation.resume(emptyList())
+                                return
+                            }
+                            val body = it.body?.string()
+                            if (body == null) {
+                                continuation.resume(emptyList())
+                                return
+                            }
+                            val parsed = try {
+                                parseResults(body)
+                            } catch (_: org.json.JSONException) {
+                                Log.w(TAG, "Address search: malformed JSON response")
+                                emptyList()
+                            }
+                            continuation.resume(parsed)
+                        }
+                    }
+                },
+            )
+        }
     }
 
     private fun parseResults(body: String): List<AddressSearchResult> {

@@ -1,6 +1,7 @@
 package com.trubus.tams.data.model
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.squareup.moshi.JsonClass
 
@@ -10,7 +11,7 @@ import com.squareup.moshi.JsonClass
 data class ApiResponse<T>(
     val success: Boolean,
     val message: String,
-    val data: T?
+    val data: T?,
 )
 
 @JsonClass(generateAdapter = true)
@@ -171,7 +172,10 @@ data class TrackedLocationSnapshot(
 // doc comment) survive an offline retry instead of being lost the moment a
 // fix couldn't be sent immediately -- MemberRepository.syncOfflineLocations
 // reads them back when finally flushing this row.
-@Entity(tableName = "tams_offline_locations")
+@Entity(
+    tableName = "tams_offline_locations",
+    indices = [Index(value = ["userId", "recordedAt"], unique = true)]
+)
 data class OfflineLocation(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val userId: Int,

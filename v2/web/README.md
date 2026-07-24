@@ -52,7 +52,7 @@ web/
 A small PHP-native (no framework, no router, no build step) web app for
 staff to manage members and watch their live location -- the web
 equivalent of the Android app's own Admin role. Deployed to
-`https://your-tams-domain.example/`.
+`https://tams.sbstrans.net/`.
 
 | Folder      | Responsibility |
 |-------------|----------------|
@@ -367,7 +367,7 @@ for the client side.
 
 | Table | Purpose |
 |---|---|
-| `tams_outlets` | The outlet itself -- name/address/coordinates, lifecycle `status` (PENDING/APPROVED/REJECTED), soft-delete (`deleted_at`), merge (`merged_into_outlet_id`, path-compressed to at most one hop), and the one Member it's assigned to (`member_id`, `NOT NULL`, one-to-one from the outlet's side -- see "Ownership vs. assignment" below). |
+| `tams_outlets` | The outlet itself -- name/address/coordinates, lifecycle `status` (PENDING/APPROVED/REJECTED), soft-delete (`deleted_at`), merge (`merged_into_outlet_id`, path-compressed to at most one hop), the one Member it's assigned to (`member_id`, `NOT NULL`, one-to-one from the outlet's side -- see "Ownership vs. assignment" below), and that Member's own manual sort position for their outlet list (`display_order`, defaults to `0` -- a personal display preference only, written exclusively by `POST /outlet/reorder`, see the Android app's "Outlet Management" section for the client side). |
 | `tams_outlet_edit_requests` | Proposed-snapshot approval queue for edits to an already-APPROVED outlet (see "Approval workflow" below). At most one PENDING row per outlet, enforced in application code via a row lock, not a DB constraint. |
 | `tams_outlet_visits` | Append-only visit ledger, one row per Member per outlet per calendar day (`UNIQUE(member_id, outlet_id, visited_date)`). Never updated after being written, including by a later merge -- see "Ledger immutability" below. |
 | `tams_outlet_dwell_state` | Transient per-Member/outlet dwell-timer bookkeeping -- current state, not history. Only ever populated when the configured minimum dwell time is greater than zero; cleared the moment the Member leaves the radius or the visit confirms. |
@@ -384,6 +384,19 @@ matching the same dual meaning the Member-facing `/outlet/update` route
 uses to decide which of the two a Member's own edit becomes (see "Edit
 workflow" below). Approving a REJECTED outlet is allowed, exactly like a
 fresh PENDING one -- a reversed decision, no separate "reconsider" action.
+
+**The Outlet page's Status filter (`ajax/outlet_list.php`) counts an
+APPROVED outlet with an open edit request as "Pending", not "Approved".**
+Both need the same Admin action, so both must appear in whichever filter
+represents outstanding review work -- otherwise an Admin using "Pending" as
+a review queue would never see it, since the outlet's own `status` column
+still literally reads APPROVED while its edit request sits unreviewed
+(previously it only ever showed under "Approved", where its "Pending
+changes" badge is easy to miss, or "All Statuses"). The SQL is a
+self-contained `EXISTS` subquery against `tams_outlet_edit_requests`, so
+"Pending" matches `status = 'PENDING' OR (status = 'APPROVED' AND an open
+edit request exists)` and "Approved" matches the complement -- a given
+outlet always counts toward exactly one of the two.
 
 **Edit workflow.** A PENDING or REJECTED outlet has no live/approved data
 to protect yet, so a Member's edit applies in place directly on
@@ -500,6 +513,9 @@ ascending `id` order regardless of which one is labeled source/target --
 the same deadlock-avoidance principle Force Location's own lock ordering
 follows (see that section above), just for two rows instead of one, so two
 concurrent merges touching the same pair never deadlock against each other.
+`/outlet/reorder` locks every row a Member submits for reordering (scoped to
+`member_id`, not `created_by_user_id` -- see "Personal display order"
+below), also always in ascending `id` order, following the same convention.
 
 **Ownership vs. assignment.** `tams_outlets.created_by_user_id` (who
 submitted the row) is what gates a Member's edit/delete rights on the
@@ -516,6 +532,30 @@ ownership restriction at all) can. Reassigning an outlet
 entire "release the previous owner" mechanism -- the old Member simply stops
 matching `WHERE member_id = ...` the instant the new value commits, no
 separate unassign step exists or is needed.
+
+**Personal display order (`tams_outlets.display_order`).** The Android app's
+"My Outlets" screen lets a Member drag to reorder their own list (search +
+drag-to-reorder), persisted via the Backend API's `POST /outlet/reorder` --
+see the Android app's "Outlet Management" section for the client side. This
+column is scoped by `member_id`, not `created_by_user_id` -- the opposite of
+`/outlet/update`/`/outlet/delete` above -- because reordering is a personal
+view preference, never an edit to the outlet's own data: a Member may freely
+reposition an Admin-assigned outlet they can only view, exactly as freely as
+one they created themselves. `/outlet/reorder` renumbers `0..N-1` across
+every id in the Member's submitted list that it can confirm still has
+`member_id` = that Member (silently dropping anything stale, e.g. an outlet
+reassigned away by an Admin mid-session, rather than rejecting the whole
+batch) -- but if that leaves zero ids actually updated, the request fails
+outright instead of reporting a false success, so the Android client's
+failure path (re-fetching the real order from the server) still triggers.
+The submitted array is capped at
+`OUTLET_REORDER_MAX_IDS` (1000) entries, and its rows are locked in
+ascending `id` order (matching `ajax/outlet_merge.php`'s own convention),
+inside one transaction with the same row-locking discipline as the other
+outlet-mutating routes above. `GET /outlet/list` orders by
+`(display_order ASC, created_at DESC)` -- every row defaults to `0`, so
+until a Member has reordered at least once this tie-breaks to the exact same
+newest-first order the list has always shown.
 
 **Delete semantics differ by caller, deliberately.** A Member's own
 `DELETE` (Backend API `/outlet/delete`) is a genuine hard `DELETE`, and only
@@ -559,13 +599,13 @@ on the same machine.
 
 | Path | Responsibility |
 |------|-----------------|
-| `backend/api.php` | The single router -- every Android app request hits this file with a `?route=` query param (see `android/app/.../data/api/ApiService.kt`). `/app/version` and `/app/config` are the two deliberately unauthenticated routes -- see "OTA Update" and "Remote Management" above. `/activity/log` backs the Member Log feature -- see "Member Log" above. `/location/status` backs the Force Location pre-flight check -- see "Force Location (Force Override)" above; it is never the actual enforcement boundary, which is the operational-hours gate applied unconditionally inside `/location/update` itself, on every call. `/outlet/create`, `/outlet/list`, `/outlet/update`, `/outlet/delete` back a Member's own Outlet Management actions -- see "Outlet Management" above; Approve/Reject/Merge are deliberately not routes here, since they're Admin-only and the Admin Panel never calls this API. |
+| `backend/api.php` | The single router -- every Android app request hits this file with a `?route=` query param (see `android/app/.../data/api/ApiService.kt`). `/app/version` and `/app/config` are the two deliberately unauthenticated routes -- see "OTA Update" and "Remote Management" above. `/activity/log` backs the Member Log feature -- see "Member Log" above. `/location/status` backs the Force Location pre-flight check -- see "Force Location (Force Override)" above; it is never the actual enforcement boundary, which is the operational-hours gate applied unconditionally inside `/location/update` itself, on every call. `/outlet/create`, `/outlet/list`, `/outlet/update`, `/outlet/delete`, `/outlet/reorder` back a Member's own Outlet Management actions -- see "Outlet Management" above; Approve/Reject/Merge are deliberately not routes here, since they're Admin-only and the Admin Panel never calls this API. |
 | `backend/includes/config.php` | CORS headers and the DB connection (via `database/credentials.php`, see below). |
 | `backend/includes/middleware.php` | Bearer-token authentication, shared by every route in `api.php`. |
 
 **Why `backend/` keeps its name, and stays a sibling of the Admin Panel
 instead of living in its own top-level folder:** the Android app has
-`https://your-tams-domain.example/backend/api.php` hardcoded as its default API
+`https://tams.sbstrans.net/backend/api.php` hardcoded as its default API
 URL (`MemberRepository.kt`'s `DEFAULT_BASE_URL`). Renaming or moving this
 folder would break every already-installed copy of the app until it were
 manually reconfigured, so restructuring intentionally leaves this one path
@@ -585,7 +625,7 @@ already say.
 
 There's no CI/CD here -- deployment is a manual upload (FTP / cPanel File
 Manager) of this entire `web/` folder's contents to the hosting account's
-document root for `your-tams-domain.example`. Both apps go up together, as
+document root for `tams.sbstrans.net`. Both apps go up together, as
 siblings, exactly as they sit here locally (i.e. don't flatten or rename
 anything on the way up -- the Android app's hardcoded URL depends on
 `backend/` staying exactly where it is).

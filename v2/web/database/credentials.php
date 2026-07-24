@@ -13,7 +13,7 @@
  */
 
 define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
-define('DB_PORT', getenv('DB_PORT') ?: 'your_db_port');
-define('DB_NAME', getenv('DB_NAME') ?: 'your_db_name');
-define('DB_USER', getenv('DB_USER') ?: 'your_db_user');
-define('DB_PASS', getenv('DB_PASS') ?: 'your_db_password');
+define('DB_PORT', getenv('DB_PORT') ?: '3306');
+define('DB_NAME', getenv('DB_NAME') ?: 'u412058299_tams');
+define('DB_USER', getenv('DB_USER') ?: 'u412058299_tams');
+define('DB_PASS', getenv('DB_PASS') ?: 'Tams@321');

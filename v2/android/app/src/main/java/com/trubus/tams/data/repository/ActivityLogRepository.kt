@@ -18,25 +18,25 @@ import kotlinx.coroutines.withContext
  * already happened (or already failed) on its own terms by the time this is
  * called, and audit-trail delivery isn't important enough to justify any
  * complexity (offline queueing, retry backoff) beyond "try once, log
- * locally on failure, move on". [log] therefore never throws (except
- * [CancellationException], which is always propagated) and returns nothing
+ * locally on failure, move on". * [log] therefore never throws (except
+ * `CancellationException`, which is always propagated) and returns nothing
  * callers need to check.
  *
- * [actionType] MUST be one of backend/api.php's POST /activity/log
+ * `actionType` MUST be one of backend/api.php's POST /activity/log
  * `$allowedActionTypes` ('profile_update', 'start_location', 'stop_location',
  * 'sync_failed', 'error') -- an unrecognized value is rejected server-side
  * with a 400, which this class simply logs locally and discards like any
  * other failure.
  *
- * NEVER pass a password (or any other sensitive value) as [fieldBefore]/
- * [fieldAfter]/[message] -- per the Log feature's security requirement,
+ * NEVER pass a password (or any other sensitive value) as `fieldBefore`/
+ * `fieldAfter`/`message` -- per the Log feature's security requirement,
  * passwords must never be stored anywhere, even in an audit trail. A
  * password change is logged as the bare fact "password was changed", never
  * the value (see MainViewModel.updateProfile's call site).
  */
 class ActivityLogRepository(
     private val baseUrlProvider: () -> String,
-    private val tokenProvider: () -> String?
+    private val tokenProvider: () -> String?,
 ) {
     companion object {
         private const val TAG = "ActivityLogRepository"
@@ -65,7 +65,7 @@ class ActivityLogRepository(
             message?.let { payload["message"] = it }
 
             val response = service.logActivity(payload)
-            if (!(response.isSuccessful && response.body()?.success == true)) {
+            if (!(response.isSuccessful && (response.body()?.success == true))) {
                 Log.w(TAG, "Activity log write rejected by server (HTTP ${response.code()}): $actionType")
             }
         } catch (e: CancellationException) {

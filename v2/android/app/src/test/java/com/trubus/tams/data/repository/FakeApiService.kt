@@ -39,6 +39,7 @@ private class UnsupportedApiService : ApiService {
     override suspend fun createOutlet(body: Map<String, Any>): Response<ApiResponse<Unit>> = unsupported("createOutlet")
     override suspend fun updateOutlet(body: Map<String, Any>): Response<ApiResponse<Unit>> = unsupported("updateOutlet")
     override suspend fun deleteOutlet(body: Map<String, Any>): Response<ApiResponse<Unit>> = unsupported("deleteOutlet")
+    override suspend fun reorderOutlets(body: Map<String, Any>): Response<ApiResponse<Unit>> = unsupported("reorderOutlets")
     override suspend fun getAppVersion(): Response<ApiResponse<VersionInfoDto>> = unsupported("getAppVersion")
     override suspend fun getAppConfig(): Response<ApiResponse<Map<String, String>>> = unsupported("getAppConfig")
 }

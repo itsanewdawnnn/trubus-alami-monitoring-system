@@ -19,17 +19,17 @@ object TrackingHealth {
 
     // Floor for "how long since the last fix is too long", regardless of how
     // short the configured GPS interval is.
-    private const val STALE_THRESHOLD_FLOOR_MS = 40_000L
+    private const val STALE_THRESHOLD_FLOOR_MS = 30_000L
 
     /**
-     * 4x the currently configured GPS Update Interval, never below
+     * 3x the currently configured GPS Update Interval, never below
      * [STALE_THRESHOLD_FLOOR_MS]. An interval below the floor would make
      * this trigger on completely normal jitter; a slower Administrator-
      * configured interval must still be given proportionally more slack
      * before being treated as stalled.
      */
     fun staleThresholdMillis(gpsIntervalSeconds: Int): Long =
-        (gpsIntervalSeconds * 4_000L).coerceAtLeast(STALE_THRESHOLD_FLOOR_MS)
+        (gpsIntervalSeconds * 3_000L).coerceAtLeast(STALE_THRESHOLD_FLOOR_MS)
 
     /**
      * Milliseconds between [fixTime] ("yyyy-MM-dd HH:mm:ss", WIB -- the same
@@ -92,7 +92,7 @@ object TrackingHealth {
      */
     fun parseFixMillis(fixTime: String): Long? = try {
         WibTime.formatter("yyyy-MM-dd HH:mm:ss").parse(fixTime)?.time
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 }

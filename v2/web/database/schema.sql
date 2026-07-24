@@ -1,4 +1,3 @@
--- Database Schema for Aplikasi Pemantauan Member Real-Time
 -- Target DB: MariaDB (Akses via phpMyAdmin / PDO mysql)
 --
 -- NOTE: This file is safe to re-run on a fresh database (uses CREATE TABLE IF
@@ -288,6 +287,20 @@ CREATE TABLE IF NOT EXISTS `tams_outlets` (
   -- can't be deleted until the outlet is reassigned or removed (see
   -- ajax/members_delete.php's own comment on this).
   `member_id` INT NOT NULL,
+  -- The Member's own manual sort position for their outlet list (Android's
+  -- "My Outlets" screen -- see android/README.md's "Outlet Management"
+  -- section). Purely a personal display preference, not a business
+  -- invariant: every row defaults to 0, and GET /outlet/list orders by
+  -- (display_order ASC, created_at DESC) -- ties (including every outlet
+  -- that has never been manually reordered) fall back to the same
+  -- newest-first order this table has always shown, so this column changes
+  -- nothing visible until a Member actually drags an outlet at least once.
+  -- Written only by POST /outlet/reorder, which renumbers 0..N-1 across
+  -- the Member's full current list in one pass -- see that route's own
+  -- comment in backend/api.php for why it scopes by `member_id` (this
+  -- column, personal view order) rather than `created_by_user_id` (edit/
+  -- delete rights, unrelated to this column).
+  `display_order` INT NOT NULL DEFAULT 0,
   -- Raw name as typed (e.g. "Toko Barokah"), never pre-formatted with the
   -- creator's name or uppercased. The "ANDI: TOKO BAROKAH" display format is
   -- derived at read time (Android + Web Admin each have one shared helper
@@ -583,11 +596,11 @@ WHERE `status` = 'offline' AND `latitude` IS NOT NULL AND `updated_at` IS NOT NU
   AND `updated_at` >= (NOW() - INTERVAL 5 MINUTE);
 
 -- Undo the earlier bcrypt migration for any database that already ran it:
--- restores the seed accounts below to plain-text 'CHANGE_ME', matching
+-- restores the seed accounts below to plain-text 'password123', matching
 -- backend/api.php's plain-text comparison (hash_equals() there is only a
 -- constant-time string compare, not a hash).
 UPDATE `tams_users`
-SET `password` = 'CHANGE_ME'
+SET `password` = 'password123'
 WHERE `username` IN ('member1', 'member2', 'admin1')
   AND `password` LIKE '$2%$%';
 
@@ -882,6 +895,16 @@ DEALLOCATE PREPARE tams_outlets_member_fk_stmt;
 -- where this migration has already run once.
 DROP TABLE IF EXISTS `tams_outlet_members`;
 
+-- Outlet display order (Android "My Outlets" drag-to-reorder -- see that
+-- column's own comment on the CREATE TABLE above, and CLAUDE.md's Outlet
+-- Management invariants). DEFAULT 0 for every already-existing row, same
+-- as a fresh install's CREATE TABLE above -- combined with GET /outlet/list's
+-- (display_order ASC, created_at DESC) ordering, this is a genuine no-op
+-- migration: every row ties at 0, so created_at DESC alone decides the
+-- order, exactly matching this table's order before this column existed.
+ALTER TABLE `tams_outlets`
+  ADD COLUMN IF NOT EXISTS `display_order` INT NOT NULL DEFAULT 0 AFTER `member_id`;
+
 -- Mock-location trust signals (see both CREATE TABLE definitions' comments
 -- above for full semantics: advisory-only, NULL means "unknown", never used
 -- to gate/reject a fix). Added to both tables so an existing, already-
@@ -900,9 +923,9 @@ ALTER TABLE `tams_member_history_locations`
 -- Passwords are stored and compared as plain text, per project requirement.
 -- ---------------------------------------------------------------------
 INSERT INTO `tams_users` (`name`, `note`, `username`, `password`, `role`, `is_active`) VALUES
-('Member One', '', 'member1', 'CHANGE_ME', 'member', 1),
-('Member Two', '', 'member2', 'CHANGE_ME', 'member', 1),
-('Admin', '', 'admin1', 'CHANGE_ME', 'admin', 1)
+('Kahfi', 'Pangeyan Kapiyiyoney', 'kahfi', '123', 'member', 1),
+('Rizqa Melia', '', 'cacha', '123', 'member', 1),
+('Trubus Alami', '', 'admin', '123', 'admin', 1)
 ON DUPLICATE KEY UPDATE `is_active` = 1;
 
 -- Guarantees the single settings row (id=1) always exists so

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
+import androidx.core.content.edit
 import com.trubus.tams.BuildConfig
 import com.trubus.tams.data.api.ApiService
 import com.trubus.tams.data.local.AppDatabase
@@ -12,7 +13,7 @@ import com.trubus.tams.data.model.*
 import com.trubus.tams.util.TrackingHealth
 import com.trubus.tams.util.WibTime
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -37,7 +38,7 @@ class SessionInvalidException(message: String) : Exception(message)
  * itself is perfectly valid, but this particular fix was rejected because
  * the Member is outside the allowed tracking window and has no (or no
  * longer has an) Admin-granted Force override. Distinct from
- * [SessionInvalidException] on purpose: [MemberLocationService] reacts to
+ * [SessionInvalidException] on purpose: `MemberLocationService` reacts to
  * this by automatically stopping its own foreground service and GPS
  * subscription (Force Location's ON->OFF auto-revoke behavior -- see that
  * class's handleNewLocation() doc comment), but must NOT log the Member out
@@ -62,10 +63,11 @@ class TrackingNotAllowedException(message: String) : Exception(message)
  * every existing caller.
  */
 class MemberRepository(
-    private val context: Context,
+    context: Context,
     offlineDaoOverride: OfflineLocationDao? = null,
-    apiServiceOverride: ApiService? = null
+    apiServiceOverride: ApiService? = null,
 ) {
+    private val repositoryScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private val offlineDao: OfflineLocationDao =
         offlineDaoOverride ?: AppDatabase.getDatabase(context).offlineLocationDao()
@@ -77,7 +79,7 @@ class MemberRepository(
     // rebuild-on-change plumbing.
     private val activityLogRepository = ActivityLogRepository(
         baseUrlProvider = { baseUrl },
-        tokenProvider = { authToken }
+        tokenProvider = { authToken },
     )
 
     companion object {
@@ -98,7 +100,7 @@ class MemberRepository(
         private const val PREF_BATTERY_OPT_CARD_DISMISSED = "battery_opt_card_dismissed"
         private const val PREF_SERVICE_HEARTBEAT_AT = "service_heartbeat_at"
 
-        private const val DEFAULT_BASE_URL = "https://your-tams-domain.example/backend/"
+        private const val DEFAULT_BASE_URL = "https://tams.sbstrans.net/backend/"
 
         // Caps the local offline-location queue so a device left offline for
         // an extended period doesn't accumulate unbounded local storage.
@@ -116,6 +118,11 @@ class MemberRepository(
         // second line of defense, but avoiding the duplicate calls here is
         // the primary fix.
         private val offlineSyncMutex = Mutex()
+
+        // Limits how many offline points are synced in a single pass to avoid
+        // holding the lock (and the radio) open for too long, which could
+        // block incoming live fixes on low-end devices or unstable networks.
+        private const val MAX_SYNC_BATCH_SIZE = 50
     }
 
     /**
@@ -128,7 +135,7 @@ class MemberRepository(
      */
     var isTrackingEnabled: Boolean
         get() = prefs.getBoolean(PREF_TRACKING_ENABLED, false)
-        set(value) = prefs.edit().putBoolean(PREF_TRACKING_ENABLED, value).apply()
+        set(value) = prefs.edit { putBoolean(PREF_TRACKING_ENABLED, value) }
 
     /**
      * [android.os.SystemClock.elapsedRealtime] timestamp (millis since boot,
@@ -148,7 +155,7 @@ class MemberRepository(
      * with real-world dates and times is important" -- exactly the opposite
      * of what an interval/freshness check needs. `elapsedRealtime()` is
      * "guaranteed to be monotonic, and continues to tick even when the CPU is
-     * in power saving modes, so is the recommend[ed] basis for general
+     * in power saving modes, so is the recommended basis for general
      * purpose interval timing" -- immune to the user or NTP changing the
      * wall clock, timezone changes (it isn't wall-clock-based at all), and
      * Doze/deep sleep (unlike `uptimeMillis()`, which stops during deep
@@ -176,7 +183,7 @@ class MemberRepository(
      */
     var serviceHeartbeatAt: Long
         get() = prefs.getLong(PREF_SERVICE_HEARTBEAT_AT, 0L)
-        set(value) = prefs.edit().putLong(PREF_SERVICE_HEARTBEAT_AT, value).apply()
+        set(value) = prefs.edit { putLong(PREF_SERVICE_HEARTBEAT_AT, value) }
 
     /**
      * Last GPS fix captured on this device, persisted independently of
@@ -202,21 +209,21 @@ class MemberRepository(
         }
         set(value) {
             if (value == null) {
-                prefs.edit()
-                    .remove(PREF_LAST_LOC_LAT)
-                    .remove(PREF_LAST_LOC_LNG)
-                    .remove(PREF_LAST_LOC_ACC)
-                    .remove(PREF_LAST_LOC_SPEED)
-                    .remove(PREF_LAST_LOC_TIME)
-                    .apply()
+                prefs.edit {
+                    remove(PREF_LAST_LOC_LAT)
+                    remove(PREF_LAST_LOC_LNG)
+                    remove(PREF_LAST_LOC_ACC)
+                    remove(PREF_LAST_LOC_SPEED)
+                    remove(PREF_LAST_LOC_TIME)
+                }
             } else {
-                prefs.edit()
-                    .putString(PREF_LAST_LOC_LAT, value.latitude.toString())
-                    .putString(PREF_LAST_LOC_LNG, value.longitude.toString())
-                    .putFloat(PREF_LAST_LOC_ACC, value.accuracy)
-                    .putFloat(PREF_LAST_LOC_SPEED, value.speed)
-                    .putString(PREF_LAST_LOC_TIME, value.time)
-                    .apply()
+                prefs.edit {
+                    putString(PREF_LAST_LOC_LAT, value.latitude.toString())
+                    putString(PREF_LAST_LOC_LNG, value.longitude.toString())
+                    putFloat(PREF_LAST_LOC_ACC, value.accuracy)
+                    putFloat(PREF_LAST_LOC_SPEED, value.speed)
+                    putString(PREF_LAST_LOC_TIME, value.time)
+                }
             }
         }
 
@@ -231,24 +238,24 @@ class MemberRepository(
      */
     var batteryOptimizationCardDismissed: Boolean
         get() = prefs.getBoolean(PREF_BATTERY_OPT_CARD_DISMISSED, false)
-        set(value) = prefs.edit().putBoolean(PREF_BATTERY_OPT_CARD_DISMISSED, value).apply()
+        set(value) = prefs.edit { putBoolean(PREF_BATTERY_OPT_CARD_DISMISSED, value) }
 
     // --- Preferences & Configuration ---
 
     var baseUrl: String
         get() = prefs.getString(PREF_BASE_URL, DEFAULT_BASE_URL) ?: DEFAULT_BASE_URL
         set(value) {
-            prefs.edit().putString(PREF_BASE_URL, value).apply()
+            prefs.edit { putString(PREF_BASE_URL, value) }
             rebuildApiService()
         }
 
     var lastSyncTime: String
         get() = prefs.getString(PREF_LAST_SYNC, "-") ?: "-"
-        set(value) = prefs.edit().putString(PREF_LAST_SYNC, value).apply()
+        set(value) = prefs.edit { putString(PREF_LAST_SYNC, value) }
 
     var authToken: String?
         get() = prefs.getString(PREF_TOKEN, null)
-        private set(value) = prefs.edit().putString(PREF_TOKEN, value).apply()
+        private set(value) = prefs.edit { putString(PREF_TOKEN, value) }
 
     var currentUser: UserDto?
         get() {
@@ -264,21 +271,21 @@ class MemberRepository(
         }
         private set(value) {
             if (value == null) {
-                prefs.edit()
-                    .remove(PREF_USER_ID)
-                    .remove(PREF_USER_NAME)
-                    .remove(PREF_USER_NOTE)
-                    .remove(PREF_USER_USERNAME)
-                    .remove(PREF_USER_ROLE)
-                    .apply()
+                prefs.edit {
+                    remove(PREF_USER_ID)
+                    remove(PREF_USER_NAME)
+                    remove(PREF_USER_NOTE)
+                    remove(PREF_USER_USERNAME)
+                    remove(PREF_USER_ROLE)
+                }
             } else {
-                prefs.edit()
-                    .putInt(PREF_USER_ID, value.id)
-                    .putString(PREF_USER_NAME, value.name)
-                    .putString(PREF_USER_NOTE, value.note)
-                    .putString(PREF_USER_USERNAME, value.username)
-                    .putString(PREF_USER_ROLE, value.role)
-                    .apply()
+                prefs.edit {
+                    putInt(PREF_USER_ID, value.id)
+                    putString(PREF_USER_NAME, value.name)
+                    putString(PREF_USER_NOTE, value.note)
+                    putString(PREF_USER_USERNAME, value.username)
+                    putString(PREF_USER_ROLE, value.role)
+                }
             }
         }
 
@@ -299,18 +306,16 @@ class MemberRepository(
     /**
      * Member Version Monitoring: reported at login and on every location
      * sync (including offline-queue flushes), matching backend/api.php's
-     * /auth/login and /location/update device-info extraction. Both server
-     * routes upsert with `COALESCE(VALUES(col), col)`, so sending this on
-     * every call is safe and requires no "did this already change"
-     * tracking here -- an omitted or unchanged value never overwrites a
-     * previously-known one.
+     * /auth/login and /location/update device-info extraction.
      */
-    private fun deviceInfoFields(): Map<String, Any> = mapOf(
-        "app_version_name" to BuildConfig.VERSION_NAME,
-        "app_version_code" to BuildConfig.VERSION_CODE,
-        "android_version" to Build.VERSION.RELEASE,
-        "device_model" to Build.MODEL
-    )
+    private val deviceInfoFields: Map<String, Any> by lazy {
+        mapOf(
+            "app_version_name" to BuildConfig.VERSION_NAME,
+            "app_version_code" to BuildConfig.VERSION_CODE,
+            "android_version" to Build.VERSION.RELEASE,
+            "device_model" to Build.MODEL
+        )
+    }
 
     // --- Authentication Actions ---
 
@@ -322,16 +327,16 @@ class MemberRepository(
      * `errorBody()` instead, falling back to [default] only if that body is
      * missing or not the expected JSON shape.
      */
-    private fun errorMessageOrDefault(response: retrofit2.Response<*>, default: String): String {
+    private fun errorMessageOrDefault(response: Response<*>, default: String): String {
         val raw = try {
             response.errorBody()?.string()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
         if (!raw.isNullOrBlank()) {
             val parsedMessage = try {
                 org.json.JSONObject(raw).optString("message", "")
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 ""
             }
             if (parsedMessage.isNotBlank()) return parsedMessage
@@ -356,10 +361,10 @@ class MemberRepository(
      * separate `errorBody()` read side by side (the second read would
      * always come back empty/closed).
      */
-    private fun parseErrorBody(response: retrofit2.Response<*>, default: String): Pair<String, String?> {
+    private fun parseErrorBody(response: Response<*>, default: String): Pair<String, String?> {
         val raw = try {
             response.errorBody()?.string()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
         val fallbackMessage = "$default (HTTP ${response.code()})"
@@ -371,7 +376,7 @@ class MemberRepository(
             val message = json.optString("message", "").ifBlank { fallbackMessage }
             val errorCode = json.optString("error_code", "").ifBlank { null }
             message to errorCode
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             fallbackMessage to null
         }
     }
@@ -409,7 +414,7 @@ class MemberRepository(
         try {
             val response = call()
             val body = response.body()
-            if (response.isSuccessful && body?.success == true) {
+            if (response.isSuccessful && (body?.success == true)) {
                 val data = body.data
                 when {
                     data != null -> Result.success(data)
@@ -447,11 +452,11 @@ class MemberRepository(
      * unlike every other failure branch above, there's no server-provided
      * `message` to fall back on here, so without this the exception's own
      * `.message` (e.g. `UnknownHostException: Unable to resolve host
-     * "your-tams-domain.example"...`) would reach the login screen, member list, or
+     * "tams.sbstrans.net"...`) would reach the login screen, member list, or
      * trip history UI verbatim. That's technically accurate but not
      * something a Member or Admin should have to read, and was previously
-     * inconsistent with [validateSessionOnStartup]'s own connectivity-error
-     * branch in MainViewModel, which already used a hand-written fallback
+     * inconsistent with `validateSessionOnStartup`'s own connectivity-error
+     * branch in `MainViewModel`, which already used a hand-written fallback
      * string instead of the raw exception message.
      *
      * The original exception is kept as the returned exception's `cause` (see
@@ -460,6 +465,9 @@ class MemberRepository(
      * cause chain and stack trace still reach Logcat -- this mapping only
      * changes what a Composable `Text()` can render, never what a developer
      * can debug.
+     *
+     * Checked against `MainViewModel` specifically for [friendlyNetworkErrorMessage]'s
+     * consistency with other connectivity-error branches.
      */
     private fun friendlyNetworkErrorMessage(e: Exception): String = when (e) {
         is java.net.UnknownHostException, is java.net.ConnectException ->
@@ -485,7 +493,7 @@ class MemberRepository(
             // parses a numeric string exactly the same as a JSON number.
             apiService.login(
                 mapOf("username" to username, "password" to password) +
-                    deviceInfoFields().mapValues { it.value.toString() }
+                    deviceInfoFields.mapValues { it.value.toString() }
             )
         }
         return result.map { loginData ->
@@ -570,9 +578,11 @@ class MemberRepository(
         // someone else's session would misattribute it server-side. Dropping
         // a few unsent points here is a better tradeoff than that (see also
         // syncOfflineLocations()'s own defensive filter for the same reason).
-        if (loggedOutUserId != null) {
-            offlineDao.deleteByUserId(loggedOutUserId)
+        loggedOutUserId?.let {
+            offlineDao.deleteByUserId(it)
         }
+        // Cancel all background syncs on logout.
+        repositoryScope.coroutineContext.cancelChildren()
         result
     }
 
@@ -681,6 +691,7 @@ class MemberRepository(
         accuracy: Float,
         speed: Float,
         recordedAt: String,
+        recordedAtMillis: Long? = null,
         isMock: Boolean = false,
         gnssSatellitesUsed: Int? = null
     ): Result<Unit> = withContext(Dispatchers.IO) {
@@ -688,20 +699,9 @@ class MemberRepository(
 
         // Persisted regardless of whether the network POST below succeeds
         // (see property doc) -- but only if this fix isn't OLDER than
-        // whatever's already stored. Without this guard, two independent
-        // postLocation() calls racing each other (this device's own live fix
-        // from MemberLocationService, and LocationSyncWorker's one-shot
-        // stopgap fix, can both be in flight at once -- see doWork()'s own
-        // doc comment: it unconditionally re-asserts the foreground service
-        // AND attempts its own one-shot fix in the same fallback branch) have
-        // no ordering guarantee on Dispatchers.IO, so the OLDER fix's write
-        // could land after the NEWER one's and silently regress the Member's
-        // own dashboard/staleness display until the next fix corrects it.
-        // Missing or unparseable data on EITHER side always loses this
-        // comparison, so a first-ever fix (nothing stored yet) or a
-        // legacy/corrupt stored value never blocks a legitimate new write.
+        // whatever's already stored.
         val existingFixMillis = lastKnownLocation?.time?.let { TrackingHealth.parseFixMillis(it) }
-        val newFixMillis = TrackingHealth.parseFixMillis(recordedAt)
+        val newFixMillis = recordedAtMillis ?: TrackingHealth.parseFixMillis(recordedAt)
         if (existingFixMillis == null || newFixMillis == null || newFixMillis >= existingFixMillis) {
             lastKnownLocation = TrackedLocationSnapshot(latitude, longitude, accuracy, speed, recordedAt)
         }
@@ -719,24 +719,27 @@ class MemberRepository(
                 "speed" to speed,
                 "recorded_at" to recordedAt,
                 "is_mock" to isMock
-            ).apply {
-                // Omitted entirely (not sent as null) when unavailable -- the
-                // server-side parser already treats an absent field as
-                // "unknown" (see backend/api.php's own doc comment), and Moshi/
-                // this Map-based payload shape has no clean way to send a JSON
-                // null through a Map<String, Any> without a special-case value.
-                gnssSatellitesUsed?.let { put("gnss_satellites_used", it) }
-            } + deviceInfoFields()
+            )
+            // Omitted entirely (not sent as null) when unavailable -- the
+            // server-side parser already treats an absent field as
+            // "unknown" (see backend/api.php's own doc comment), and Moshi/
+            // this Map-based payload shape has no clean way to send a JSON
+            // null through a Map<String, Any> without a special-case value.
+            gnssSatellitesUsed?.let { payload["gnss_satellites_used"] = it }
+            payload.putAll(deviceInfoFields)
+
             val response = apiService.updateLocation(payload)
             if (response.isSuccessful && response.body()?.success == true) {
                 lastSyncTime = WibTime.nowShort()
                 // Confirmed delivered -- remove the write-ahead row first,
                 // so the opportunistic flush right below can never re-send it.
                 offlineDao.deleteByIds(listOf(queuedId))
-                // Network just proved reachable -- opportunistically flush the
-                // offline queue now instead of waiting for the next 15-minute
-                // WorkManager pass. Cheap no-op (one Room COUNT query) when empty.
-                syncOfflineLocations()
+                // Network just proved reachable -- trigger sync in background
+                // so it doesn't block the next fix's upload path if the queue
+                // is large or network is slow.
+                repositoryScope.launch {
+                    this@MemberRepository.syncOfflineLocations()
+                }
                 Result.success(Unit)
             } else {
                 // Only leave this queued for retry on a transient (5xx)
@@ -849,8 +852,9 @@ class MemberRepository(
             isMock = isMock,
             gnssSatellitesUsed = gnssSatellitesUsed
         )
+        // Room unique constraint on (userId, recordedAt) with REPLACE
+        // strategy handles deduplication efficiently.
         val rowId = offlineDao.insert(offlineLoc)
-        offlineDao.trimToMostRecent(MAX_OFFLINE_QUEUE_SIZE)
         Log.d("MemberRepository", "Wrote location to local queue ahead of upload attempt: $offlineLoc")
         return rowId.toInt()
     }
@@ -890,6 +894,11 @@ class MemberRepository(
             // instead of a new, previously-impossible throw path.
             try {
                 val user = currentUser ?: return@withLock Result.success(0)
+
+                // Trim the queue before processing to ensure we stay within limits
+                // without doing it on every single insert (hot path).
+                offlineDao.trimToMostRecent(MAX_OFFLINE_QUEUE_SIZE)
+
                 val items = offlineDao.getAll()
                 if (items.isEmpty()) return@withLock Result.success(0)
 
@@ -905,10 +914,14 @@ class MemberRepository(
                 }
                 if (ownItems.isEmpty()) return@withLock Result.success(0)
 
+                // Only process up to MAX_SYNC_BATCH_SIZE per call to avoid
+                // blocking live fixes for too long.
+                val batch = ownItems.take(MAX_SYNC_BATCH_SIZE)
+
                 var successfulCount = 0
                 val itemsToDelete = mutableListOf<Int>()
 
-                for (item in ownItems) {
+                for (item in batch) {
                     try {
                         val payload = mutableMapOf<String, Any>(
                             "latitude" to item.latitude,
@@ -917,12 +930,13 @@ class MemberRepository(
                             "speed" to item.speed,
                             "recorded_at" to item.recordedAt,
                             "is_mock" to item.isMock
-                        ).apply {
-                            // Read back from the Room row -- see OfflineLocation's own
-                            // doc comment for why these two fields ride along in the
-                            // queue instead of being lost on a retry.
-                            item.gnssSatellitesUsed?.let { put("gnss_satellites_used", it) }
-                        } + deviceInfoFields()
+                        )
+                        // Read back from the Room row -- see OfflineLocation's own
+                        // doc comment for why these two fields ride along in the
+                        // queue instead of being lost on a retry.
+                        item.gnssSatellitesUsed?.let { payload["gnss_satellites_used"] = it }
+                        payload.putAll(deviceInfoFields)
+
                         val res = apiService.updateLocation(payload)
                         if (res.isSuccessful && res.body()?.success == true) {
                             successfulCount++
@@ -953,6 +967,8 @@ class MemberRepository(
                     lastSyncTime = WibTime.nowShort()
                 }
 
+                // If there are more items remaining, report success but the caller
+                // (or subsequent fixes) will eventually trigger another pass.
                 Result.success(successfulCount)
             } catch (e: CancellationException) {
                 throw e
@@ -1006,7 +1022,7 @@ class MemberRepository(
             "latitude" to latitude,
             "longitude" to longitude
         )
-        return apiCall("Failed to submit outlet.", default = { Unit }) { apiService.createOutlet(payload) }
+        return apiCall("Failed to submit outlet.", default = { }) { apiService.createOutlet(payload) }
     }
 
     /**
@@ -1027,7 +1043,7 @@ class MemberRepository(
             "latitude" to latitude,
             "longitude" to longitude
         )
-        return apiCall("Failed to submit outlet changes.", default = { Unit }) { apiService.updateOutlet(payload) }
+        return apiCall("Failed to submit outlet changes.", default = { }) { apiService.updateOutlet(payload) }
     }
 
     /**
@@ -1038,6 +1054,24 @@ class MemberRepository(
      */
     suspend fun deleteOutlet(id: Int): Result<Unit> {
         val payload = mapOf("id" to id)
-        return apiCall("Failed to delete outlet.", default = { Unit }) { apiService.deleteOutlet(payload) }
+        return apiCall("Failed to delete outlet.", default = { }) { apiService.deleteOutlet(payload) }
+    }
+
+    /**
+     * Persists the Member's own manual sort order for their outlet list.
+     * [orderedIds] must be every outlet id currently shown to this Member
+     * (both self-created and Admin-assigned -- see GET /outlet/list's own
+     * `member_id` scoping), in the desired top-to-bottom order; the server
+     * assigns 0..N-1 only to the ids it can confirm still belong to this
+     * Member, silently skipping anything stale (see POST /outlet/reorder's
+     * own comment) rather than rejecting the whole batch. Deliberately
+     * allowed for an Admin-assigned outlet this Member can only view -- this
+     * changes nothing but a personal display preference, never the outlet's
+     * own data, unlike updateOutlet/deleteOutlet above which are scoped to
+     * ownership instead.
+     */
+    suspend fun reorderOutlets(orderedIds: List<Int>): Result<Unit> {
+        val payload = mapOf("outlet_ids" to orderedIds)
+        return apiCall("Failed to save outlet order.", default = { }) { apiService.reorderOutlets(payload) }
     }
 }

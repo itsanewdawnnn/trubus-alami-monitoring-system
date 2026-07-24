@@ -127,7 +127,7 @@ tams/
   Detection" section and `web/README.md`'s "Live Tracking, Member History &
   Reverse Geocoding" section.
 - **`web/backend/` must never be renamed or moved.** The Android app has
-  `https://your-tams-domain.example/backend/` hardcoded as its default API URL
+  `https://tams.sbstrans.net/backend/` hardcoded as its default API URL
   (`MemberRepository.kt`). Changing that path breaks every already-installed
   copy of the app until manually reconfigured.
 

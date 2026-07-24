@@ -3,6 +3,7 @@ package com.trubus.tams.data.repository
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.core.content.edit
 import com.trubus.tams.data.api.ApiService
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +44,7 @@ import kotlinx.coroutines.withContext
  */
 class RemoteConfigRepository(
     context: Context,
-    private val baseUrlProvider: () -> String
+    private val baseUrlProvider: () -> String,
 ) {
     private val prefs: SharedPreferences =
         context.getSharedPreferences("remote_config_prefs", Context.MODE_PRIVATE)
@@ -121,7 +122,7 @@ class RemoteConfigRepository(
     suspend fun refreshIfStale() = withContext(Dispatchers.IO) {
         val lastFetch = prefs.getLong(KEY_LAST_FETCH_TIME, 0L)
         val now = System.currentTimeMillis()
-        if (lastFetch != 0L && (now - lastFetch) < STALE_THRESHOLD_MS) {
+        if (lastFetch != 0L && ((now - lastFetch) < STALE_THRESHOLD_MS)) {
             return@withContext
         }
 
@@ -135,23 +136,23 @@ class RemoteConfigRepository(
             val service = ApiService.create(baseUrlProvider()) { null }
             val response = service.getAppConfig()
             val body = response.body()
-            if (response.isSuccessful && body?.success == true && body.data != null) {
+            if (response.isSuccessful && (body?.success == true) && (body.data != null)) {
                 val config = body.data
-                val editor = prefs.edit()
-                config[KEY_GPS_INTERVAL_SECONDS]?.toIntOrNull()?.let {
-                    editor.putInt(KEY_GPS_INTERVAL_SECONDS, it)
+                prefs.edit {
+                    config[KEY_GPS_INTERVAL_SECONDS]?.toIntOrNull()?.let {
+                        putInt(KEY_GPS_INTERVAL_SECONDS, it)
+                    }
+                    config[KEY_SYNC_INTERVAL_MINUTES]?.toLongOrNull()?.let {
+                        putLong(KEY_SYNC_INTERVAL_MINUTES, it)
+                    }
+                    config[KEY_PASSWORD_MIN_LENGTH]?.toIntOrNull()?.let {
+                        putInt(KEY_PASSWORD_MIN_LENGTH, it)
+                    }
+                    config[KEY_PASSWORD_MAX_LENGTH]?.toIntOrNull()?.let {
+                        putInt(KEY_PASSWORD_MAX_LENGTH, it)
+                    }
+                    putLong(KEY_LAST_FETCH_TIME, now)
                 }
-                config[KEY_SYNC_INTERVAL_MINUTES]?.toLongOrNull()?.let {
-                    editor.putLong(KEY_SYNC_INTERVAL_MINUTES, it)
-                }
-                config[KEY_PASSWORD_MIN_LENGTH]?.toIntOrNull()?.let {
-                    editor.putInt(KEY_PASSWORD_MIN_LENGTH, it)
-                }
-                config[KEY_PASSWORD_MAX_LENGTH]?.toIntOrNull()?.let {
-                    editor.putInt(KEY_PASSWORD_MAX_LENGTH, it)
-                }
-                editor.putLong(KEY_LAST_FETCH_TIME, now)
-                editor.apply()
                 Log.d(TAG, "Remote config refreshed successfully.")
             } else {
                 Log.w(TAG, "Remote config fetch returned failure; keeping existing cache.")

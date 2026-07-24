@@ -71,7 +71,7 @@ object AddressSearchService : ForwardGeocodingProvider {
     // (same Gradle module, `internal` visibility) reassigns it.
     internal var providers: List<ForwardGeocodingProvider> = listOf(
         NominatimSearchService,
-        PhotonSearchService
+        PhotonSearchService,
     )
 
     // Full clear on overflow, not real LRU -- same tradeoff every geocoding
@@ -109,7 +109,7 @@ object AddressSearchService : ForwardGeocodingProvider {
     override suspend fun search(query: String): List<AddressSearchResult> {
         val key = query.trim().lowercase(Locale.US)
         cache[key]?.let { entry ->
-            if (clockMillis() - entry.cachedAtMs < CACHE_TTL_MS) {
+            if ((clockMillis() - entry.cachedAtMs) < CACHE_TTL_MS) {
                 return entry.results
             }
             // Expired -- evict now rather than serve a stale answer. The

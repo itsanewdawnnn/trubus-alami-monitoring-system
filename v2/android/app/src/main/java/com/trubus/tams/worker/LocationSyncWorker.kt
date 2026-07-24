@@ -74,7 +74,7 @@ import java.util.concurrent.TimeUnit
  */
 class LocationSyncWorker(
     context: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -172,11 +172,11 @@ class LocationSyncWorker(
                 // comment for that last case) -- all three fail toward "try
                 // now" rather than silently doing nothing or trusting a
                 // clock reading that just proved itself unreliable.
-                val isStale = lastFixAgeMs == null || lastFixAgeMs > staleThresholdMs
+                val isStale = (lastFixAgeMs == null) || (lastFixAgeMs > staleThresholdMs)
                 if (isStale) {
                     Log.w("LocationSyncWorker", "Service was not running and last known fix is stale (age=${lastFixAgeMs}ms, threshold=${staleThresholdMs}ms); attempting one-shot location fix.")
                     try {
-                        val fix = withTimeoutOrNull(ONE_SHOT_FIX_TIMEOUT_MS) {
+                        val fix = withTimeoutOrNull(timeMillis = ONE_SHOT_FIX_TIMEOUT_MS) {
                             OneShotLocationProvider.getCurrentLocation(applicationContext)
                         }
                         if (fix == null) {

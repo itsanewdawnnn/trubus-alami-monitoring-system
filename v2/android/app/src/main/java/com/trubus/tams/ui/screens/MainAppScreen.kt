@@ -28,6 +28,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Notes
+import androidx.compose.material.icons.automirrored.outlined.DirectionsWalk
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -47,6 +49,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.core.net.toUri
 import com.trubus.tams.R
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -129,8 +132,7 @@ fun MainAppScreen(
     // this only re-fires when the state actually changes to a new
     // ReadyToInstall, not on every unrelated recomposition.
     LaunchedEffect(updateState) {
-        val ready = updateState as? UpdateFlowState.ReadyToInstall
-        if (ready != null) {
+        (updateState as? UpdateFlowState.ReadyToInstall)?.let { ready ->
             viewModel.launchInstall(ready.apkFile)
         }
     }
@@ -498,7 +500,6 @@ fun LoginScreen(viewModel: MainViewModel) {
  * button couldn't do anything on that OS version.
  */
 private fun isIgnoringBatteryOptimizations(context: Context): Boolean {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true
     val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
     return powerManager.isIgnoringBatteryOptimizations(context.packageName)
 }
@@ -592,7 +593,7 @@ fun MemberDashboard(viewModel: MainViewModel) {
     // never changes, so nothing else would prompt Compose to re-check
     // elapsed time on its own. Updated on the same 3s tick as the freshness
     // poll below.
-    var nowMillis by remember { mutableStateOf(System.currentTimeMillis()) }
+    var nowMillis by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
     // Re-reads the persisted last fix from disk every few seconds while
     // tracking is active, instead of relying solely on MemberLocationService's
@@ -605,7 +606,7 @@ fun MemberDashboard(viewModel: MainViewModel) {
             while (true) {
                 viewModel.refreshLastKnownLocation()
                 nowMillis = System.currentTimeMillis()
-                delay(3000)
+                delay(3000L)
             }
         }
     }
@@ -645,7 +646,7 @@ fun MemberDashboard(viewModel: MainViewModel) {
     // parse-and-subtract, including the same clock-rollback exposure that
     // function used to have before it was hardened.
     val isLocationStale = remember(lastLocation, nowMillis, isTrackingActive) {
-        if (!isTrackingActive || lastLocation == null) {
+        if (!isTrackingActive || (lastLocation == null)) {
             false
         } else {
             val ageMs = TrackingHealth.elapsedMillisSince(lastLocation!!.time)
@@ -679,7 +680,7 @@ fun MemberDashboard(viewModel: MainViewModel) {
     // screen; drives one extra delayed re-check since some OEM ROMs
     // (observed: iQOO/vivo OriginOS 6) take a moment to propagate a
     // just-granted exemption. Bounded, one-shot -- not a polling loop.
-    var batteryOptimizationRecheckTrigger by remember { mutableStateOf(0) }
+    var batteryOptimizationRecheckTrigger by remember { mutableIntStateOf(0) }
     LaunchedEffect(batteryOptimizationRecheckTrigger) {
         if (batteryOptimizationRecheckTrigger > 0) {
             delay(1500)
@@ -745,8 +746,8 @@ fun MemberDashboard(viewModel: MainViewModel) {
                     showBackgroundPermissionDialog = true
                 } else {
                     viewModel.requestStartTracking { errorMessage ->
-                        if (errorMessage != null) {
-                            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                        errorMessage?.let {
+                            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
                         }
                     }
                 }
@@ -848,16 +849,12 @@ fun MemberDashboard(viewModel: MainViewModel) {
         if (!isIgnoringBatteryOptimizations && !batteryOptimizationCardDismissed) {
             item {
                 BatteryOptimizationCard(
-                    onRequestExemption = {
+                            onRequestExemption = {
                         try {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                                    data = Uri.parse("package:${context.packageName}")
-                                }
-                                batteryOptimizationLauncher.launch(intent)
-                            } else {
-                                Toast.makeText(context, "Not supported on this OS version", Toast.LENGTH_SHORT).show()
+                            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                                data = "package:${context.packageName}".toUri()
                             }
+                            batteryOptimizationLauncher.launch(intent)
                         } catch (e: Exception) {
                             Log.e("MemberDashboard", "Battery optimization intent failed: ${e.message}")
                         }
@@ -1217,9 +1214,10 @@ private fun MemberProfileCard(viewModel: MainViewModel, currentUser: UserDto?) {
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        if (!currentUser?.note.isNullOrBlank()) {
+                        val note = currentUser?.note
+                        if (!note.isNullOrBlank()) {
                             Text(
-                                text = "Note: ${currentUser?.note}",
+                                text = "Note: $note",
                                 fontSize = 13.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 1,
@@ -1251,7 +1249,7 @@ private fun MemberProfileCard(viewModel: MainViewModel, currentUser: UserDto?) {
                 fun trySave() {
                     keyboardController?.hide()
                     focusManager.clearFocus()
-                    val passwordArg: String? = if (password.isBlank()) null else password
+                    val passwordArg = password.ifBlank { null }
                     viewModel.updateProfile(name, username, note, passwordArg) { success, message ->
                         Toast.makeText(context, message, if (success) Toast.LENGTH_SHORT else Toast.LENGTH_LONG).show()
                         if (success) password = ""
@@ -1302,11 +1300,11 @@ private fun MemberProfileCard(viewModel: MainViewModel, currentUser: UserDto?) {
                     Spacer(modifier = Modifier.height(10.dp))
 
                     OutlinedTextField(
-                        value = note,
-                        onValueChange = { note = it },
-                        label = { Text("Note (Visible to Admin)") },
-                        leadingIcon = { Icon(Icons.Default.Notes, contentDescription = null) },
-                        singleLine = true,
+                    value = note,
+                    onValueChange = { note = it },
+                    label = { Text("Note (Visible to Admin)") },
+                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.Notes, contentDescription = null) },
+                    singleLine = true,
                         shape = RoundedCornerShape(16.dp),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text),
                         keyboardActions = KeyboardActions(onNext = { passwordFocus.requestFocus() }),
@@ -1545,14 +1543,14 @@ fun AdminDashboard(viewModel: MainViewModel) {
                     modifier = Modifier.weight(1f),
                     icon = Icons.Default.People,
                     label = "Active Members",
-                    value = "$activeMemberCount",
+                    value = activeMemberCount.toString(),
                     subValue = "/$totalMemberCount"
                 )
                 BentoStatCard(
                     modifier = Modifier.weight(1f),
-                    icon = Icons.Outlined.DirectionsWalk,
+                    icon = Icons.AutoMirrored.Outlined.DirectionsWalk,
                     label = "Currently Moving",
-                    value = "$movingMemberCount",
+                    value = movingMemberCount.toString(),
                     subValue = "/$activeMemberCount"
                 )
             }
@@ -1914,8 +1912,8 @@ fun AdminMapScreen(
                             // doesn't fire a fresh request on every 5s poll --
                             // only when the rounded position actually changes.
                             var nearbyLabel by remember(loc.user_id) { mutableStateOf<String?>(null) }
-                            val roundedLat = loc.latitude?.let { Math.round(it * 10000.0) }
-                            val roundedLon = loc.longitude?.let { Math.round(it * 10000.0) }
+                            val roundedLat = loc.latitude?.let { kotlin.math.round(it * 10000.0) }
+                            val roundedLon = loc.longitude?.let { kotlin.math.round(it * 10000.0) }
                             LaunchedEffect(loc.user_id, roundedLat, roundedLon) {
                                 nearbyLabel = if (loc.latitude != null && loc.longitude != null) {
                                     ReverseGeocodingService.getNearbyLabel(loc.latitude, loc.longitude)
@@ -2337,10 +2335,6 @@ fun AdminHistoryScreen(viewModel: MainViewModel) {
                     )
 
                     val tappedPoint = selectedPointIndex?.let { historyPoints.getOrNull(it) }
-                    // Fully-qualified: this Box sits inside a ColumnScope, so
-                    // both the top-level and ColumnScope.AnimatedVisibility
-                    // overloads are reachable and the compiler can't
-                    // disambiguate automatically.
                     androidx.compose.animation.AnimatedVisibility(
                         visible = tappedPoint != null,
                         enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
@@ -2499,7 +2493,7 @@ private fun SimpleMonthCalendar(
         val dow = Calendar.getInstance(WibTime.ZONE).apply {
             clear()
             set(year, month - 1, 1)
-        }.get(Calendar.DAY_OF_WEEK)
+        }[Calendar.DAY_OF_WEEK]
         (dow + 5) % 7
     }
     val todayKey = remember { WibTime.today() }
@@ -2578,7 +2572,7 @@ private fun SimpleMonthCalendar(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "$day",
+                                    text = day.toString(),
                                     fontSize = 13.sp,
                                     fontWeight = if (hasData) FontWeight.Bold else FontWeight.Normal,
                                     color = when {
@@ -2604,7 +2598,7 @@ private fun shiftYearMonth(yearMonth: String, delta: Int): String {
         set(year, month - 1, 1)
         add(Calendar.MONTH, delta)
     }
-    return "%04d-%02d".format(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1)
+    return "%04d-%02d".format(cal[Calendar.YEAR], cal[Calendar.MONTH] + 1)
 }
 
 private fun monthTitleLabel(yearMonth: String): String {
@@ -2828,8 +2822,8 @@ private fun computeHistoryGapIndices(points: List<HistoryPointDto>): Set<Int> {
 
     val gaps = mutableSetOf<Int>()
     for (i in 0 until points.size - 1) {
-        val curTime = try { parser.parse(points[i].recorded_at)?.time } catch (e: Exception) { null }
-        val nextTime = try { parser.parse(points[i + 1].recorded_at)?.time } catch (e: Exception) { null }
+        val curTime = try { parser.parse(points[i].recorded_at)?.time } catch (_: Exception) { null }
+        val nextTime = try { parser.parse(points[i + 1].recorded_at)?.time } catch (_: Exception) { null }
         if (curTime != null && nextTime != null) {
             val gapSeconds = (nextTime - curTime) / 1000
             if (gapSeconds > MAX_NORMAL_FIX_GAP_SECONDS) {
@@ -2851,7 +2845,7 @@ fun formatToWIB(wibTimeString: String?): String {
     return try {
         WibTime.formatter("yyyy-MM-dd HH:mm:ss").parse(wibTimeString)
         wibTimeString
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         wibTimeString
     }
 }

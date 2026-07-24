@@ -27,12 +27,14 @@ interface OfflineLocationDao {
 
     // Safety net for extended offline periods: keeps only the most recent
     // [keepCount] queued points so the local queue can't grow unbounded.
-    @Query("""
+    @Query(
+        """
         DELETE FROM tams_offline_locations
         WHERE id NOT IN (
             SELECT id FROM tams_offline_locations ORDER BY timestamp DESC LIMIT :keepCount
         )
-    """)
+        """,
+    )
     suspend fun trimToMostRecent(keepCount: Int)
 }
 
@@ -40,11 +42,8 @@ interface OfflineLocationDao {
     entities = [
         OfflineLocation::class
     ],
-    // v4: added isMock/gnssSatellitesUsed columns (see OfflineLocation's own
-    // doc comment) -- fallbackToDestructiveMigration below means this just
-    // wipes and recreates the local queue on upgrade, acceptable per that
-    // property's own doc comment (transient retry queue, not a durable store).
-    version = 4,
+    // v5: added UNIQUE constraint on (userId, recordedAt) to OfflineLocation.
+    version = 5,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

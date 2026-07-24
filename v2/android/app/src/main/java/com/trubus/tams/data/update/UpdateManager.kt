@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
+import androidx.core.content.edit
 import androidx.core.content.FileProvider
 import com.trubus.tams.BuildConfig
 import com.trubus.tams.data.model.VersionInfoDto
@@ -14,7 +15,6 @@ import com.trubus.tams.data.repository.UpdateRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import org.json.JSONArray
 import java.io.File
 
@@ -22,8 +22,8 @@ import java.io.File
  * The whole OTA update flow as one state machine: no update known yet ->
  * a newer version is available (dialog shown) -> downloading -> either
  * ready to install or failed -> (if the OS blocks installs from this app)
- * needs a one-time settings permission first. [info] rides along on every
- * state past [Available] so the dialog can keep showing the same
+ * needs a one-time settings permission first. `info` rides along on every
+ * state past `Available` so the dialog can keep showing the same
  * version name/release notes/force-update flag throughout, without the UI
  * needing to separately track "which update is this download for".
  */
@@ -36,7 +36,7 @@ sealed class UpdateFlowState {
         val info: VersionInfoDto,
         val percent: Int,
         val downloadedBytes: Long,
-        val totalBytes: Long
+        val totalBytes: Long,
     ) : UpdateFlowState()
 
     data class DownloadFailed(val info: VersionInfoDto, val message: String) : UpdateFlowState()
@@ -46,12 +46,12 @@ sealed class UpdateFlowState {
 
 /**
  * Orchestrates the OTA update flow: check -> optional dialog / forced block
- * -> download -> install hand-off. Owned privately by [MainViewModel]
+ * -> download -> install hand-off. Owned privately by `MainViewModel`
  * (never exposed to the UI layer directly -- CLAUDE.md's architecture rule
  * is that MainViewModel is the only thing ui/screens/ talks to);
- * MainViewModel forwards [state] as its own StateFlow and delegates its
+ * MainViewModel forwards `state` as its own StateFlow and delegates its
  * update-related functions here, the same composition pattern it already
- * uses for [MemberRepository].
+ * uses for `MemberRepository`.
  *
  * Deliberately a plain class, not a ViewModel of its own: it needs no
  * SavedStateHandle or lifecycle awareness beyond the Application context it
@@ -176,16 +176,16 @@ class UpdateManager(
     }
 
     private fun persistPendingForceUpdate(info: VersionInfoDto) {
-        prefs.edit()
-            .putInt(KEY_VERSION_CODE, info.version_code)
-            .putString(KEY_VERSION_NAME, info.version_name)
-            .putString(KEY_APK_URL, info.apk_url)
-            .putString(KEY_RELEASE_NOTES, JSONArray(info.release_notes).toString())
-            .apply()
+        prefs.edit {
+            putInt(KEY_VERSION_CODE, info.version_code)
+            putString(KEY_VERSION_NAME, info.version_name)
+            putString(KEY_APK_URL, info.apk_url)
+            putString(KEY_RELEASE_NOTES, JSONArray(info.release_notes).toString())
+        }
     }
 
     private fun clearPersistedPendingForceUpdate() {
-        prefs.edit().clear().apply()
+        prefs.edit { clear() }
     }
 
     private fun decodeReleaseNotes(raw: String?): List<String> {
@@ -193,7 +193,7 @@ class UpdateManager(
         return try {
             val array = JSONArray(raw)
             List(array.length()) { array.getString(it) }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
     }
@@ -253,9 +253,15 @@ class UpdateManager(
         }
 
     /** Opens the OS settings screen where the user grants "install unknown apps" for this app specifically (API 26+ only -- see [canInstallPackages]). */
-    fun installPermissionSettingsIntent(): Intent =
-        Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${appContext.packageName}"))
+    fun installPermissionSettingsIntent(): Intent {
+        val action = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES
+        } else {
+            Settings.ACTION_SECURITY_SETTINGS
+        }
+        return Intent(action, Uri.parse("package:${appContext.packageName}"))
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
 
     /**
      * Re-checks install permission and, if now granted, advances
@@ -266,7 +272,7 @@ class UpdateManager(
      */
     fun recheckInstallPermission() {
         val current = _state.value
-        if (current is UpdateFlowState.NeedsInstallPermission && canInstallPackages()) {
+        if (current is UpdateFlowState.NeedsInstallPermission && (canInstallPackages())) {
             _state.value = UpdateFlowState.ReadyToInstall(current.info, current.apkFile)
         }
     }
@@ -302,9 +308,9 @@ class UpdateManager(
             true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to launch package installer: ${e.message}")
-            if (info != null) {
+            info?.let {
                 _state.value = UpdateFlowState.DownloadFailed(
-                    info,
+                    it,
                     "No package installer app was found on this device."
                 )
             }

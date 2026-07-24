@@ -1,7 +1,6 @@
 package com.trubus.tams.ui.viewmodel
 
 import android.app.Application
-import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -46,7 +45,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // never surface to the UI.
     private val activityLogRepository = ActivityLogRepository(
         baseUrlProvider = { repository.baseUrl },
-        tokenProvider = { repository.authToken }
+        tokenProvider = { repository.authToken },
     )
 
     // --- OTA Update ---
@@ -63,10 +62,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // validateSessionOnStartup() (below) is allowed to flip this to true,
     // and only after the server has actually confirmed the token is still
     // valid. See that function's doc comment for why.
-    private val _isLoggedIn = MutableStateFlow(false)
+    private val _isLoggedIn = MutableStateFlow(value = false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
 
-    private val _user = MutableStateFlow<UserDto?>(repository.currentUser)
+    private val _user = MutableStateFlow(repository.currentUser)
     val user: StateFlow<UserDto?> = _user.asStateFlow()
 
     // True from process start until validateSessionOnStartup()'s check
@@ -194,6 +193,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // Member bounces Outlet tab -> Dashboard -> Outlet quickly) -- same
     // out-of-order guard as historyFetchJob below.
     private var outletsFetchJob: Job? = null
+
+    // Cancelled on logout() alongside outletsFetchJob above -- without this,
+    // a reorder saved right before logging out could still complete (or
+    // fail and re-fetch) after _outlets has already been cleared for the
+    // next account on a shared device, the same class of bug that section
+    // of logout() already guards every other outlet StateFlow against.
+    private var outletReorderJob: Job? = null
 
     fun fetchOutlets() {
         outletsFetchJob?.cancel()
@@ -329,6 +335,49 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 onResult(true, "Outlet deleted.")
             } else {
                 onResult(false, result.exceptionOrNull()?.message ?: "Failed to delete outlet.")
+            }
+        }
+    }
+
+    /**
+     * Called once a drag-to-reorder gesture ends (OutletScreen.kt's
+     * MemberOutletScreen list). [orderedIds] is every outlet currently shown,
+     * in the Member's newly chosen order. Updates [outlets] immediately
+     * (optimistic -- the caller already reflects this exact order locally
+     * mid-drag, so this just makes it the new source of truth instead of a
+     * separate fetchOutlets() round trip flashing the list), then persists
+     * in the background; only re-fetches from the server to correct course
+     * if that save actually fails, rather than leaving a locally-guessed
+     * order that silently never made it to the server.
+     */
+    fun reorderOutlets(orderedIds: List<Int>, onResult: ((success: Boolean, message: String) -> Unit)? = null) {
+        val currentById = _outlets.value.associateBy { it.id }
+        val reordered = orderedIds.mapNotNull { currentById[it] }
+        if (reordered.size == _outlets.value.size) {
+            _outlets.value = reordered
+        }
+        // Cancel any in-flight fetch too, not just a previous reorder: a
+        // slower fetchOutlets() call still pending from before this drag
+        // could otherwise land AFTER the optimistic update above and
+        // silently overwrite it back to the pre-reorder order. Cancelling
+        // it skips fetchOutlets()'s own `_outletsLoading.value = false` at
+        // its tail, so reset the flag here too -- otherwise a fetch
+        // cancelled mid-flight would leave the loading spinner (and
+        // reorderEnabled, which is gated on it) stuck permanently, since
+        // nothing else would ever clear it.
+        outletsFetchJob?.cancel()
+        _outletsLoading.value = false
+        outletReorderJob?.cancel()
+        outletReorderJob = viewModelScope.launch {
+            val result = repository.reorderOutlets(orderedIds)
+            if (result.isSuccess) {
+                onResult?.invoke(true, "Outlet order saved.")
+            } else {
+                // The optimistic order above never actually saved -- resync
+                // with the server's real order rather than let the Member
+                // keep looking at an arrangement that silently didn't stick.
+                fetchOutlets()
+                onResult?.invoke(false, result.exceptionOrNull()?.message ?: "Failed to save outlet order.")
             }
         }
     }
@@ -501,7 +550,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun onAppResumed() {
         val current = updateState.value
-        if (current is UpdateFlowState.ReadyToInstall && current.info.force_update) {
+        if (current is UpdateFlowState.ReadyToInstall && (current.info.force_update)) {
             updateManager.launchInstall(current.apkFile)
             return
         }
@@ -683,6 +732,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _lastSyncTime.value = repository.lastSyncTime
             _memberTripSummary.value = null
             outletsFetchJob?.cancel()
+            outletReorderJob?.cancel()
             _outlets.value = emptyList()
             _outletsError.value = null
             _outletFormError.value = null
@@ -859,7 +909,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      * Writes one Log entry per changed field (Username, Note), matching the
-     * spec's example format ("[Date] Wawan changed Username from member01
+     * spec's example format ("`[Date]` Wawan changed Username from member01
      * to member_surabaya"), plus one entry for a password change --
      * NEVER the password value itself, only the bare fact that it changed.
      * Logged with [succeeded]'s actual outcome (not assumed success) for
@@ -1029,7 +1079,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         pollingJob = viewModelScope.launch {
             while (true) {
                 fetchCurrentLocations()
-                delay(5000)
+                delay(5000L)
             }
         }
     }

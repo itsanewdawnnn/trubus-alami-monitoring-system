@@ -73,38 +73,40 @@ object ReverseGeocodingService {
         // aborts the in-flight HTTP call via invokeOnCancellation, instead of
         // leaving a blocked IO thread running for up to the 6s timeout for
         // a result nothing will ever read.
-        val label = suspendCancellableCoroutine<String?> { continuation ->
+        val label = suspendCancellableCoroutine { continuation ->
             val call = client.newCall(request)
             continuation.invokeOnCancellation { call.cancel() }
-            call.enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    if (call.isCanceled()) return
-                    Log.w(TAG, "Reverse geocoding failed: ${e.message}")
-                    continuation.resume(null)
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    response.use {
-                        if (!it.isSuccessful) {
-                            Log.w(TAG, "Reverse geocoding HTTP ${it.code}")
-                            continuation.resume(null)
-                            return
-                        }
-                        val body = it.body?.string()
-                        if (body == null) {
-                            continuation.resume(null)
-                            return
-                        }
-                        val displayName = try {
-                            JSONObject(body).optString("display_name", "")
-                        } catch (e: org.json.JSONException) {
-                            Log.w(TAG, "Reverse geocoding: malformed JSON response")
-                            ""
-                        }
-                        continuation.resume(formatLabel(displayName))
+            call.enqueue(
+                object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        if (call.isCanceled()) return
+                        Log.w(TAG, "Reverse geocoding failed: ${e.message}")
+                        continuation.resume(null)
                     }
-                }
-            })
+
+                    override fun onResponse(call: Call, response: Response) {
+                        response.use {
+                            if (!it.isSuccessful) {
+                                Log.w(TAG, "Reverse geocoding HTTP ${it.code}")
+                                continuation.resume(null)
+                                return
+                            }
+                            val body = it.body?.string()
+                            if (body == null) {
+                                continuation.resume(null)
+                                return
+                            }
+                            val displayName = try {
+                                JSONObject(body).optString("display_name", "")
+                            } catch (_: org.json.JSONException) {
+                                Log.w(TAG, "Reverse geocoding: malformed JSON response")
+                                ""
+                            }
+                            continuation.resume(formatLabel(displayName))
+                        }
+                    }
+                },
+            )
         }
 
         if (label != null) {
@@ -123,7 +125,11 @@ object ReverseGeocodingService {
      */
     private fun formatLabel(displayName: String): String? {
         if (displayName.isBlank()) return null
-        val segments = displayName.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+        val segments = displayName.split(",")
+            .asSequence()
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .toList()
         if (segments.isEmpty()) return null
         val shortAddress = segments.take(2).joinToString(", ")
         return "Near $shortAddress"

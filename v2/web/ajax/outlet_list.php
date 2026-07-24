@@ -48,8 +48,32 @@ $sortDir = (strtoupper($_GET['dir'] ?? 'DESC') === 'ASC') ? 'ASC' : 'DESC';
 $where = 'WHERE o.deleted_at IS NULL';
 $params = [];
 
+// An APPROVED outlet with an open edit request (tams_outlet_edit_requests,
+// status='PENDING' -- see tams_outlets.status's own schema.sql comment)
+// needs the exact same Admin action -- approve or reject -- as a genuinely
+// new PENDING outlet does. It must therefore count toward the "Pending"
+// bucket here, not "Approved": an Admin working the Pending filter as their
+// review queue would otherwise never see it, since the outlet's own
+// `status` column still literally reads APPROVED while the edit sits
+// unreviewed. Symmetrically, "Approved" excludes it in the meantime, so a
+// given outlet is never double-counted across the two filters (it appears
+// in exactly one, matching whichever bucket the Admin still owes an action
+// on). Self-contained EXISTS subquery (not a JOIN) so this applies
+// identically to both the COUNT query above and the paginated SELECT below
+// without either needing to join tams_outlet_edit_requests just for this
+// filter -- same table/columns/index (idx_outlet_edit_requests_outlet_status)
+// the paginated SELECT's own LEFT JOIN further down already relies on.
+$hasPendingEditSql = "EXISTS (
+    SELECT 1 FROM tams_outlet_edit_requests er_filter
+    WHERE er_filter.outlet_id = o.id AND er_filter.status = 'PENDING'
+)";
+
 $statusFilter = $_GET['status'] ?? '';
-if (in_array($statusFilter, ['PENDING', 'APPROVED', 'REJECTED'], true)) {
+if ($statusFilter === 'PENDING') {
+    $where .= " AND (o.status = 'PENDING' OR (o.status = 'APPROVED' AND {$hasPendingEditSql}))";
+} elseif ($statusFilter === 'APPROVED') {
+    $where .= " AND o.status = 'APPROVED' AND NOT {$hasPendingEditSql}";
+} elseif ($statusFilter === 'REJECTED') {
     $where .= ' AND o.status = :status';
     $params['status'] = $statusFilter;
 }

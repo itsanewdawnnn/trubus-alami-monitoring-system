@@ -65,7 +65,7 @@ data class MapMarkerData(
     val position: GeoPoint,
     val title: String,
     val snippet: String,
-    val isActive: Boolean
+    val isActive: Boolean,
 )
 
 // Squared lat/lon distance, not true haversine -- only needs to rank points
@@ -78,7 +78,7 @@ private fun nearestRoutePointIndex(points: List<GeoPoint>, target: GeoPoint): In
     for (i in points.indices) {
         val dLat = points[i].latitude - target.latitude
         val dLon = points[i].longitude - target.longitude
-        val distSq = dLat * dLat + dLon * dLon
+        val distSq = (dLat * dLat) + (dLon * dLon)
         if (distSq < bestDistSq) {
             bestDistSq = distSq
             bestIndex = i
@@ -436,10 +436,10 @@ fun OsmMap(
             // above rather than recreating it. See that creation site's
             // comment for why the listener isn't attached there directly.
             if (onRoutePointSelected != null) {
-                routeHitAreaOverlay.value?.setOnClickListener(Polyline.OnClickListener { _, _, eventPos ->
+                routeHitAreaOverlay.value?.setOnClickListener { _, _, eventPos ->
                     nearestRoutePointIndex(routePoints, eventPos)?.let { onRoutePointSelected(it) }
                     true
-                })
+                }
             }
 
             // Only re-centers the first time this exact route is shown (an
