@@ -120,8 +120,7 @@ object ReverseGeocodingService {
 
     /**
      * Nominatim's `display_name` lists components from most to least
-     * specific, comma-separated. Takes just the first two segments and
-     * prefixes "Near " for a short landmark hint instead of the full address.
+     * specific, comma-separated. Takes just the first two segments.
      */
     private fun formatLabel(displayName: String): String? {
         if (displayName.isBlank()) return null
@@ -131,7 +130,6 @@ object ReverseGeocodingService {
             .filter { it.isNotEmpty() }
             .toList()
         if (segments.isEmpty()) return null
-        val shortAddress = segments.take(2).joinToString(", ")
-        return "Near $shortAddress"
+        return segments.take(2).joinToString(", ")
     }
 }

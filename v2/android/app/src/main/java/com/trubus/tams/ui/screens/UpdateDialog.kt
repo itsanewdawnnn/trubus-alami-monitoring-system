@@ -21,7 +21,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.trubus.tams.R
 import com.trubus.tams.data.model.VersionInfoDto
 import com.trubus.tams.data.update.UpdateFlowState
 
@@ -108,7 +110,7 @@ fun UpdateDialog(
             )
         },
         title = {
-            Text(if (forced) "Mandatory Update" else "Update Available")
+            Text(if (forced) stringResource(R.string.mandatory_update) else stringResource(R.string.update_available))
         },
         text = { UpdateDialogBody(state, info) },
         confirmButton = { UpdateDialogConfirmButton(state, onUpdateClick, onRetryClick, onOpenSettingsClick, onInstallClick) },
@@ -117,7 +119,7 @@ fun UpdateDialog(
             // (available, downloading, failed, needs-permission) -- the user
             // must see this through to install before continuing.
             if (!forced) {
-                TextButton(onClick = onLaterClick) { Text("LATER") }
+                TextButton(onClick = onLaterClick) { Text(stringResource(R.string.later_action)) }
             }
         }
     )
@@ -127,7 +129,7 @@ fun UpdateDialog(
 private fun UpdateDialogBody(state: UpdateFlowState, info: VersionInfoDto) {
     Column {
         Text(
-            "Version ${info.version_name} is available.",
+            stringResource(R.string.version_available, info.version_name),
             style = MaterialTheme.typography.bodyMedium
         )
 
@@ -151,7 +153,7 @@ private fun UpdateDialogBody(state: UpdateFlowState, info: VersionInfoDto) {
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Downloading... ${state.percent}%",
+                        stringResource(R.string.downloading_percent, state.percent),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -163,7 +165,7 @@ private fun UpdateDialogBody(state: UpdateFlowState, info: VersionInfoDto) {
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Downloading... ${formatBytes(state.downloadedBytes)}",
+                        stringResource(R.string.downloading_bytes, formatBytes(state.downloadedBytes)),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -180,7 +182,7 @@ private fun UpdateDialogBody(state: UpdateFlowState, info: VersionInfoDto) {
             is UpdateFlowState.NeedsInstallPermission -> {
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    "The app needs \"Install unknown apps\" permission to install this update. Tap Open Settings, enable that permission for TAMS, then return to the app.",
+                    stringResource(R.string.needs_install_permission),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -194,7 +196,7 @@ private fun UpdateDialogBody(state: UpdateFlowState, info: VersionInfoDto) {
             is UpdateFlowState.ReadyToInstall -> {
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    "The update has been downloaded. If the installer didn't open automatically, tap Install below.",
+                    stringResource(R.string.ready_to_install),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -220,7 +222,7 @@ private fun UpdateDialogConfirmButton(
 ) {
     when (state) {
         is UpdateFlowState.Available -> {
-            Button(onClick = onUpdateClick) { Text("UPDATE") }
+            Button(onClick = onUpdateClick) { Text(stringResource(R.string.update_action)) }
         }
         is UpdateFlowState.Downloading -> {
             // No confirm action while a download is already in flight --
@@ -231,14 +233,14 @@ private fun UpdateDialogConfirmButton(
             }
         }
         is UpdateFlowState.DownloadFailed -> {
-            Button(onClick = onRetryClick) { Text("RETRY") }
+            Button(onClick = onRetryClick) { Text(stringResource(R.string.retry_action)) }
         }
         is UpdateFlowState.NeedsInstallPermission -> {
-            Button(onClick = onOpenSettingsClick) { Text("OPEN SETTINGS") }
+            Button(onClick = onOpenSettingsClick) { Text(stringResource(R.string.open_settings_action)) }
         }
         // Only reachable when forced -- see UpdateDialog's doc comment.
         is UpdateFlowState.ReadyToInstall -> {
-            Button(onClick = onInstallClick) { Text("INSTALL") }
+            Button(onClick = onInstallClick) { Text(stringResource(R.string.install_action)) }
         }
         else -> Unit
     }

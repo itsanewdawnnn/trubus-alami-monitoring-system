@@ -1,0 +1,195 @@
+<resources>
+    <string name="app_name">TAMS</string>
+    <string name="app_full_name">TAMS - Trubus Alami Monitoring System</string>
+
+    <!-- Pemilihan Bahasa -->
+    <string name="language">Bahasa</string>
+    <string name="language_en">English</string>
+    <string name="language_id">Bahasa Indonesia</string>
+
+    <!-- Tindakan Umum -->
+    <string name="cancel">BATAL</string>
+    <string name="save">SIMPAN</string>
+    <string name="delete">Hapus</string>
+    <string name="add">Tambah</string>
+    <string name="edit">Ubah</string>
+    <string name="try_again">COBA LAGI</string>
+    <string name="select">Pilih</string>
+    <string name="close">Tutup</string>
+    <string name="back">Kembali</string>
+
+    <!-- Layar Masuk -->
+    <string name="login_title">Masuk ke akun Anda.</string>
+    <string name="login_subtitle">Silakan masukkan kredensial Anda untuk mengakses akun.</string>
+    <string name="username">Nama Pengguna</string>
+    <string name="password">Kata Sandi</string>
+    <string name="hide_password">Sembunyikan kata sandi</string>
+    <string name="show_password">Tampilkan kata sandi</string>
+    <string name="sign_in">MASUK</string>
+    <string name="checking">MEMERIKSA…</string>
+    <string name="logout">Keluar</string>
+    <string name="username_label">Nama Pengguna: %s</string>
+    <string name="logout_confirm_title">Keluar</string>
+    <string name="logout_confirm_message">Apakah Anda yakin ingin keluar?</string>
+    <string name="invalid_role">Peran tidak valid: %s</string>
+
+    <!-- Navigasi -->
+    <string name="dashboard">Dasbor</string>
+    <string name="outlet">Outlet</string>
+    <string name="active_members">Anggota Aktif</string>
+    <string name="real_time_map">Peta Real-Time</string>
+    <string name="member_history">Riwayat Anggota</string>
+
+    <!-- Dasbor Anggota -->
+    <string name="member_location">LOKASI ANGGOTA</string>
+    <string name="real_time_location">LOKASI REAL-TIME</string>
+    <string name="tracking_active">Aktif</string>
+    <string name="tracking_inactive">Tidak Aktif</string>
+    <string name="start">MULAI</string>
+    <string name="stop">BERHENTI</string>
+    <string name="last_coordinate_status">STATUS KOORDINAT TERAKHIR</string>
+    <string name="no_location_yet">Belum ada lokasi terekam. Ketuk \'MULAI\' untuk mulai mengirim koordinat GPS.</string>
+    <string name="stale_location_warning">Tidak ada pembaruan GPS terbaru. Periksa sinyal/koneksi — aplikasi akan mencoba memulihkan secara otomatis.</string>
+    <string name="time_recorded">Waktu Terekam</string>
+    <string name="latitude">Lintang</string>
+    <string name="longitude">Bujur</string>
+    <string name="accuracy_gps">Akurasi (GPS)</string>
+    <string name="travel_speed">Kecepatan Perjalanan</string>
+    <string name="server_sync">Sinkronisasi Server</string>
+    <string name="trip_detail">DETAIL PERJALANAN</string>
+    <string name="no_trip_today">Belum ada perjalanan terekam hari ini.</string>
+    <string name="total_distance">Total Jarak</string>
+    <string name="duration">Durasi</string>
+    <string name="time_range">Rentang Waktu</string>
+    <string name="bg_optimization_title">Optimasi Latar Belakang</string>
+    <string name="bg_optimization_text">Optimasi baterai harus dinonaktifkan agar aplikasi berfungsi dengan baik.</string>
+    <string name="ignore_bg_optimization">Abaikan Optimasi Baterai</string>
+    <string name="already_configured">Saya sudah mengonfigurasi ini, tetap mulai</string>
+
+    <!-- Ubah Profil -->
+    <string name="edit_profile">Ubah Profil</string>
+    <string name="name">Nama</string>
+    <string name="note_admin">Catatan (Terlihat oleh Admin)</string>
+    <string name="new_password_optional">Kata Sandi Baru (opsional)</string>
+    <string name="password_blank_hint">Biarkan kosong jika Anda tidak ingin mengubah kata sandi</string>
+
+    <!-- Layar Admin -->
+    <string name="currently_moving">Sedang Bergerak</string>
+    <string name="online">ONLINE</string>
+    <string name="offline">OFFLINE</string>
+    <string name="moving">BERGERAK</string>
+    <string name="stationary">DIAM</string>
+    <string name="select_member">Pilih Anggota</string>
+    <string name="member">Anggota</string>
+    <string name="loading_members">Memuat daftar anggota…</string>
+    <string name="failed_load_members">Gagal memuat anggota. Ketuk untuk mencoba lagi.</string>
+    <string name="no_active_members">Tidak ada anggota aktif</string>
+    <string name="date">Tanggal</string>
+    <string name="select_date">Pilih Tanggal</string>
+    <string name="no_history_month">Tidak ada riwayat perjalanan untuk bulan ini.</string>
+    <string name="history_hint">Silakan pilih anggota &amp; tanggal untuk menampilkan riwayat perjalanan.</string>
+    <string name="no_history_found">Tidak ditemukan log perjalanan GPS untuk %1$s pada %2$s.</string>
+    <string name="missing_data_hint">Garis merah putus-putus: %d segmen dengan data lokasi yang hilang (bukan rute sebenarnya).</string>
+    <string name="prev_month">Bulan sebelumnya</string>
+    <string name="next_month">Bulan berikutnya</string>
+    <string name="last_update_at">Pembaruan terakhir: %s</string>
+    <string name="note_label">Catatan: %s</string>
+    <string name="near_prefix">Dekat %s</string>
+    <string name="start_point">Titik Mulai</string>
+    <string name="start_point_desc">Waktu koordinat pertama</string>
+    <string name="end_point">Titik Akhir</string>
+    <string name="end_point_desc">Waktu koordinat terakhir</string>
+    <string name="trip_history">Riwayat Perjalanan</string>
+    <string name="gps_points">Titik GPS</string>
+    <string name="active_moving">AKTIF - Bergerak</string>
+    <string name="active_stationary">AKTIF - Diam</string>
+    <string name="offline_last_update">OFFLINE (update terakhir %s)</string>
+
+    <!-- Outlet -->
+    <string name="my_outlets">Outlet Saya</string>
+    <string name="reload_outlets">Muat ulang outlet</string>
+    <string name="search_outlets">Cari outlet…</string>
+    <string name="clear_search">Hapus pencarian</string>
+    <string name="no_outlets_yet">Anda belum mendaftarkan outlet apa pun. Ketuk \'Tambah\' untuk mendaftarkan satu.</string>
+    <string name="no_outlets_match">Tidak ada outlet yang cocok dengan \"%s\".</string>
+    <string name="delete_outlet_title">Hapus Outlet</string>
+    <string name="delete_outlet_confirm">Hapus \"%s\"? Ini tidak dapat dibatalkan.</string>
+    <string name="status_approved">Disetujui</string>
+    <string name="status_rejected">Ditolak</string>
+    <string name="status_pending">Menunggu</string>
+    <string name="rejected_reason">Ditolak: %s</string>
+    <string name="changes_pending">Perubahan menunggu persetujuan</string>
+    <string name="last_edit_rejected">Ubah terakhir ditolak: %s</string>
+    <string name="assigned_by_admin">Ditugaskan oleh Admin</string>
+    <string name="scanning_data">Menunggu koordinat anggota. Memindai data…</string>
+    <string name="edit_outlet">Ubah Outlet</string>
+    <string name="add_outlet">Tambah Outlet</string>
+    <string name="approved_edit_warning">Outlet ini sudah disetujui. Perubahan Anda akan dikirimkan untuk ditinjau Admin dan tidak akan berlaku sampai disetujui.</string>
+    <string name="outlet_name">Nama Outlet</string>
+    <string name="address">Alamat</string>
+    <string name="address_auto_hint">Diisi secara otomatis berdasarkan lokasi pin.</string>
+    <string name="location_header">LOKASI</string>
+    <string name="search_address">Cari Alamat</string>
+    <string name="search_address_placeholder">misal. Jalan Sudirman, Jakarta</string>
+    <string name="address_not_found">Alamat tidak ditemukan.</string>
+    <string name="address_not_found_hint">Coba kata kunci lain, gunakan alamat yang lebih spesifik, atau pindahkan peta secara manual.</string>
+    <string name="use_current_location">Gunakan Lokasi Saat Ini</string>
+    <string name="pin_coordinates">Pin: %1$.6f, %2$.6f</string>
+    <string name="submit_changes">Kirim Perubahan</string>
+    <string name="submit_outlet">Kirim Outlet</string>
+
+    <!-- Pembaruan OTA -->
+    <string name="mandatory_update">Pembaruan Wajib</string>
+    <string name="update_available">Pembaruan Tersedia</string>
+    <string name="version_available">Versi %s tersedia.</string>
+    <string name="downloading_percent">Mengunduh… %d%%</string>
+    <string name="downloading_bytes">Mengunduh… %s</string>
+    <string name="needs_install_permission">Aplikasi memerlukan izin \"Instal aplikasi yang tidak dikenal\" untuk menginstal pembaruan ini. Ketuk Buka Pengaturan, aktifkan izin tersebut untuk TAMS, lalu kembali ke aplikasi.</string>
+    <string name="ready_to_install">Pembaruan telah diunduh. Jika penginstal tidak terbuka secara otomatis, ketuk Instal di bawah.</string>
+    <string name="update_action">PERBARUI</string>
+    <string name="retry_action">COBA LAGI</string>
+    <string name="open_settings_action">BUKA PENGATURAN</string>
+    <string name="install_action">INSTAL</string>
+    <string name="later_action">NANTI</string>
+
+    <!-- Izin & Kesalahan -->
+    <string name="permission_bg_required">Izin lokasi latar belakang (Izinkan sepanjang waktu) diperlukan untuk melacak di latar belakang.</string>
+    <string name="permission_required_toast">Izin lokasi diperlukan agar aplikasi berfungsi dengan baik.</string>
+    <string name="battery_optimization_required">Optimasi baterai harus diabaikan untuk mulai melacak. Ketuk kartu \'Abaikan Optimasi Baterai\' untuk mengonfigurasi.</string>
+    <string name="failed_stop_tracking">Gagal menghentikan pengiriman lokasi. Coba lagi.</string>
+    <string name="location_error">Tidak dapat mendapatkan lokasi Anda saat ini. Periksa sinyal GPS/jaringan dan coba lagi.</string>
+    <string name="location_permission_required">Izin lokasi diperlukan untuk menggunakan lokasi Anda saat ini.</string>
+
+    <!-- Pesan Kesalahan -->
+    <string name="session_expired">Sesi Anda telah berakhir atau tidak lagi valid. Silakan masuk kembali.</string>
+    <string name="network_error">Tidak dapat terhubung ke server. Silakan periksa koneksi internet Anda dan coba lagi.</string>
+    <string name="login_required">Nama pengguna dan kata sandi diperlukan.</string>
+    <string name="auth_failed">Autentikasi gagal.</string>
+    <string name="failed_load_outlets">Gagal memuat outlet.</string>
+    <string name="failed_load_history">Gagal memuat riwayat perjalanan.</string>
+    <string name="outlet_name_required">Nama outlet diperlukan.</string>
+    <string name="outlet_submitted">Outlet berhasil dikirim, menunggu persetujuan Admin.</string>
+    <string name="outlet_submit_failed">Gagal mengirim outlet.</string>
+    <string name="outlet_name_address_required">Nama dan alamat outlet diperlukan.</string>
+    <string name="outlet_changes_submitted">Perubahan dikirim. Data outlet saat ini tetap aktif sampai Admin menyetujui perubahan Anda.</string>
+    <string name="outlet_updated">Outlet diperbarui.</string>
+    <string name="outlet_edit_failed">Gagal mengirim perubahan outlet.</string>
+    <string name="outlet_deleted">Outlet dihapus.</string>
+    <string name="outlet_delete_failed">Gagal menghapus outlet.</string>
+    <string name="outlet_order_saved">Urutan outlet disimpan.</string>
+    <string name="outlet_order_failed">Gagal menyimpan urutan outlet.</string>
+    <string name="tracking_auto_stopped">Pelacakan dihentikan secara otomatis karena Anda berada di luar jam operasional yang diizinkan (admin mungkin telah mematikan akses Lokasi Paksa Anda).</string>
+    <string name="profile_name_user_required">Nama dan nama pengguna diperlukan.</string>
+    <string name="password_min_length">Kata sandi baru minimal %d karakter.</string>
+    <string name="password_max_length">Kata sandi baru maksimal %d karakter.</string>
+    <string name="profile_updated">Profil berhasil diperbarui.</string>
+    <string name="profile_update_failed">Gagal memperbarui profil.</string>
+    <string name="tracking_allowed_between">Pelacakan hanya diizinkan antara %1$s dan %2$s GMT+7.</string>
+    <string name="failed_start_tracking">Gagal mulai mengirim lokasi. Coba lagi.</string>
+
+    <!-- Layanan & Notifikasi -->
+    <string name="notif_channel_name">TAMS - Trubus Alami Monitoring System</string>
+    <string name="notif_channel_desc">Runtime sistem dan dependensi beroperasi normal.</string>
+    <string name="notif_title">TAMS - Trubus Alami Monitoring System</string>
+    <string name="notif_text">Runtime sistem dan dependensi beroperasi normal.</string>
+</resources>

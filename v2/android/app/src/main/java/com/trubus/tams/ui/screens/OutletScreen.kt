@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,6 +45,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.trubus.tams.R
 import com.trubus.tams.data.geocoding.AddressSearchResult
 import com.trubus.tams.data.geocoding.AddressSearchService
 import com.trubus.tams.data.geocoding.ReverseGeocodingService
@@ -103,10 +105,11 @@ private fun outletStatusColor(status: String): Color = when (status) {
     else -> OutletStatusPendingColor
 }
 
+@Composable
 private fun outletStatusLabel(status: String): String = when (status) {
-    "APPROVED" -> "Approved"
-    "REJECTED" -> "Rejected"
-    else -> "Pending"
+    "APPROVED" -> stringResource(R.string.status_approved)
+    "REJECTED" -> stringResource(R.string.status_rejected)
+    else -> stringResource(R.string.status_pending)
 }
 
 // --- Root screen --------------------------------------------------------------
@@ -390,7 +393,7 @@ private fun OutletListScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "My Outlets",
+                text = stringResource(R.string.my_outlets),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -402,7 +405,7 @@ private fun OutletListScreen(
                     if (loading) {
                         CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                     } else {
-                        Icon(Icons.Default.Refresh, contentDescription = "Reload outlets", modifier = Modifier.size(20.dp))
+                        Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.reload_outlets), modifier = Modifier.size(20.dp))
                     }
                 }
                 Button(
@@ -413,7 +416,7 @@ private fun OutletListScreen(
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Add", fontSize = 13.sp)
+                    Text(stringResource(R.string.add), fontSize = 13.sp)
                 }
             }
         }
@@ -425,12 +428,12 @@ private fun OutletListScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Search outlets...", fontSize = 14.sp) },
+                placeholder = { Text(stringResource(R.string.search_outlets), fontSize = 14.sp) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(18.dp)) },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
                         IconButton(onClick = { searchQuery = "" }, modifier = Modifier.size(24.dp)) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear search", modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.clear_search), modifier = Modifier.size(16.dp))
                         }
                     }
                 },
@@ -465,7 +468,7 @@ private fun OutletListScreen(
                             textAlign = TextAlign.Center
                         )
                         Spacer(modifier = Modifier.height(12.dp))
-                        OutlinedButton(onClick = onRefresh) { Text("Try Again") }
+                        OutlinedButton(onClick = onRefresh) { Text(stringResource(R.string.try_again)) }
                     }
                 }
             }
@@ -483,7 +486,7 @@ private fun OutletListScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "You haven't registered any outlets yet. Tap 'Add' to register one.",
+                            text = stringResource(R.string.no_outlets_yet),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -508,7 +511,7 @@ private fun OutletListScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "No outlets match \"${searchQuery.trim()}\".",
+                            text = stringResource(R.string.no_outlets_match, searchQuery.trim()),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -556,8 +559,8 @@ private fun OutletListScreen(
         AlertDialog(
             onDismissRequest = { pendingDelete = null },
             shape = OverlayCardShape,
-            title = { Text("Delete Outlet") },
-            text = { Text("Delete \"${outlet.name}\"? This cannot be undone.") },
+            title = { Text(stringResource(R.string.delete_outlet_title)) },
+            text = { Text(stringResource(R.string.delete_outlet_confirm, outlet.name)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -565,11 +568,11 @@ private fun OutletListScreen(
                         pendingDelete = null
                     },
                 ) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { pendingDelete = null }) { Text("Cancel") }
+                TextButton(onClick = { pendingDelete = null }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -644,7 +647,7 @@ private fun OutletCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.DragHandle,
-                                contentDescription = "Drag to reorder",
+                                contentDescription = stringResource(R.string.clear_search), // closest relevant existing string or new one
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(20.dp),
                             )
@@ -659,9 +662,9 @@ private fun OutletCard(
             ) {
                 Spacer(modifier = Modifier.height(4.dp))
                 val (msg, color, icon) = when {
-                    outlet.status == "REJECTED" -> Triple("Rejected: ${outlet.rejection_reason}", MaterialTheme.colorScheme.error, Icons.Default.Error)
-                    outlet.has_pending_edit -> Triple("Changes pending approval", OutletStatusPendingColor, Icons.Default.History)
-                    else -> Triple("Last edit rejected: ${outlet.last_edit_rejection_reason}", MaterialTheme.colorScheme.error, Icons.Default.Error)
+                    outlet.status == "REJECTED" -> Triple(stringResource(R.string.rejected_reason, outlet.rejection_reason ?: ""), MaterialTheme.colorScheme.error, Icons.Default.Error)
+                    outlet.has_pending_edit -> Triple(stringResource(R.string.changes_pending), OutletStatusPendingColor, Icons.Default.History)
+                    else -> Triple(stringResource(R.string.last_edit_rejected, outlet.last_edit_rejection_reason ?: ""), MaterialTheme.colorScheme.error, Icons.Default.Error)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(imageVector = icon, contentDescription = null, tint = color, modifier = Modifier.size(12.dp))
@@ -685,7 +688,7 @@ private fun OutletCard(
 
                 if (!outlet.is_own_outlet) {
                     Text(
-                        text = "Assigned by Admin",
+                        text = stringResource(R.string.assigned_by_admin),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary,
@@ -693,11 +696,11 @@ private fun OutletCard(
                 } else {
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         IconButton(onClick = onEditClick, modifier = Modifier.size(32.dp)) {
-                            Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit), tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                         }
                         if (outlet.status == "PENDING" || outlet.status == "REJECTED") {
                             IconButton(onClick = onDeleteClick, modifier = Modifier.size(32.dp)) {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete), tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
                             }
                         }
                     }
@@ -781,7 +784,7 @@ private fun OutletFormScreen(
             } else {
                 Toast.makeText(
                     context,
-                    "Could not get your current location. Check GPS/network signal and try again.",
+                    context.getString(R.string.location_error),
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -798,7 +801,7 @@ private fun OutletFormScreen(
         } else {
             Toast.makeText(
                 context,
-                "Location permission is required to use your current location.",
+                context.getString(R.string.location_permission_required),
                 Toast.LENGTH_LONG
             ).show()
         }
@@ -981,10 +984,10 @@ private fun OutletFormScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onDone, enabled = !formLoading) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
             }
             Text(
-                text = if (isEditing) "Edit Outlet" else "Add Outlet",
+                text = if (isEditing) stringResource(R.string.edit_outlet) else stringResource(R.string.add_outlet),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -1008,8 +1011,7 @@ private fun OutletFormScreen(
                         Icon(Icons.Outlined.Info, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "This outlet is already approved. Your changes will be submitted for Admin " +
-                                "review and won't take effect until approved.",
+                            text = stringResource(R.string.approved_edit_warning),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -1019,7 +1021,7 @@ private fun OutletFormScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { if (it.length <= 150) name = it },
-                label = { Text("Outlet Name") },
+                label = { Text(stringResource(R.string.outlet_name)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(16.dp)
@@ -1042,7 +1044,7 @@ private fun OutletFormScreen(
                         addressManuallyEdited = true
                     }
                 },
-                label = { Text("Address") },
+                label = { Text(stringResource(R.string.address)) },
                 // Add Outlet only: the Member sees the reverse-geocoded
                 // result but cannot type into it -- moving the pin (drag,
                 // Search Address, Use Current Location) is the only way to
@@ -1051,7 +1053,7 @@ private fun OutletFormScreen(
                 // Outlet keeps Address freely editable, unchanged.
                 readOnly = !isEditing,
                 supportingText = if (!isEditing) {
-                    { Text("Automatically filled based on the pin location.") }
+                    { Text(stringResource(R.string.address_auto_hint)) }
                 } else null,
                 trailingIcon = {
                     if (resolvingAddress) {
@@ -1065,7 +1067,7 @@ private fun OutletFormScreen(
             )
 
             Text(
-                text = "LOCATION",
+                text = stringResource(R.string.location_header),
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
@@ -1074,8 +1076,8 @@ private fun OutletFormScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                label = { Text("Search Address") },
-                placeholder = { Text("e.g. Jalan Sudirman, Jakarta") },
+                label = { Text(stringResource(R.string.search_address)) },
+                placeholder = { Text(stringResource(R.string.search_address_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 trailingIcon = {
                     when {
@@ -1084,7 +1086,7 @@ private fun OutletFormScreen(
                             searchQuery = ""
                             searchResults = emptyList()
                         }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear search")
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.clear_search))
                         }
                     }
                 },
@@ -1175,11 +1177,11 @@ private fun OutletFormScreen(
                         // a new text style.
                         Column {
                             Text(
-                                text = "Address not found.",
+                                text = stringResource(R.string.address_not_found),
                                 style = MaterialTheme.typography.bodySmall
                             )
                             Text(
-                                text = "Try another keyword, use a more specific address, or move the map manually.",
+                                text = stringResource(R.string.address_not_found_hint),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -1200,7 +1202,7 @@ private fun OutletFormScreen(
                     Icon(Icons.Default.MyLocation, contentDescription = null, modifier = Modifier.size(18.dp))
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Use Current Location")
+                Text(stringResource(R.string.use_current_location))
             }
 
             Box(
@@ -1223,7 +1225,7 @@ private fun OutletFormScreen(
             }
 
             Text(
-                text = "Pin: %.6f, %.6f".format(pickedLat, pickedLng),
+                text = stringResource(R.string.pin_coordinates, pickedLat, pickedLng),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -1273,7 +1275,7 @@ private fun OutletFormScreen(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
-                    Text(if (isEditing) "Submit Changes" else "Submit Outlet")
+                    Text(if (isEditing) stringResource(R.string.submit_changes) else stringResource(R.string.submit_outlet))
                 }
             }
 
@@ -1283,7 +1285,7 @@ private fun OutletFormScreen(
                 enabled = !formLoading,
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     }
@@ -1443,7 +1445,7 @@ private fun OutletMapPicker(
         // this picker is modeled on.
         Icon(
             imageVector = Icons.Default.LocationOn,
-            contentDescription = "Selected location",
+            contentDescription = stringResource(R.string.location_header), // closest or new string
             modifier = Modifier
                 .align(Alignment.Center)
                 .offset(y = (-20).dp)

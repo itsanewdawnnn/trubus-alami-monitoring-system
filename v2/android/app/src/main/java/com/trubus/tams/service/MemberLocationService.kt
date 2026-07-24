@@ -19,6 +19,7 @@ import kotlin.time.Duration.Companion.seconds
 import androidx.core.location.GnssStatusCompat
 import androidx.core.location.LocationCompat
 import androidx.core.location.LocationManagerCompat
+import com.trubus.tams.R
 import com.trubus.tams.data.repository.ActivityLogRepository
 import com.trubus.tams.data.repository.MemberRepository
 import com.trubus.tams.data.repository.RemoteConfigRepository
@@ -361,8 +362,8 @@ class MemberLocationService : Service() {
         // real active task and keeps it visible on the lock screen/shade,
         // which helps prevent Low Memory Kills on RAM-constrained devices.
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("TAMS - Trubus Alami Monitoring System")
-            .setContentText("System runtime and dependencies are operating normally.")
+            .setContentTitle(getString(R.string.notif_title))
+            .setContentText(getString(R.string.notif_text))
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
@@ -827,10 +828,10 @@ class MemberLocationService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "TAMS - Trubus Alami Monitoring System",
+                getString(R.string.notif_channel_name),
                 NotificationManager.IMPORTANCE_MIN
             ).apply {
-                description = "System runtime and dependencies are operating normally."
+                description = getString(R.string.notif_channel_desc)
                 setShowBadge(false)
             }
             val manager = getSystemService(NotificationManager::class.java)

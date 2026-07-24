@@ -1,12 +1,12 @@
 # Graph Report - v2  (2026-07-24)
 
 ## Corpus Check
-- 98 files · ~123,782 words
+- 98 files · ~123,551 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 659 nodes · 1091 edges · 80 communities (71 shown, 9 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 25 edges (avg confidence: 0.74)
+- 661 nodes · 1094 edges · 80 communities (72 shown, 8 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.73)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -47,7 +47,7 @@
 - authenticateUser
 
 ## God Nodes (most connected - your core abstractions)
-1. `MainViewModel` - 61 edges
+1. `MainViewModel` - 63 edges
 2. `ApiResponse` - 39 edges
 3. `MemberRepository` - 36 edges
 4. `MemberLocationService` - 29 edges
@@ -73,7 +73,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (80 total, 9 thin omitted)
+## Communities (80 total, 8 thin omitted)
 
 ### Community 0 - "ApiResponse"
 Cohesion: 0.11
@@ -157,11 +157,15 @@ Nodes (8): gapRoutePolyline(), GeoPoint, Modifier, MapMarkerData, nearestRoutePo
 
 ### Community 23 - ".onCreate"
 Cohesion: 0.29
-Nodes (4): MainActivity, MyApplicationTheme(), Bundle, ComponentActivity
+Nodes (4): MainActivity, MyApplicationTheme(), AppCompatActivity, Bundle
 
 ### Community 24 - "UnitJsonAdapter"
 Cohesion: 0.33
 Nodes (4): UnitJsonAdapter, JsonAdapter, JsonReader, JsonWriter
+
+### Community 25 - "WibTime"
+Cohesion: 0.38
+Nodes (3): WibTime, SimpleDateFormat, TimeZone
 
 ### Community 26 - "ShadowWorkManagerInitializer"
 Cohesion: 0.33
@@ -182,22 +186,22 @@ Nodes (3): gradlew script, die(), warn()
 ## Knowledge Gaps
 - **21 isolated node(s):** `None`, `Package layout (`app/src/main/java/com/trubus/tams/`)`, `Architecture & Reliability Principles`, `App workflow`, `Remote Management` (+16 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `MemberRepository` connect `MemberRepository` to `ApiResponse`, `MainViewModel`, `MemberLocationService`, `FakeOfflineLocationDao`, `MemberRepositoryTest`?**
-  _High betweenness centrality (0.123) - this node is a cross-community bridge._
+  _High betweenness centrality (0.120) - this node is a cross-community bridge._
 - **Why does `MainViewModel` connect `MainViewModel` to `UpdateManager`, `MainAppScreen.kt`, `MemberRepository`, `OutletScreen.kt`?**
-  _High betweenness centrality (0.118) - this node is a cross-community bridge._
-- **Why does `UserDto` connect `MemberRepository` to `ApiResponse`, `MainViewModel`, `MainAppScreen.kt`?**
-  _High betweenness centrality (0.051) - this node is a cross-community bridge._
+  _High betweenness centrality (0.115) - this node is a cross-community bridge._
+- **Why does `MemberLocationService` connect `MemberLocationService` to `MemberRepository`?**
+  _High betweenness centrality (0.049) - this node is a cross-community bridge._
 - **What connects `None`, `Package layout (`app/src/main/java/com/trubus/tams/`)`, `Architecture & Reliability Principles` to the rest of the system?**
   _21 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `ApiResponse` be split into smaller, more focused modules?**
   _Cohesion score 0.11312217194570136 - nodes in this community are weakly interconnected._
 - **Should `MainViewModel` be split into smaller, more focused modules?**
-  _Cohesion score 0.061224489795918366 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0596078431372549 - nodes in this community are weakly interconnected._
 - **Should `MemberLocationService` be split into smaller, more focused modules?**
   _Cohesion score 0.06382978723404255 - nodes in this community are weakly interconnected._

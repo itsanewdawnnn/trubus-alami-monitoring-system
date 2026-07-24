@@ -25,12 +25,14 @@ object WibTime {
 
     // Thread-local cache for SimpleDateFormat instances to avoid expensive
     // constructor calls and allocations while maintaining thread safety.
+    // Keyed by "pattern|localeTag" to keep them separate.
     private val formatters = ConcurrentHashMap<String, ThreadLocal<SimpleDateFormat>>()
 
-    fun formatter(pattern: String): SimpleDateFormat {
-        val threadLocal = formatters.getOrPut(pattern) {
+    fun formatter(pattern: String, locale: Locale = Locale.US): SimpleDateFormat {
+        val key = "$pattern|${locale.toLanguageTag()}"
+        val threadLocal = formatters.getOrPut(key) {
             ThreadLocal.withInitial {
-                SimpleDateFormat(pattern, Locale.getDefault()).apply { timeZone = ZONE }
+                SimpleDateFormat(pattern, locale).apply { timeZone = ZONE }
             }
         }
         return threadLocal.get()!!

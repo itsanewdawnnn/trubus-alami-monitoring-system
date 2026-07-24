@@ -8,12 +8,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
+import com.trubus.tams.R
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.trubus.tams.R
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -406,15 +407,15 @@ fun OsmMap(
                         val endPoint = routePoints.last()
                         val startMarker = Marker(mapView).apply {
                             position = startPoint
-                            title = "Start Point"
-                            subDescription = "Time of first coordinate"
+                            title = context.getString(R.string.start_point)
+                    subDescription = context.getString(R.string.start_point_desc)
                             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                             startMarkerDrawable?.let { icon = it }
                         }
                         val endMarker = Marker(mapView).apply {
                             position = endPoint
-                            title = "End Point"
-                            subDescription = "Time of last coordinate"
+                            title = context.getString(R.string.end_point)
+                    subDescription = context.getString(R.string.end_point_desc)
                             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                             endMarkerDrawable?.let { icon = it }
                         }

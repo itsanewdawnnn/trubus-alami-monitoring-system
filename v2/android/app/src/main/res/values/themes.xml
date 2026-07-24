@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.MyApplication" parent="android:Theme.DeviceDefault.NoActionBar" />
+    <!--
+        Modern Material3 theme for AppCompatActivity.
+        Inheriting from Theme.Material3.DayNight.NoActionBar ensures
+        compatibility with Material3 components and edge-to-edge rendering.
+    -->
+    <style name="Theme.MyApplication" parent="Theme.Material3.DayNight.NoActionBar" />
 </resources>

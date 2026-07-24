@@ -3,8 +3,11 @@ package com.trubus.tams.ui.viewmodel
 import android.app.Application
 import android.content.Intent
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.trubus.tams.R
 import androidx.work.*
 import com.trubus.tams.BuildConfig
 import com.trubus.tams.data.model.HistoryResponseDto
@@ -74,6 +77,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // check in the first place -- see validateSessionOnStartup().
     private val _isValidatingSession = MutableStateFlow(repository.authToken != null)
     val isValidatingSession: StateFlow<Boolean> = _isValidatingSession.asStateFlow()
+
+    // --- Language Selection ---
+    // Reads the current application-wide locale set via AppCompatDelegate
+    // (persisted automatically by AndroidX). Defaults to English if none set.
+    private val _currentLanguage = MutableStateFlow(
+        AppCompatDelegate.getApplicationLocales().toLanguageTags().ifEmpty { "en" }
+    )
+    val currentLanguage: StateFlow<String> = _currentLanguage.asStateFlow()
+
+    /**
+     * Updates the app's language across all activities and components.
+     * Persisted automatically by AndroidX/AppCompat.
+     */
+    fun setLanguage(languageCode: String) {
+        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(languageCode)
+        AppCompatDelegate.setApplicationLocales(appLocale)
+        _currentLanguage.value = languageCode
+    }
 
     // Shown on the login screen after validateSessionOnStartup() (or a
     // manual retrySessionValidation()) fails -- distinct from [loginError],
@@ -205,7 +226,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (result.isSuccess) {
                 _outlets.value = result.getOrDefault(emptyList())
             } else {
-                _outletsError.value = result.exceptionOrNull()?.message ?: "Failed to load outlets."
+                _outletsError.value = result.exceptionOrNull()?.message ?: getApplication<Application>().getString(R.string.failed_load_outlets)
             }
             _outletsLoading.value = false
         }
@@ -249,7 +270,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val trimmedName = name.trim()
         val trimmedAddress = address.trim()
         if (trimmedName.isEmpty()) {
-            _outletFormError.value = "Outlet name is required."
+            _outletFormError.value = getApplication<Application>().getString(R.string.outlet_name_required)
             return
         }
 
@@ -259,9 +280,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val result = repository.createOutlet(trimmedName, trimmedAddress, latitude, longitude)
             if (result.isSuccess) {
                 fetchOutlets()
-                onResult(true, "Outlet submitted, waiting for Admin approval.")
+                onResult(true, getApplication<Application>().getString(R.string.outlet_submitted))
             } else {
-                val message = result.exceptionOrNull()?.message ?: "Failed to submit outlet."
+                val message = result.exceptionOrNull()?.message ?: getApplication<Application>().getString(R.string.outlet_submit_failed)
                 _outletFormError.value = message
                 onResult(false, message)
             }
@@ -290,7 +311,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val trimmedName = name.trim()
         val trimmedAddress = address.trim()
         if (trimmedName.isEmpty() || trimmedAddress.isEmpty()) {
-            _outletFormError.value = "Outlet name and address are required."
+            _outletFormError.value = getApplication<Application>().getString(R.string.outlet_name_address_required)
             return
         }
 
@@ -301,13 +322,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (result.isSuccess) {
                 fetchOutlets()
                 val message = if (currentStatus == "APPROVED") {
-                    "Changes submitted. This outlet's current data stays active until an Admin approves your changes."
+                    getApplication<Application>().getString(R.string.outlet_changes_submitted)
                 } else {
-                    "Outlet updated."
+                    getApplication<Application>().getString(R.string.outlet_updated)
                 }
                 onResult(true, message)
             } else {
-                val message = result.exceptionOrNull()?.message ?: "Failed to submit outlet changes."
+                val message = result.exceptionOrNull()?.message ?: getApplication<Application>().getString(R.string.outlet_edit_failed)
                 _outletFormError.value = message
                 onResult(false, message)
             }
@@ -327,9 +348,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val result = repository.deleteOutlet(id)
             if (result.isSuccess) {
                 fetchOutlets()
-                onResult(true, "Outlet deleted.")
+                onResult(true, getApplication<Application>().getString(R.string.outlet_deleted))
             } else {
-                onResult(false, result.exceptionOrNull()?.message ?: "Failed to delete outlet.")
+                onResult(false, result.exceptionOrNull()?.message ?: getApplication<Application>().getString(R.string.outlet_delete_failed))
             }
         }
     }
@@ -366,13 +387,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         outletReorderJob = viewModelScope.launch {
             val result = repository.reorderOutlets(orderedIds)
             if (result.isSuccess) {
-                onResult?.invoke(true, "Outlet order saved.")
+                onResult?.invoke(true, getApplication<Application>().getString(R.string.outlet_order_saved))
             } else {
                 // The optimistic order above never actually saved -- resync
                 // with the server's real order rather than let the Member
                 // keep looking at an arrangement that silently didn't stick.
                 fetchOutlets()
-                onResult?.invoke(false, result.exceptionOrNull()?.message ?: "Failed to save outlet order.")
+                onResult?.invoke(false, result.exceptionOrNull()?.message ?: getApplication<Application>().getString(R.string.outlet_order_failed))
             }
         }
     }
@@ -610,7 +631,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         _user.value = null
                         _canRetrySessionValidation.value = false
                         _sessionValidationError.value =
-                            "Your session has expired or is no longer valid. Please log in again."
+                            getApplication<Application>().getString(R.string.session_expired)
                     }
                     else -> {
                         // Unconfirmed -- likely a connectivity or server
@@ -622,7 +643,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         // re-runs this same check.
                         _canRetrySessionValidation.value = true
                         _sessionValidationError.value =
-                            "Cannot connect to the server. Please check your internet connection and try again."
+                            getApplication<Application>().getString(R.string.network_error)
                     }
                 }
                 _isLoggedIn.value = false
@@ -652,7 +673,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         // Client-side check before touching the network -- avoids a wasted
         // round trip when the server would reject the same blank fields anyway.
         if (trimmedUsername.isEmpty() || password.isEmpty()) {
-            _loginError.value = "Username and password are required."
+            _loginError.value = getApplication<Application>().getString(R.string.login_required)
             return
         }
 
@@ -779,7 +800,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _isLoggedIn.value = false
             _canRetrySessionValidation.value = false
             _sessionValidationError.value =
-                "Your session has expired or is no longer valid. Please log in again."
+                getApplication<Application>().getString(R.string.session_expired)
         }
     }
 
@@ -811,8 +832,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (!_isLoggedIn.value) return
         _isTrackingActive.value = false
         _trackingAutoStoppedMessage.value =
-            "Tracking was stopped automatically because you are outside the allowed operational hours " +
-                "(an admin may have turned off your Force Location access)."
+            getApplication<Application>().getString(R.string.tracking_auto_stopped)
     }
 
     // Belt-and-suspenders refresh: re-reads the persisted fix from disk
@@ -855,7 +875,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val trimmedNote = note.trim()
 
         if (trimmedName.isEmpty() || trimmedUsername.isEmpty()) {
-            _profileUpdateError.value = "Name and username are required."
+            _profileUpdateError.value = getApplication<Application>().getString(R.string.profile_name_user_required)
             return
         }
         // Bounds come from Remote Management (tams_remote_management), same
@@ -866,14 +886,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val passwordMinLength = remoteConfigRepository.passwordMinLength
         val passwordMaxLength = remoteConfigRepository.passwordMaxLength
         if (!password.isNullOrBlank() && password.trim().length < passwordMinLength) {
-            _profileUpdateError.value = "New password must be at least $passwordMinLength characters."
+            _profileUpdateError.value = getApplication<Application>().getString(R.string.password_min_length, passwordMinLength)
             return
         }
         // tams_users.password is VARCHAR(255) on the server at most --
         // without this check, a too-long password would only be caught
         // after a round trip to the server (or worse, silently truncated there).
         if (!password.isNullOrBlank() && password.length > passwordMaxLength) {
-            _profileUpdateError.value = "New password must be at most $passwordMaxLength characters."
+            _profileUpdateError.value = getApplication<Application>().getString(R.string.password_max_length, passwordMaxLength)
             return
         }
 
@@ -892,9 +912,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (result.isSuccess) {
                 _user.value = result.getOrNull()
                 _isEditingProfile.value = false
-                onResult(true, "Profile updated successfully.")
+                onResult(true, getApplication<Application>().getString(R.string.profile_updated))
             } else {
-                val message = result.exceptionOrNull()?.message ?: "Failed to update profile."
+                val message = result.exceptionOrNull()?.message ?: getApplication<Application>().getString(R.string.profile_update_failed)
                 _profileUpdateError.value = message
                 onResult(false, message)
             }
@@ -1009,15 +1029,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val status = repository.getLocationStatus().getOrNull()
             if (status != null && !status.tracking_allowed) {
                 onResult(
-                    "Tracking is only allowed between ${status.operational_hours_start} " +
-                        "and ${status.operational_hours_end} GMT+7."
+                    getApplication<Application>().getString(R.string.tracking_allowed_between, status.operational_hours_start, status.operational_hours_end)
                 )
                 return@launch
             }
             if (startTracking()) {
                 onResult(null)
             } else {
-                onResult("Failed to start sending location. Try again.")
+                onResult(getApplication<Application>().getString(R.string.failed_start_tracking))
             }
         }
     }
@@ -1123,7 +1142,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             } else {
                 // Keep the existing list on failure; surface the error separately
                 // so the UI can tell "load failed" apart from "genuinely empty".
-                _memberListError.value = result.exceptionOrNull()?.message ?: "Failed to load member list."
+                _memberListError.value = result.exceptionOrNull()?.message ?: getApplication<Application>().getString(R.string.failed_load_members)
                 Log.e("MainViewModel", "Failed to load member list: ${_memberListError.value}")
             }
             _memberListLoading.value = false
@@ -1164,7 +1183,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (result.isSuccess) {
                 _historyResponse.value = result.getOrNull()
             } else {
-                _historyError.value = result.exceptionOrNull()?.message ?: "Failed to load trip history."
+                _historyError.value = result.exceptionOrNull()?.message ?: getApplication<Application>().getString(R.string.failed_load_history)
             }
             _historyLoading.value = false
         }

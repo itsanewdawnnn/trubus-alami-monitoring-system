@@ -49,7 +49,7 @@ android/
 
 The app is built with a **Reliability-First** approach, specifically optimized for **low-end devices (RAM 2–3 GB)** and aggressive OEM power management (MIUI, OriginOS, ColorOS, etc.):
 
-- **UI Standard**: Strictly **English-only** interface. ASCII-safe design (no emojis or special non-ASCII symbols) for maximum compatibility across various system fonts.
+- **Multi-Language Support**: Full support for **English (EN)** and **Bahasa Indonesia (ID)**. Uses official **AndroidX per-app language preferences** (`AppCompatDelegate`), allowing users to switch languages within the app independent of system settings. Bahasa Indonesia uses the standard `values-in` resource qualifier for maximum framework compatibility.
 - **Data Continuity**: Processes *all* locations in a `LocationResult` batch. Uses `THREAD_PRIORITY_FOREGROUND` for location threads and a tight `maxUpdateDelay` to ensure data reaches disk as fast as possible.
 - **Process Survival**: Uses `START_STICKY`, `onTaskRemoved()` alarm-restarts, and a WorkManager watchdog to ensure tracking resumes quickly after a kill.
 - **OEM Compatibility**: Includes a **Manual Escape Hatch** for the battery optimization card. On devices like iQOO (OriginOS) where system reporting is delayed or inaccurate, members can manually acknowledge they've configured the device to start tracking anyway.

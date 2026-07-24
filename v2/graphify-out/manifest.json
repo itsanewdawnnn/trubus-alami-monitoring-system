@@ -1,12 +1,12 @@
 {
   "android/app/build.gradle.kts": {
-    "mtime": 1784724356.0,
-    "ast_hash": "958af5c6c474016ae2224e71b75a3e5e",
+    "mtime": 1784886428.0,
+    "ast_hash": "70831c2c475a4e7331f35136a6af1fa6",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/MainActivity.kt": {
-    "mtime": 1784804152.0,
-    "ast_hash": "26177fc566fd78cc146904e153ef713c",
+    "mtime": 1784882838.0,
+    "ast_hash": "57c8c01bbc84757b3ec241930c27a9c0",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/api/ApiService.kt": {
@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/geocoding/ReverseGeocodingService.kt": {
-    "mtime": 1784803772.0,
-    "ast_hash": "f72e6d4d7f3c5c5a9808cc97e4828bbe",
+    "mtime": 1784882766.0,
+    "ast_hash": "f5f8a6a4a6def8068e70692f8870eab4",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/data/local/AppDatabase.kt": {
@@ -85,23 +85,23 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/service/MemberLocationService.kt": {
-    "mtime": 1784874632.0,
-    "ast_hash": "42c0942ef5b8df2ca25ccd6e38db1899",
+    "mtime": 1784882628.0,
+    "ast_hash": "54f64bbcdb417fe560206cd37e5cfaab",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/screens/MainAppScreen.kt": {
-    "mtime": 1784876192.0,
-    "ast_hash": "de93ccc46560c3d47d89a8eea3715cfc",
+    "mtime": 1784884468.0,
+    "ast_hash": "5f3389ec3d6569880223e70a6874775f",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/screens/OsmMap.kt": {
-    "mtime": 1784804134.0,
-    "ast_hash": "162a51ab69aa07ee72820319e895dfc6",
+    "mtime": 1784883046.0,
+    "ast_hash": "25e813328ee43622c987e5cfdbc04906",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/screens/OutletScreen.kt": {
-    "mtime": 1784869330.0,
-    "ast_hash": "d08274730a2567bf418a34b01f22fae9",
+    "mtime": 1784882570.0,
+    "ast_hash": "fcc7cc8d55b752c991ef02ad6438bfd2",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/screens/SplashScreen.kt": {
@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/screens/UpdateDialog.kt": {
-    "mtime": 1784868416.0,
-    "ast_hash": "4338dad64a15e29650dd02035d096274",
+    "mtime": 1784882608.0,
+    "ast_hash": "b77e604189601933c8484dced21a298b",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/theme/Color.kt": {
@@ -130,8 +130,8 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/ui/viewmodel/MainViewModel.kt": {
-    "mtime": 1784876118.0,
-    "ast_hash": "80e0a03c3649fba55f8078aae8c2f8ff",
+    "mtime": 1784889676.0,
+    "ast_hash": "41126ec9cfa61d03f6a59bcca48a00b9",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/util/OneShotLocationProvider.kt": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/util/WibTime.kt": {
-    "mtime": 1784872420.0,
-    "ast_hash": "e69672e129c1352fd8560105b9c51027",
+    "mtime": 1784884376.0,
+    "ast_hash": "e917e16b425c4fa7aa4ed2fc8eb4a5c1",
     "semantic_hash": ""
   },
   "android/app/src/main/java/com/trubus/tams/worker/LocationSyncWorker.kt": {
@@ -480,8 +480,8 @@
     "semantic_hash": ""
   },
   "android/README.md": {
-    "mtime": 1784877714.0,
-    "ast_hash": "487b74deb1b68451cfe7172df12fa494",
+    "mtime": 1784884186.0,
+    "ast_hash": "5e7633fdc7ee35e19dd5701b38d6e3c5",
     "semantic_hash": ""
   },
   "web/README.md": {

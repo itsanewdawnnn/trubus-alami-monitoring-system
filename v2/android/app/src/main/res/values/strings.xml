@@ -1,10 +1,195 @@
 <resources>
-    <!-- Launcher/app label, kept short on purpose: this is what shows
-         under the home-screen icon and in the recents/app-switcher list,
-         where a long name gets truncated by the OS anyway. -->
     <string name="app_name">TAMS</string>
-    <!-- Full, expanded name shown inside the app itself (TopAppBar title),
-         deliberately a separate string from app_name so lengthening this one
-         never affects the launcher icon label. -->
     <string name="app_full_name">TAMS - Trubus Alami Monitoring System</string>
+
+    <!-- Language Selection -->
+    <string name="language">Language</string>
+    <string name="language_en">English</string>
+    <string name="language_id">Bahasa Indonesia</string>
+
+    <!-- Common Actions -->
+    <string name="cancel">CANCEL</string>
+    <string name="save">SAVE</string>
+    <string name="delete">Delete</string>
+    <string name="add">Add</string>
+    <string name="edit">Edit</string>
+    <string name="try_again">TRY AGAIN</string>
+    <string name="select">Select</string>
+    <string name="close">Close</string>
+    <string name="back">Back</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">Log in to your account.</string>
+    <string name="login_subtitle">Please enter your credentials to access your account.</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show password</string>
+    <string name="sign_in">SIGN IN</string>
+    <string name="checking">CHECKING…</string>
+    <string name="logout">Log Out</string>
+    <string name="username_label">Username: %s</string>
+    <string name="logout_confirm_title">Log Out</string>
+    <string name="logout_confirm_message">Are you sure you want to log out?</string>
+    <string name="invalid_role">Invalid role: %s</string>
+
+    <!-- Navigation -->
+    <string name="dashboard">Dashboard</string>
+    <string name="outlet">Outlet</string>
+    <string name="active_members">Active Members</string>
+    <string name="real_time_map">Real-Time Map</string>
+    <string name="member_history">Member History</string>
+
+    <!-- Member Dashboard -->
+    <string name="member_location">MEMBER LOCATION</string>
+    <string name="real_time_location">REAL-TIME LOCATION</string>
+    <string name="tracking_active">Active</string>
+    <string name="tracking_inactive">Inactive</string>
+    <string name="start">START</string>
+    <string name="stop">STOP</string>
+    <string name="last_coordinate_status">LAST COORDINATE STATUS</string>
+    <string name="no_location_yet">No location recorded yet. Tap \'START\' to begin sending GPS coordinates.</string>
+    <string name="stale_location_warning">No recent GPS update. Check signal/connection — the app will try to recover automatically.</string>
+    <string name="time_recorded">Time Recorded</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="accuracy_gps">Accuracy (GPS)</string>
+    <string name="travel_speed">Travel Speed</string>
+    <string name="server_sync">Server Sync</string>
+    <string name="trip_detail">TRIP DETAIL</string>
+    <string name="no_trip_today">No trip recorded today yet.</string>
+    <string name="total_distance">Total Distance</string>
+    <string name="duration">Duration</string>
+    <string name="time_range">Time Range</string>
+    <string name="bg_optimization_title">Background Optimization</string>
+    <string name="bg_optimization_text">Battery optimization must be disabled for the app to work properly.</string>
+    <string name="ignore_bg_optimization">Ignore Battery Optimization</string>
+    <string name="already_configured">I\'ve already configured this, start anyway</string>
+
+    <!-- Profile Edit -->
+    <string name="edit_profile">Edit Profile</string>
+    <string name="name">Name</string>
+    <string name="note_admin">Note (Visible to Admin)</string>
+    <string name="new_password_optional">New Password (optional)</string>
+    <string name="password_blank_hint">Leave blank if you don\'t want to change the password</string>
+
+    <!-- Admin Screens -->
+    <string name="currently_moving">Currently Moving</string>
+    <string name="online">ONLINE</string>
+    <string name="offline">OFFLINE</string>
+    <string name="moving">MOVING</string>
+    <string name="stationary">STATIONARY</string>
+    <string name="select_member">Select Member</string>
+    <string name="member">Member</string>
+    <string name="loading_members">Loading member list...</string>
+    <string name="failed_load_members">Failed to load members. Tap to try again.</string>
+    <string name="no_active_members">No active members</string>
+    <string name="date">Date</string>
+    <string name="select_date">Select Date</string>
+    <string name="no_history_month">No trip history for this month.</string>
+    <string name="history_hint">Please select a member &amp; date to show trip history.</string>
+    <string name="no_history_found">No GPS trip logs found for %1$s on %2$s.</string>
+    <string name="missing_data_hint">Dashed red line: %d segment(s) with missing location data (not the actual route).</string>
+    <string name="prev_month">Previous month</string>
+    <string name="next_month">Next month</string>
+    <string name="last_update_at">Last update: %s</string>
+    <string name="note_label">Note: %s</string>
+    <string name="near_prefix">Near %s</string>
+    <string name="start_point">Start Point</string>
+    <string name="start_point_desc">Time of first coordinate</string>
+    <string name="end_point">End Point</string>
+    <string name="end_point_desc">Time of last coordinate</string>
+    <string name="trip_history">Trip History</string>
+    <string name="gps_points">GPS Points</string>
+    <string name="active_moving">ACTIVE - Moving</string>
+    <string name="active_stationary">ACTIVE - Stationary</string>
+    <string name="offline_last_update">OFFLINE (last update %s)</string>
+
+    <!-- Outlets -->
+    <string name="my_outlets">My Outlets</string>
+    <string name="reload_outlets">Reload outlets</string>
+    <string name="search_outlets">Search outlets...</string>
+    <string name="clear_search">Clear search</string>
+    <string name="no_outlets_yet">You haven\'t registered any outlets yet. Tap \'Add\' to register one.</string>
+    <string name="no_outlets_match">No outlets match \"%s\".</string>
+    <string name="delete_outlet_title">Delete Outlet</string>
+    <string name="delete_outlet_confirm">Delete \"%s\"? This cannot be undone.</string>
+    <string name="status_approved">Approved</string>
+    <string name="status_rejected">Rejected</string>
+    <string name="status_pending">Pending</string>
+    <string name="rejected_reason">Rejected: %s</string>
+    <string name="changes_pending">Changes pending approval</string>
+    <string name="last_edit_rejected">Last edit rejected: %s</string>
+    <string name="assigned_by_admin">Assigned by Admin</string>
+    <string name="scanning_data">Waiting for member coordinates. Scanning for data…</string>
+    <string name="edit_outlet">Edit Outlet</string>
+    <string name="add_outlet">Add Outlet</string>
+    <string name="approved_edit_warning">This outlet is already approved. Your changes will be submitted for Admin review and won\'t take effect until approved.</string>
+    <string name="outlet_name">Outlet Name</string>
+    <string name="address">Address</string>
+    <string name="address_auto_hint">Automatically filled based on the pin location.</string>
+    <string name="location_header">LOCATION</string>
+    <string name="search_address">Search Address</string>
+    <string name="search_address_placeholder">e.g. Jalan Sudirman, Jakarta</string>
+    <string name="address_not_found">Address not found.</string>
+    <string name="address_not_found_hint">Try another keyword, use a more specific address, or move the map manually.</string>
+    <string name="use_current_location">Use Current Location</string>
+    <string name="pin_coordinates">Pin: %1$.6f, %2$.6f</string>
+    <string name="submit_changes">Submit Changes</string>
+    <string name="submit_outlet">Submit Outlet</string>
+
+    <!-- OTA Update -->
+    <string name="mandatory_update">Mandatory Update</string>
+    <string name="update_available">Update Available</string>
+    <string name="version_available">Version %s is available.</string>
+    <string name="downloading_percent">Downloading... %d%%</string>
+    <string name="downloading_bytes">Downloading... %s</string>
+    <string name="needs_install_permission">The app needs \"Install unknown apps\" permission to install this update. Tap Open Settings, enable that permission for TAMS, then return to the app.</string>
+    <string name="ready_to_install">The update has been downloaded. If the installer didn\'t open automatically, tap Install below.</string>
+    <string name="update_action">UPDATE</string>
+    <string name="retry_action">RETRY</string>
+    <string name="open_settings_action">OPEN SETTINGS</string>
+    <string name="install_action">INSTALL</string>
+    <string name="later_action">LATER</string>
+
+    <!-- Permissions & Errors -->
+    <string name="permission_bg_required">Background location permission (Allow all the time) is required to track in the background.</string>
+    <string name="permission_required_toast">Location permission is required for the app to function properly.</string>
+    <string name="battery_optimization_required">Battery optimization must be ignored to start tracking. Tap the \'Ignore Battery Optimization\' card to configure.</string>
+    <string name="failed_stop_tracking">Failed to stop sending location. Try again.</string>
+    <string name="location_error">Could not get your current location. Check GPS/network signal and try again.</string>
+    <string name="location_permission_required">Location permission is required to use your current location.</string>
+
+    <!-- Error Messages -->
+    <string name="session_expired">Your session has expired or is no longer valid. Please log in again.</string>
+    <string name="network_error">Cannot connect to the server. Please check your internet connection and try again.</string>
+    <string name="login_required">Username and password are required.</string>
+    <string name="auth_failed">Authentication failed.</string>
+    <string name="failed_load_outlets">Failed to load outlets.</string>
+    <string name="failed_load_history">Failed to load trip history.</string>
+    <string name="outlet_name_required">Outlet name is required.</string>
+    <string name="outlet_submitted">Outlet submitted, waiting for Admin approval.</string>
+    <string name="outlet_submit_failed">Failed to submit outlet.</string>
+    <string name="outlet_name_address_required">Outlet name and address are required.</string>
+    <string name="outlet_changes_submitted">Changes submitted. This outlet\'s current data stays active until an Admin approves your changes.</string>
+    <string name="outlet_updated">Outlet updated.</string>
+    <string name="outlet_edit_failed">Failed to submit outlet changes.</string>
+    <string name="outlet_deleted">Outlet deleted.</string>
+    <string name="outlet_delete_failed">Failed to delete outlet.</string>
+    <string name="outlet_order_saved">Outlet order saved.</string>
+    <string name="outlet_order_failed">Failed to save outlet order.</string>
+    <string name="tracking_auto_stopped">Tracking was stopped automatically because you are outside the allowed operational hours (an admin may have turned off your Force Location access).</string>
+    <string name="profile_name_user_required">Name and username are required.</string>
+    <string name="password_min_length">New password must be at least %d characters.</string>
+    <string name="password_max_length">New password must be at most %d characters.</string>
+    <string name="profile_updated">Profile updated successfully.</string>
+    <string name="profile_update_failed">Failed to update profile.</string>
+    <string name="tracking_allowed_between">Tracking is only allowed between %1$s and %2$s GMT+7.</string>
+    <string name="failed_start_tracking">Failed to start sending location. Try again.</string>
+
+    <!-- Service & Notification -->
+    <string name="notif_channel_name">TAMS - Trubus Alami Monitoring System</string>
+    <string name="notif_channel_desc">System runtime and dependencies are operating normally.</string>
+    <string name="notif_title">TAMS - Trubus Alami Monitoring System</string>
+    <string name="notif_text">System runtime and dependencies are operating normally.</string>
 </resources>

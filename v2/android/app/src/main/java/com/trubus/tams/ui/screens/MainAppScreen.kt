@@ -160,7 +160,7 @@ fun MainAppScreen(
                 title = {
                     Column {
                         Text(
-                            text = "REAL-TIME LOCATION",
+                            text = stringResource(R.string.real_time_location),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.2.sp,
@@ -193,6 +193,7 @@ fun MainAppScreen(
                     )
                 },
                 actions = {
+                    LanguageSwitcher(viewModel = viewModel)
                     if (isLoggedIn) {
                         IconButton(
                             onClick = { viewModel.logout() },
@@ -200,7 +201,7 @@ fun MainAppScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                                contentDescription = "Log Out",
+                                contentDescription = stringResource(R.string.logout),
                                 tint = MaterialTheme.colorScheme.error
                             )
                         }
@@ -239,7 +240,7 @@ fun MainAppScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("Invalid role: ${currentUser?.role}")
+                            Text(stringResource(R.string.invalid_role, currentUser?.role ?: ""))
                         }
                     }
                 }
@@ -349,13 +350,13 @@ fun LoginScreen(viewModel: MainViewModel) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Log in to your account.",
+                    text = stringResource(R.string.login_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "Please enter your credentials to access your account.",
+                    text = stringResource(R.string.login_subtitle),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -395,7 +396,7 @@ fun LoginScreen(viewModel: MainViewModel) {
                                     onClick = { viewModel.retrySessionValidation() },
                                     enabled = !isValidatingSession
                                 ) {
-                                    Text(if (isValidatingSession) "CHECKING..." else "TRY AGAIN")
+                                    Text(if (isValidatingSession) stringResource(R.string.checking) else stringResource(R.string.try_again))
                                 }
                             }
                         }
@@ -409,7 +410,7 @@ fun LoginScreen(viewModel: MainViewModel) {
                 OutlinedTextField(
                     value = username,
                     onValueChange = { username = it },
-                    label = { Text("Username") },
+                    label = { Text(stringResource(R.string.username)) },
                     leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                     singleLine = true,
                     shape = RoundedCornerShape(16.dp),
@@ -426,13 +427,13 @@ fun LoginScreen(viewModel: MainViewModel) {
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Password") },
+                    label = { Text(stringResource(R.string.password)) },
                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
                                 imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                                contentDescription = if (passwordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
                             )
                         }
                     },
@@ -483,7 +484,7 @@ fun LoginScreen(viewModel: MainViewModel) {
                             modifier = Modifier.size(24.dp)
                         )
                     } else {
-                        Text("SIGN IN", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text(stringResource(R.string.sign_in), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     }
                 }
 
@@ -927,7 +928,7 @@ private fun TrackingStatusCard(isTrackingActive: Boolean, onToggleClick: () -> U
         ) {
             Column {
                 Text(
-                    text = "MEMBER LOCATION",
+                    text = stringResource(R.string.member_location),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (isTrackingActive) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -947,7 +948,7 @@ private fun TrackingStatusCard(isTrackingActive: Boolean, onToggleClick: () -> U
                         .background(if (isTrackingActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline)
                     )
                     Text(
-                        text = if (isTrackingActive) "Active" else "Inactive",
+                        text = if (isTrackingActive) stringResource(R.string.tracking_active) else stringResource(R.string.tracking_inactive),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -975,7 +976,7 @@ private fun TrackingStatusCard(isTrackingActive: Boolean, onToggleClick: () -> U
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = if (isTrackingActive) "STOP" else "START",
+                    text = if (isTrackingActive) stringResource(R.string.stop) else stringResource(R.string.start),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -1002,7 +1003,7 @@ private fun LastCoordinateCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "LAST COORDINATE STATUS",
+                text = stringResource(R.string.last_coordinate_status),
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.primary,
@@ -1011,7 +1012,7 @@ private fun LastCoordinateCard(
 
             if (lastLocation == null) {
                 Text(
-                    text = "No location recorded yet. Tap 'START' to begin sending GPS coordinates.",
+                    text = stringResource(R.string.no_location_yet),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -1033,20 +1034,20 @@ private fun LastCoordinateCard(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "No recent GPS update. Check signal/connection -- the app will try to recover automatically.",
+                            text = stringResource(R.string.stale_location_warning),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error
                         )
                     }
                 }
 
-                DetailRow("Time Recorded", lastLocation.time)
-                DetailRow("Latitude", "%.7f".format(lastLocation.latitude))
-                DetailRow("Longitude", "%.7f".format(lastLocation.longitude))
-                DetailRow("Accuracy (GPS)", "%.1f meter".format(lastLocation.accuracy))
-                DetailRow("Travel Speed", "%.2f m/s".format(lastLocation.speed))
+                DetailRow(stringResource(R.string.time_recorded), lastLocation.time)
+                DetailRow(stringResource(R.string.latitude), "%.7f".format(lastLocation.latitude))
+                DetailRow(stringResource(R.string.longitude), "%.7f".format(lastLocation.longitude))
+                DetailRow(stringResource(R.string.accuracy_gps), "%.1f meter".format(lastLocation.accuracy))
+                DetailRow(stringResource(R.string.travel_speed), "%.2f m/s".format(lastLocation.speed))
                 if (lastSyncTime != "-") {
-                    DetailRow("Server Sync", lastSyncTime)
+                    DetailRow(stringResource(R.string.server_sync), lastSyncTime)
                 }
             }
         }
@@ -1064,7 +1065,7 @@ private fun TripSummaryCard(summary: HistoryResponseDto?) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "TRIP DETAIL",
+                text = stringResource(R.string.trip_detail),
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.primary,
@@ -1073,7 +1074,7 @@ private fun TripSummaryCard(summary: HistoryResponseDto?) {
 
             if (summary == null || summary.total_points == 0) {
                 Text(
-                    text = "No trip recorded today yet.",
+                    text = stringResource(R.string.no_trip_today),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -1081,9 +1082,9 @@ private fun TripSummaryCard(summary: HistoryResponseDto?) {
                 // Same formatting as Admin's HistoryStatTile, for consistency.
                 val rangeText = "${timeOfDay(summary.start_time)}-${timeOfDay(summary.end_time)}"
 
-                DetailRow("Total Distance", "${summary.total_distance_km} km")
-                DetailRow("Duration", summary.duration_formatted)
-                DetailRow("Time Range", "$rangeText GMT+7")
+                DetailRow(stringResource(R.string.total_distance), "${summary.total_distance_km} km")
+                DetailRow(stringResource(R.string.duration), summary.duration_formatted)
+                DetailRow(stringResource(R.string.time_range), "$rangeText GMT+7")
             }
         }
     }
@@ -1108,13 +1109,13 @@ private fun BatteryOptimizationCard(onRequestExemption: () -> Unit, onDismiss: (
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Background Optimization",
+                text = stringResource(R.string.bg_optimization_title),
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.bodyMedium
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Battery optimization must be disabled for the app to work properly.",
+                text = stringResource(R.string.bg_optimization_text),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -1129,7 +1130,7 @@ private fun BatteryOptimizationCard(onRequestExemption: () -> Unit, onDismiss: (
             ) {
                 Icon(Icons.Default.BatteryAlert, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Ignore Battery Optimization")
+                Text(stringResource(R.string.ignore_bg_optimization))
             }
 
             if (exemptionRequested) {
@@ -1139,7 +1140,7 @@ private fun BatteryOptimizationCard(onRequestExemption: () -> Unit, onDismiss: (
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("I've already configured this, start anyway")
+                    Text(stringResource(R.string.already_configured))
                 }
             }
         }
@@ -1197,14 +1198,14 @@ private fun MemberProfileCard(viewModel: MainViewModel, currentUser: UserDto?) {
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Username: ${currentUser?.username}",
+                            text = stringResource(R.string.username_label, currentUser?.username ?: ""),
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         val note = currentUser?.note
                         if (!note.isNullOrBlank()) {
                             Text(
-                                text = "Note: $note",
+                                text = stringResource(R.string.note_label, note),
                                 fontSize = 13.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 1,
@@ -1214,7 +1215,7 @@ private fun MemberProfileCard(viewModel: MainViewModel, currentUser: UserDto?) {
                     }
                     Icon(
                         imageVector = Icons.Outlined.Edit,
-                        contentDescription = "Edit profile",
+                        contentDescription = stringResource(R.string.edit_profile),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp)
                     )
@@ -1249,7 +1250,7 @@ private fun MemberProfileCard(viewModel: MainViewModel, currentUser: UserDto?) {
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = "Edit Profile",
+                        text = stringResource(R.string.edit_profile),
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary,
@@ -1263,7 +1264,7 @@ private fun MemberProfileCard(viewModel: MainViewModel, currentUser: UserDto?) {
                         onValueChange = {},
                         readOnly = true,
                         enabled = false,
-                        label = { Text("Name") },
+                        label = { Text(stringResource(R.string.name)) },
                         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                         singleLine = true,
                         shape = RoundedCornerShape(16.dp),
@@ -1275,7 +1276,7 @@ private fun MemberProfileCard(viewModel: MainViewModel, currentUser: UserDto?) {
                     OutlinedTextField(
                         value = username,
                         onValueChange = { username = it },
-                        label = { Text("Username") },
+                        label = { Text(stringResource(R.string.username)) },
                         leadingIcon = { Icon(Icons.Default.AlternateEmail, contentDescription = null) },
                         singleLine = true,
                         shape = RoundedCornerShape(16.dp),
@@ -1289,7 +1290,7 @@ private fun MemberProfileCard(viewModel: MainViewModel, currentUser: UserDto?) {
                     OutlinedTextField(
                     value = note,
                     onValueChange = { note = it },
-                    label = { Text("Note (Visible to Admin)") },
+                    label = { Text(stringResource(R.string.note_admin)) },
                     leadingIcon = { Icon(Icons.AutoMirrored.Filled.Notes, contentDescription = null) },
                     singleLine = true,
                         shape = RoundedCornerShape(16.dp),
@@ -1305,17 +1306,17 @@ private fun MemberProfileCard(viewModel: MainViewModel, currentUser: UserDto?) {
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
-                        label = { Text("New Password (optional)") },
+                        label = { Text(stringResource(R.string.new_password_optional)) },
                         leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                         trailingIcon = {
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                 Icon(
                                     imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                    contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                                    contentDescription = if (passwordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
                                 )
                             }
                         },
-                        supportingText = { Text("Leave blank if you don't want to change the password") },
+                        supportingText = { Text(stringResource(R.string.password_blank_hint)) },
                         singleLine = true,
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         shape = RoundedCornerShape(16.dp),
@@ -1349,7 +1350,7 @@ private fun MemberProfileCard(viewModel: MainViewModel, currentUser: UserDto?) {
                                 .weight(1f)
                                 .height(48.dp)
                         ) {
-                            Text("CANCEL")
+                            Text(stringResource(R.string.cancel))
                         }
                         Button(
                             onClick = { trySave() },
@@ -1366,7 +1367,7 @@ private fun MemberProfileCard(viewModel: MainViewModel, currentUser: UserDto?) {
                                     strokeWidth = 2.dp
                                 )
                             } else {
-                                Text("SAVE")
+                                Text(stringResource(R.string.save))
                             }
                         }
                     }
@@ -1501,19 +1502,19 @@ fun AdminDashboard(viewModel: MainViewModel) {
                 selected = selectedTab == ADMIN_TAB_ACTIVE_MEMBER,
                 onClick = { selectedTab = ADMIN_TAB_ACTIVE_MEMBER },
                 icon = { Icon(Icons.Default.People, contentDescription = null) },
-                text = { Text("Active Members", fontSize = 12.sp, fontWeight = FontWeight.Bold) }
+                text = { Text(stringResource(R.string.active_members), fontSize = 12.sp, fontWeight = FontWeight.Bold) }
             )
             Tab(
                 selected = selectedTab == ADMIN_TAB_MAP,
                 onClick = { selectedTab = ADMIN_TAB_MAP },
                 icon = { Icon(Icons.Default.Map, contentDescription = null) },
-                text = { Text("Real-Time Map", fontSize = 12.sp, fontWeight = FontWeight.Bold) }
+                text = { Text(stringResource(R.string.real_time_map), fontSize = 12.sp, fontWeight = FontWeight.Bold) }
             )
             Tab(
                 selected = selectedTab == ADMIN_TAB_HISTORY,
                 onClick = { selectedTab = ADMIN_TAB_HISTORY },
                 icon = { Icon(Icons.Default.History, contentDescription = null) },
-                text = { Text("Member History", fontSize = 12.sp, fontWeight = FontWeight.Bold) }
+                text = { Text(stringResource(R.string.member_history), fontSize = 12.sp, fontWeight = FontWeight.Bold) }
             )
         }
 
@@ -1529,14 +1530,14 @@ fun AdminDashboard(viewModel: MainViewModel) {
                 BentoStatCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Default.People,
-                    label = "Active Members",
+                    label = stringResource(R.string.active_members),
                     value = activeMemberCount.toString(),
                     subValue = "/$totalMemberCount"
                 )
                 BentoStatCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.AutoMirrored.Outlined.DirectionsWalk,
-                    label = "Currently Moving",
+                    label = stringResource(R.string.currently_moving),
                     value = movingMemberCount.toString(),
                     subValue = "/$activeMemberCount"
                 )
@@ -1595,7 +1596,7 @@ fun ActiveMemberScreen(
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "No members are currently active.",
+                    text = stringResource(R.string.no_active_members),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -1625,6 +1626,7 @@ fun ActiveMemberScreen(
  */
 @Composable
 private fun ActiveMemberListItem(loc: MemberCurrentLocationDto, onClick: () -> Unit) {
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -1661,7 +1663,7 @@ private fun ActiveMemberListItem(loc: MemberCurrentLocationDto, onClick: () -> U
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = movementSnippet(loc),
+                        text = movementSnippet(context, loc),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -1671,7 +1673,7 @@ private fun ActiveMemberListItem(loc: MemberCurrentLocationDto, onClick: () -> U
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
-                    text = "Last update: ${formatTimestamp(loc.updated_at)} GMT+7",
+                    text = stringResource(R.string.last_update_at, formatTimestamp(loc.updated_at)),
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -1679,7 +1681,7 @@ private fun ActiveMemberListItem(loc: MemberCurrentLocationDto, onClick: () -> U
                 if (loc.note.isNotBlank()) {
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "Note: ${loc.note}",
+                        text = stringResource(R.string.note_label, loc.note),
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
@@ -1690,7 +1692,7 @@ private fun ActiveMemberListItem(loc: MemberCurrentLocationDto, onClick: () -> U
 
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "View on map",
+                contentDescription = stringResource(R.string.back), // Content desc for "View on map" navigation
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(20.dp)
             )
@@ -1709,6 +1711,7 @@ fun AdminMapScreen(
     focusedMemberId: Int?,
     onFocusedMemberIdChange: (Int?) -> Unit
 ) {
+    val context = LocalContext.current
     // Looked up live from currentLocations rather than storing the tapped
     // object, so the detail card reflects the latest poll, not a stale copy.
     val selectedMemberLoc = remember(focusedMemberId, currentLocations) {
@@ -1721,13 +1724,13 @@ fun AdminMapScreen(
     // OsmMap.kt), so this list's content now genuinely reflects "did the
     // renderable data change", which is exactly what OsmMap's own diffing
     // relies on to skip untouched markers.
-    val mapMarkers = remember(currentLocations) {
+    val mapMarkers = remember(currentLocations, context) {
         currentLocations.filter { it.latitude != null && it.longitude != null }.map { loc ->
             MapMarkerData(
                 id = loc.user_id,
                 position = GeoPoint(loc.latitude!!, loc.longitude!!),
                 title = loc.name,
-                snippet = movementSnippet(loc),
+                snippet = movementSnippet(context, loc),
                 isActive = loc.status == "active"
             )
         }
@@ -1759,7 +1762,7 @@ fun AdminMapScreen(
                         .padding(12.dp)
                 ) {
                     Text(
-                        text = "Waiting for member coordinates. Scanning for data...",
+                        text = stringResource(R.string.scanning_data),
                         fontSize = 13.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -1839,7 +1842,7 @@ fun AdminMapScreen(
                                     )
                                     if (loc.note.isNotBlank()) {
                                         Text(
-                                            text = "Note: ${loc.note}",
+                                            text = stringResource(R.string.note_label, loc.note),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
@@ -1849,7 +1852,7 @@ fun AdminMapScreen(
                                 IconButton(onClick = { onFocusedMemberIdChange(null) }) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
-                                        contentDescription = "Close detail"
+                                        contentDescription = stringResource(R.string.close)
                                     )
                                 }
                             }
@@ -1866,7 +1869,7 @@ fun AdminMapScreen(
                                         .padding(horizontal = 8.dp, vertical = 4.dp)
                                 ) {
                                     Text(
-                                        text = if (loc.status == "active") "ONLINE" else "OFFLINE",
+                                        text = if (loc.status == "active") stringResource(R.string.online) else stringResource(R.string.offline),
                                         fontWeight = FontWeight.Bold,
                                         color = if (loc.status == "active") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                                         fontSize = 11.sp
@@ -1883,7 +1886,7 @@ fun AdminMapScreen(
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = if (loc.is_moving) "MOVING" else "STATIONARY",
+                                        text = if (loc.is_moving) stringResource(R.string.moving) else stringResource(R.string.stationary),
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.SemiBold,
                                         color = if (loc.is_moving) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
@@ -1919,7 +1922,7 @@ fun AdminMapScreen(
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = label,
+                                        text = stringResource(R.string.near_prefix, label),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -1928,10 +1931,10 @@ fun AdminMapScreen(
 
                             HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
 
-                DetailRow("Latitude", loc.latitude?.toString() ?: "-")
-                DetailRow("Longitude", loc.longitude?.toString() ?: "-")
-                DetailRow("GPS Accuracy", if (loc.accuracy != null) "+/-%.1f m".format(loc.accuracy) else "-")
-                DetailRow("Last Updated", "${formatTimestamp(loc.updated_at)} GMT+7")
+                DetailRow(stringResource(R.string.latitude), loc.latitude?.toString() ?: "-")
+                DetailRow(stringResource(R.string.longitude), loc.longitude?.toString() ?: "-")
+                DetailRow(stringResource(R.string.accuracy_gps), if (loc.accuracy != null) "+/-%.1f m".format(loc.accuracy) else "-")
+                DetailRow(stringResource(R.string.last_update_at), formatTimestamp(loc.updated_at))
                         }
                     }
                 }
@@ -1983,7 +1986,7 @@ private fun RoutePointDetailCard(point: HistoryPointDto, onClose: () -> Unit) {
                 IconButton(onClick = onClose, modifier = Modifier.size(32.dp)) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close point detail",
+                        contentDescription = stringResource(R.string.close),
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -2000,7 +2003,7 @@ private fun RoutePointDetailCard(point: HistoryPointDto, onClose: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = label,
+                        text = stringResource(R.string.near_prefix, label),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -2105,7 +2108,7 @@ fun AdminHistoryScreen(viewModel: MainViewModel) {
                                 modifier = Modifier.size(16.dp)
                             )
                             Text(
-                                text = "Trip History",
+                                text = stringResource(R.string.member_history),
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -2123,7 +2126,7 @@ fun AdminHistoryScreen(viewModel: MainViewModel) {
                             } else {
                                 Icon(
                                     imageVector = Icons.Default.Refresh,
-                                    contentDescription = "Reload member list",
+                                    contentDescription = stringResource(R.string.reload_outlets), // shared description
                                     tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(18.dp)
                                 )
@@ -2140,10 +2143,10 @@ fun AdminHistoryScreen(viewModel: MainViewModel) {
                         // Member Selection Dropdown
                         Box(modifier = Modifier.weight(1f)) {
                             OutlinedTextField(
-                                value = selectedMember?.name ?: "Select Member",
+                                value = selectedMember?.name ?: stringResource(R.string.select_member),
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text("Member") },
+                                label = { Text(stringResource(R.string.member)) },
                                 leadingIcon = { Icon(Icons.Outlined.Person, contentDescription = null) },
                                 trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null) },
                                 shape = RoundedCornerShape(16.dp),
@@ -2164,14 +2167,14 @@ fun AdminHistoryScreen(viewModel: MainViewModel) {
                                 when {
                                     memberListLoading && memberList.isEmpty() -> {
                                         DropdownMenuItem(
-                                            text = { Text("Loading member list...") },
+                                            text = { Text(stringResource(R.string.loading_members)) },
                                             onClick = {},
                                             enabled = false
                                         )
                                     }
                                     memberListError != null && memberList.isEmpty() -> {
                                         DropdownMenuItem(
-                                            text = { Text("Failed to load members. Tap to try again.") },
+                                            text = { Text(stringResource(R.string.failed_load_members)) },
                                             onClick = {
                                                 viewModel.fetchMemberList()
                                             }
@@ -2179,7 +2182,7 @@ fun AdminHistoryScreen(viewModel: MainViewModel) {
                                     }
                                     memberList.isEmpty() -> {
                                         DropdownMenuItem(
-                                            text = { Text("No active members") },
+                                            text = { Text(stringResource(R.string.no_active_members)) },
                                             onClick = { showMemberDropdown = false }
                                         )
                                     }
@@ -2206,7 +2209,7 @@ fun AdminHistoryScreen(viewModel: MainViewModel) {
                                 value = formatDateDisplay(historyDate),
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text("Date") },
+                                label = { Text(stringResource(R.string.date)) },
                                 leadingIcon = { Icon(Icons.Default.CalendarToday, null) },
                                 trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null) },
                                 shape = RoundedCornerShape(16.dp),
@@ -2224,7 +2227,7 @@ fun AdminHistoryScreen(viewModel: MainViewModel) {
 
                     if (memberListError != null) {
                         Text(
-                            text = "Failed to load member list: $memberListError",
+                            text = stringResource(R.string.failed_load_members) + ": $memberListError",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -2266,7 +2269,7 @@ fun AdminHistoryScreen(viewModel: MainViewModel) {
                                 modifier = Modifier.size(18.dp)
                             )
                             Text(
-                                text = "Error: $historyError",
+                                text = stringResource(R.string.try_again) + ": $historyError",
                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -2276,13 +2279,13 @@ fun AdminHistoryScreen(viewModel: MainViewModel) {
                 historyResponseSnapshot == null -> {
                     HistoryEmptyHint(
                         icon = Icons.Outlined.Route,
-                        message = "Please select a member & date to show trip history."
+                        message = stringResource(R.string.history_hint)
                     )
                 }
                 historyResponseSnapshot.total_points == 0 -> {
                     HistoryEmptyHint(
                         icon = Icons.Outlined.LocationOff,
-                        message = "No GPS trip logs found for ${selectedMember?.name} on ${formatDateDisplay(historyDate)}."
+                        message = stringResource(R.string.no_history_found, selectedMember?.name ?: "", formatDateDisplay(historyDate))
                     )
                 }
                 else -> {
@@ -2353,7 +2356,7 @@ fun AdminHistoryScreen(viewModel: MainViewModel) {
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Dashed red line: ${gapIndices.size} segment(s) with missing location data (not the actual route)",
+                        text = stringResource(R.string.missing_data_hint, gapIndices.size),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -2415,7 +2418,7 @@ private fun HistoryDatePickerDialog(
                 )
                 if (!availableDatesLoading && availableDates.isEmpty()) {
                     Text(
-                        text = "No trip history for this month.",
+                        text = stringResource(R.string.no_history_month),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 8.dp)
@@ -2433,12 +2436,12 @@ private fun HistoryDatePickerDialog(
                 },
                 enabled = availableDates.contains(pendingDateKey)
             ) {
-                Text("Select")
+                Text(stringResource(R.string.select))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )
@@ -2609,7 +2612,7 @@ private fun monthTitleLabel(yearMonth: String): String {
         clear()
         set(year, month - 1, 1)
     }
-    return SimpleDateFormat("MMMM yyyy", Locale.US).apply { timeZone = WibTime.ZONE }.format(cal.time)
+    return WibTime.formatter("MMMM yyyy", Locale.getDefault()).format(cal.time)
 }
 
 /**
@@ -2621,7 +2624,7 @@ private fun monthTitleLabel(yearMonth: String): String {
 private fun formatDateDisplay(dateKey: String): String {
     return try {
         val date = WibTime.formatter("yyyy-MM-dd").parse(dateKey) ?: return dateKey
-        SimpleDateFormat("dd MMM yyyy", Locale.US).apply { timeZone = WibTime.ZONE }.format(date)
+        WibTime.formatter("dd MMM yyyy", Locale.getDefault()).format(date)
     } catch (_: Exception) {
         dateKey
     }
@@ -2677,7 +2680,7 @@ private fun HistoryStatsCard(stats: HistoryResponseDto, dateLabel: String) {
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Total Distance / $dateLabel",
+                        text = stringResource(R.string.total_distance) + " / $dateLabel",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1
@@ -2784,11 +2787,11 @@ private fun DetailRow(label: String, value: String, valueColor: Color = Material
  * `is_moving` is a real, server-computed signal (backend/api.php), so a
  * stationary-but-online member correctly shows as "ACTIVE - Stationary".
  */
-fun movementSnippet(loc: MemberCurrentLocationDto): String {
+fun movementSnippet(context: Context, loc: MemberCurrentLocationDto): String {
     return when {
-        loc.status != "active" -> "OFFLINE (last update ${formatTimestamp(loc.updated_at)} GMT+7)"
-        loc.is_moving -> "ACTIVE - Moving"
-        else -> "ACTIVE - Stationary"
+        loc.status != "active" -> context.getString(R.string.offline_last_update, formatTimestamp(loc.updated_at))
+        loc.is_moving -> context.getString(R.string.active_moving)
+        else -> context.getString(R.string.active_stationary)
     }
 }
 
@@ -2846,5 +2849,50 @@ fun formatTimestamp(timestampString: String?): String {
         timestampString
     } catch (_: Exception) {
         timestampString
+    }
+}
+
+@Composable
+fun LanguageSwitcher(viewModel: MainViewModel) {
+    var expanded by remember { mutableStateOf(false) }
+    val currentLanguage by viewModel.currentLanguage.collectAsState()
+
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                imageVector = Icons.Default.Language,
+                contentDescription = stringResource(R.string.language),
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.language_en)) },
+                onClick = {
+                    viewModel.setLanguage("en")
+                    expanded = false
+                },
+                leadingIcon = {
+                    if (currentLanguage == "en") {
+                        Icon(Icons.Default.Check, contentDescription = null)
+                    }
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.language_id)) },
+                onClick = {
+                    viewModel.setLanguage("id")
+                    expanded = false
+                },
+                leadingIcon = {
+                    if (currentLanguage == "id") {
+                        Icon(Icons.Default.Check, contentDescription = null)
+                    }
+                }
+            )
+        }
     }
 }
