@@ -384,7 +384,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_addresssearchservice",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": "addresssearchservice.kt"
     },
@@ -395,7 +395,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_addresssearchservice_addresssearchservice",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": "addresssearchservice"
     },
@@ -406,7 +406,7 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_addresssearchservice_cacheentry",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": "cacheentry"
     },
@@ -417,7 +417,7 @@
       "source_location": "L105",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_addresssearchservice_addresssearchservice_clearcachefortest",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".clearcachefortest()"
     },
@@ -428,7 +428,7 @@
       "source_location": "L109",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_addresssearchservice_addresssearchservice_search",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".search()"
     },
@@ -439,7 +439,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_forwardgeocodingprovider",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": "forwardgeocodingprovider.kt"
     },
@@ -450,7 +450,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_forwardgeocodingprovider_forwardgeocodingprovider",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": "forwardgeocodingprovider"
     },
@@ -461,7 +461,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_forwardgeocodingprovider_forwardgeocodingprovider_search",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".search()"
     },
@@ -472,7 +472,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_nominatimsearchservice",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": "nominatimsearchservice.kt"
     },
@@ -483,7 +483,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_nominatimsearchservice_addresssearchresult",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": "addresssearchresult"
     },
@@ -494,7 +494,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_nominatimsearchservice_nominatimsearchservice",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": "nominatimsearchservice"
     },
@@ -505,7 +505,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_nominatimsearchservice_nominatimsearchservice_search",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".search()"
     },
@@ -516,7 +516,7 @@
       "source_location": "L126",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_nominatimsearchservice_nominatimsearchservice_parseresults",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".parseresults()"
     },
@@ -527,7 +527,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_photonsearchservice",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": "photonsearchservice.kt"
     },
@@ -538,7 +538,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_photonsearchservice_photonsearchservice",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": "photonsearchservice"
     },
@@ -549,7 +549,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_photonsearchservice_photonsearchservice_search",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".search()"
     },
@@ -560,7 +560,7 @@
       "source_location": "L118",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_photonsearchservice_photonsearchservice_parseresults",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".parseresults()"
     },
@@ -571,7 +571,7 @@
       "source_location": "L142",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_geocoding_photonsearchservice_photonsearchservice_formatlabel",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".formatlabel()"
     },
@@ -582,7 +582,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "jsonobject",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": "jsonobject"
     },
@@ -813,7 +813,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_model_models_userdto",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": "userdto"
     },
@@ -879,7 +879,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_model_models_versioninfodto",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "versioninfodto"
     },
@@ -967,7 +967,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": "memberrepository.kt"
     },
@@ -978,7 +978,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_sessioninvalidexception",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": "sessioninvalidexception"
     },
@@ -989,7 +989,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "exception",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": "exception"
     },
@@ -1000,7 +1000,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_trackingnotallowedexception",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": "trackingnotallowedexception"
     },
@@ -1011,7 +1011,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": "memberrepository"
     },
@@ -1022,7 +1022,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_kt_sharedpreferences",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": "sharedpreferences"
     },
@@ -1033,7 +1033,7 @@
       "source_location": "L300",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_rebuildapiservice",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".rebuildapiservice()"
     },
@@ -1044,7 +1044,7 @@
       "source_location": "L328",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_errormessageordefault",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".errormessageordefault()"
     },
@@ -1055,7 +1055,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_kt_response",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": "response"
     },
@@ -1066,7 +1066,7 @@
       "source_location": "L362",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_parseerrorbody",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".parseerrorbody()"
     },
@@ -1077,7 +1077,7 @@
       "source_location": "L406",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_apicall",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".apicall()"
     },
@@ -1088,7 +1088,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "t",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": "t"
     },
@@ -1099,7 +1099,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_kt_result",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": "result"
     },
@@ -1110,7 +1110,7 @@
       "source_location": "L470",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_friendlynetworkerrormessage",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".friendlynetworkerrormessage()"
     },
@@ -1121,7 +1121,7 @@
       "source_location": "L483",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_login",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".login()"
     },
@@ -1132,7 +1132,7 @@
       "source_location": "L524",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_validatesession",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".validatesession()"
     },
@@ -1143,7 +1143,7 @@
       "source_location": "L553",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_logout",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".logout()"
     },
@@ -1154,7 +1154,7 @@
       "source_location": "L597",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_updateprofile",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".updateprofile()"
     },
@@ -1165,7 +1165,7 @@
       "source_location": "L617",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_postofflinestatus",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".postofflinestatus()"
     },
@@ -1176,7 +1176,7 @@
       "source_location": "L686",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_postlocation",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".postlocation()"
     },
@@ -1198,7 +1198,7 @@
       "source_location": "L868",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_getlocationstatus",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".getlocationstatus()"
     },
@@ -1209,7 +1209,7 @@
       "source_location": "L880",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_syncofflinelocations",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".syncofflinelocations()"
     },
@@ -1220,7 +1220,7 @@
       "source_location": "L982",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_getmemberlist",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".getmemberlist()"
     },
@@ -1231,7 +1231,7 @@
       "source_location": "L985",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_getcurrentlocations",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".getcurrentlocations()"
     },
@@ -1242,7 +1242,7 @@
       "source_location": "L988",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_getlocationhistory",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".getlocationhistory()"
     },
@@ -1253,7 +1253,7 @@
       "source_location": "L996",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_getlocationhistorydates",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".getlocationhistorydates()"
     },
@@ -1264,7 +1264,7 @@
       "source_location": "L1012",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_getoutlets",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".getoutlets()"
     },
@@ -1275,7 +1275,7 @@
       "source_location": "L1016",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_createoutlet",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".createoutlet()"
     },
@@ -1286,7 +1286,7 @@
       "source_location": "L1036",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_updateoutlet",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".updateoutlet()"
     },
@@ -1297,7 +1297,7 @@
       "source_location": "L1053",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_deleteoutlet",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".deleteoutlet()"
     },
@@ -1308,7 +1308,7 @@
       "source_location": "L1071",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_memberrepository_memberrepository_reorderoutlets",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".reorderoutlets()"
     },
@@ -1363,7 +1363,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_updaterepository",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "updaterepository.kt"
     },
@@ -1374,7 +1374,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_updaterepository_updaterepository",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "updaterepository"
     },
@@ -1385,7 +1385,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_updaterepository_updaterepository_fetchlatestversion",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": ".fetchlatestversion()"
     },
@@ -1396,7 +1396,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_repository_updaterepository_kt_result",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "result"
     },
@@ -1539,7 +1539,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "updatemanager.kt"
     },
@@ -1550,7 +1550,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_updateflowstate",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "updateflowstate"
     },
@@ -1561,7 +1561,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_none",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "none"
     },
@@ -1572,7 +1572,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_available",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "available"
     },
@@ -1583,7 +1583,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_downloading",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "downloading"
     },
@@ -1594,7 +1594,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_downloadfailed",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "downloadfailed"
     },
@@ -1605,7 +1605,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_needsinstallpermission",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "needsinstallpermission"
     },
@@ -1616,7 +1616,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_readytoinstall",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "readytoinstall"
     },
@@ -1627,7 +1627,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_updatemanager",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "updatemanager"
     },
@@ -1638,7 +1638,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_kt_sharedpreferences",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "sharedpreferences"
     },
@@ -1649,7 +1649,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_kt_stateflow",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "stateflow"
     },
@@ -1660,7 +1660,7 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_updatemanager_checkforupdate",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": ".checkforupdate()"
     },
@@ -1671,7 +1671,7 @@
       "source_location": "L158",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_updatemanager_restorependingforceupdate",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": ".restorependingforceupdate()"
     },
@@ -1682,7 +1682,7 @@
       "source_location": "L178",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_updatemanager_persistpendingforceupdate",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": ".persistpendingforceupdate()"
     },
@@ -1693,7 +1693,7 @@
       "source_location": "L187",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_updatemanager_clearpersistedpendingforceupdate",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": ".clearpersistedpendingforceupdate()"
     },
@@ -1704,7 +1704,7 @@
       "source_location": "L191",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_updatemanager_decodereleasenotes",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": ".decodereleasenotes()"
     },
@@ -1715,7 +1715,7 @@
       "source_location": "L210",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_updatemanager_dismiss",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": ".dismiss()"
     },
@@ -1726,7 +1726,7 @@
       "source_location": "L221",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_updatemanager_startdownload",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": ".startdownload()"
     },
@@ -1737,7 +1737,7 @@
       "source_location": "L234",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_updatemanager_resolveafterdownload",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": ".resolveafterdownload()"
     },
@@ -1748,7 +1748,7 @@
       "source_location": "L248",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_updatemanager_caninstallpackages",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": ".caninstallpackages()"
     },
@@ -1759,7 +1759,7 @@
       "source_location": "L256",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_updatemanager_installpermissionsettingsintent",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": ".installpermissionsettingsintent()"
     },
@@ -1770,7 +1770,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_kt_intent",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "intent"
     },
@@ -1781,7 +1781,7 @@
       "source_location": "L273",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_updatemanager_recheckinstallpermission",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": ".recheckinstallpermission()"
     },
@@ -1792,7 +1792,7 @@
       "source_location": "L294",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_data_update_updatemanager_updatemanager_launchinstall",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": ".launchinstall()"
     },
@@ -1803,7 +1803,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_service_bootcompletedreceiver",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": "bootcompletedreceiver.kt"
     },
@@ -1814,7 +1814,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_service_bootcompletedreceiver_bootcompletedreceiver",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": "bootcompletedreceiver"
     },
@@ -1825,7 +1825,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "broadcastreceiver",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": "broadcastreceiver"
     },
@@ -1836,7 +1836,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_service_bootcompletedreceiver_bootcompletedreceiver_onreceive",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": ".onreceive()"
     },
@@ -1847,7 +1847,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_service_bootcompletedreceiver_kt_context",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": "context"
     },
@@ -1858,7 +1858,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_service_bootcompletedreceiver_kt_intent",
-      "community": 5,
+      "community": 4,
       "community_name": "MemberRepository",
       "norm_label": "intent"
     },
@@ -2892,7 +2892,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_ui_screens_updatedialog",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "updatedialog.kt"
     },
@@ -2903,7 +2903,7 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_ui_screens_updatedialog_updatedialog",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "updatedialog()"
     },
@@ -2914,7 +2914,7 @@
       "source_location": "L126",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_ui_screens_updatedialog_updatedialogbody",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "updatedialogbody()"
     },
@@ -2925,7 +2925,7 @@
       "source_location": "L208",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_ui_screens_updatedialog_formatbytes",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "formatbytes()"
     },
@@ -2936,7 +2936,7 @@
       "source_location": "L213",
       "_origin": "ast",
       "id": "android_app_src_main_java_com_trubus_tams_ui_screens_updatedialog_updatedialogconfirmbutton",
-      "community": 6,
+      "community": 5,
       "community_name": "UpdateManager",
       "norm_label": "updatedialogconfirmbutton()"
     },
@@ -3794,7 +3794,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_app_src_test_java_com_trubus_tams_data_geocoding_addresssearchservicetest",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": "addresssearchservicetest.kt"
     },
@@ -3805,7 +3805,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "android_app_src_test_java_com_trubus_tams_data_geocoding_addresssearchservicetest_addresssearchservicetest",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": "addresssearchservicetest"
     },
@@ -3816,7 +3816,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "android_app_src_test_java_com_trubus_tams_data_geocoding_addresssearchservicetest_fakeprovider",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": "fakeprovider"
     },
@@ -3827,7 +3827,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "android_app_src_test_java_com_trubus_tams_data_geocoding_addresssearchservicetest_fakeprovider_search",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".search()"
     },
@@ -3838,7 +3838,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "android_app_src_test_java_com_trubus_tams_data_geocoding_addresssearchservicetest_addresssearchservicetest_setup",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".setup()"
     },
@@ -3849,7 +3849,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "android_app_src_test_java_com_trubus_tams_data_geocoding_addresssearchservicetest_addresssearchservicetest_teardown",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".teardown()"
     },
@@ -3860,7 +3860,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "android_app_src_test_java_com_trubus_tams_data_geocoding_addresssearchservicetest_addresssearchservicetest_search_caches_a_successful_result_and_does_not_call_the_provider_again",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".`search caches a successful result and does not call the provider again`()"
     },
@@ -3871,7 +3871,7 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "android_app_src_test_java_com_trubus_tams_data_geocoding_addresssearchservicetest_addresssearchservicetest_search_re_queries_after_the_cache_entry_expires_past_the_ttl",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".`search re-queries after the cache entry expires past the ttl`()"
     },
@@ -3882,7 +3882,7 @@
       "source_location": "L101",
       "_origin": "ast",
       "id": "android_app_src_test_java_com_trubus_tams_data_geocoding_addresssearchservicetest_addresssearchservicetest_search_does_not_expire_a_cache_entry_that_is_still_within_the_ttl",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".`search does not expire a cache entry that is still within the ttl`()"
     },
@@ -3893,7 +3893,7 @@
       "source_location": "L116",
       "_origin": "ast",
       "id": "android_app_src_test_java_com_trubus_tams_data_geocoding_addresssearchservicetest_addresssearchservicetest_search_falls_back_to_the_second_provider_when_the_first_finds_nothing",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".`search falls back to the second provider when the first finds nothing`()"
     },
@@ -3904,7 +3904,7 @@
       "source_location": "L130",
       "_origin": "ast",
       "id": "android_app_src_test_java_com_trubus_tams_data_geocoding_addresssearchservicetest_addresssearchservicetest_search_recovers_when_a_provider_throws_and_tries_the_next_one",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".`search recovers when a provider throws and tries the next one`()"
     },
@@ -3915,7 +3915,7 @@
       "source_location": "L143",
       "_origin": "ast",
       "id": "android_app_src_test_java_com_trubus_tams_data_geocoding_addresssearchservicetest_addresssearchservicetest_search_propagates_cancellation_instead_of_trying_the_next_provider",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".`search propagates cancellation instead of trying the next provider`()"
     },
@@ -3926,7 +3926,7 @@
       "source_location": "L160",
       "_origin": "ast",
       "id": "android_app_src_test_java_com_trubus_tams_data_geocoding_addresssearchservicetest_addresssearchservicetest_search_returns_empty_and_caches_nothing_when_every_provider_finds_nothing",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".`search returns empty and caches nothing when every provider finds nothing`()"
     },
@@ -3937,7 +3937,7 @@
       "source_location": "L182",
       "_origin": "ast",
       "id": "android_app_src_test_java_com_trubus_tams_data_geocoding_addresssearchservicetest_addresssearchservicetest_search_treats_queries_as_case_insensitive_and_trims_whitespace_for_cache_lookups",
-      "community": 7,
+      "community": 6,
       "community_name": "AddressSearchResult",
       "norm_label": ".`search treats queries as case-insensitive and trims whitespace for cache lookups`()"
     },
@@ -5911,7 +5911,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_assets_js_outlet",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "outlet.js"
     },
@@ -5922,7 +5922,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "web_assets_js_outlet_loadoutlets",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "loadoutlets()"
     },
@@ -5933,7 +5933,7 @@
       "source_location": "L114",
       "_origin": "ast",
       "id": "web_assets_js_outlet_assignedmembertext",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "assignedmembertext()"
     },
@@ -5944,7 +5944,7 @@
       "source_location": "L118",
       "_origin": "ast",
       "id": "web_assets_js_outlet_renderrows",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "renderrows()"
     },
@@ -5955,7 +5955,7 @@
       "source_location": "L180",
       "_origin": "ast",
       "id": "web_assets_js_outlet_renderpagination",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "renderpagination()"
     },
@@ -5966,7 +5966,7 @@
       "source_location": "L216",
       "_origin": "ast",
       "id": "web_assets_js_outlet_applysearchnow",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "applysearchnow()"
     },
@@ -5977,7 +5977,7 @@
       "source_location": "L280",
       "_origin": "ast",
       "id": "web_assets_js_outlet_ensurepickermap",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "ensurepickermap()"
     },
@@ -5988,7 +5988,7 @@
       "source_location": "L288",
       "_origin": "ast",
       "id": "web_assets_js_outlet_setpickermarker",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "setpickermarker()"
     },
@@ -5999,7 +5999,7 @@
       "source_location": "L312",
       "_origin": "ast",
       "id": "web_assets_js_outlet_updatecoordfields",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "updatecoordfields()"
     },
@@ -6010,7 +6010,7 @@
       "source_location": "L318",
       "_origin": "ast",
       "id": "web_assets_js_outlet_resetpicker",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "resetpicker()"
     },
@@ -6021,7 +6021,7 @@
       "source_location": "L334",
       "_origin": "ast",
       "id": "web_assets_js_outlet_setmemberid",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "setmemberid()"
     },
@@ -6032,7 +6032,7 @@
       "source_location": "L338",
       "_origin": "ast",
       "id": "web_assets_js_outlet_getmemberid",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "getmemberid()"
     },
@@ -6043,7 +6043,7 @@
       "source_location": "L350",
       "_origin": "ast",
       "id": "web_assets_js_outlet_capitalize",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "capitalize()"
     },
@@ -6054,7 +6054,7 @@
       "source_location": "L354",
       "_origin": "ast",
       "id": "web_assets_js_outlet_clearerrors",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "clearerrors()"
     },
@@ -6065,7 +6065,7 @@
       "source_location": "L368",
       "_origin": "ast",
       "id": "web_assets_js_outlet_showerrors",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "showerrors()"
     },
@@ -6076,7 +6076,7 @@
       "source_location": "L380",
       "_origin": "ast",
       "id": "web_assets_js_outlet_openaddmodal",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "openaddmodal()"
     },
@@ -6087,7 +6087,7 @@
       "source_location": "L395",
       "_origin": "ast",
       "id": "web_assets_js_outlet_openeditmodal",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "openeditmodal()"
     },
@@ -6098,7 +6098,7 @@
       "source_location": "L416",
       "_origin": "ast",
       "id": "web_assets_js_outlet_closeoutletmodal",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "closeoutletmodal()"
     },
@@ -6109,7 +6109,7 @@
       "source_location": "L468",
       "_origin": "ast",
       "id": "web_assets_js_outlet_approveoutlet",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "approveoutlet()"
     },
@@ -6120,7 +6120,7 @@
       "source_location": "L498",
       "_origin": "ast",
       "id": "web_assets_js_outlet_openrejectmodal",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "openrejectmodal()"
     },
@@ -6131,7 +6131,7 @@
       "source_location": "L510",
       "_origin": "ast",
       "id": "web_assets_js_outlet_closerejectmodal",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "closerejectmodal()"
     },
@@ -6142,7 +6142,7 @@
       "source_location": "L552",
       "_origin": "ast",
       "id": "web_assets_js_outlet_opendeletemodal",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "opendeletemodal()"
     },
@@ -6153,7 +6153,7 @@
       "source_location": "L560",
       "_origin": "ast",
       "id": "web_assets_js_outlet_closedeletemodal",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "closedeletemodal()"
     },
@@ -6164,7 +6164,7 @@
       "source_location": "L608",
       "_origin": "ast",
       "id": "web_assets_js_outlet_haversinemeters",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "haversinemeters()"
     },
@@ -6175,7 +6175,7 @@
       "source_location": "L618",
       "_origin": "ast",
       "id": "web_assets_js_outlet_formatdistance",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "formatdistance()"
     },
@@ -6186,7 +6186,7 @@
       "source_location": "L623",
       "_origin": "ast",
       "id": "web_assets_js_outlet_loadmergecandidates",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "loadmergecandidates()"
     },
@@ -6197,7 +6197,7 @@
       "source_location": "L657",
       "_origin": "ast",
       "id": "web_assets_js_outlet_openmergemodal",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "openmergemodal()"
     },
@@ -6208,7 +6208,7 @@
       "source_location": "L668",
       "_origin": "ast",
       "id": "web_assets_js_outlet_closemergemodal",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "closemergemodal()"
     },
@@ -6219,7 +6219,7 @@
       "source_location": "L730",
       "_origin": "ast",
       "id": "web_assets_js_outlet_loadvisitreport",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "loadvisitreport()"
     },
@@ -6230,7 +6230,7 @@
       "source_location": "L753",
       "_origin": "ast",
       "id": "web_assets_js_outlet_rendervisitreportrows",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "rendervisitreportrows()"
     },
@@ -6241,7 +6241,7 @@
       "source_location": "L795",
       "_origin": "ast",
       "id": "web_assets_js_outlet_formatdwell",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "formatdwell()"
     },
@@ -6252,7 +6252,7 @@
       "source_location": "L802",
       "_origin": "ast",
       "id": "web_assets_js_outlet_openvisitdetailmodal",
-      "community": 8,
+      "community": 7,
       "community_name": "outlet.js",
       "norm_label": "openvisitdetailmodal()"
     },
@@ -6978,7 +6978,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_readme",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "android/readme.md"
     },
@@ -6989,7 +6989,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "android_readme_tams_android",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "tams android"
     },
@@ -7000,7 +7000,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "android_readme_folder_structure",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "folder structure"
     },
@@ -7011,7 +7011,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "android_readme_package_layout_app_src_main_java_com_trubus_tams",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "package layout (`app/src/main/java/com/trubus/tams/`)"
     },
@@ -7022,7 +7022,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "android_readme_architecture_reliability_principles",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "architecture & reliability principles"
     },
@@ -7033,7 +7033,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "android_readme_app_workflow",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "app workflow"
     },
@@ -7044,7 +7044,7 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "android_readme_remote_management",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "remote management"
     },
@@ -7055,7 +7055,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "android_readme_background_tracking_reliability",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "background tracking reliability"
     },
@@ -7066,7 +7066,7 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "android_readme_troubleshooting",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "troubleshooting"
     },
@@ -7077,7 +7077,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_readme",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "web/readme.md"
     },
@@ -7088,7 +7088,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_readme_tams_web",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "tams web"
     },
@@ -7099,7 +7099,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "web_readme_the_two_apps",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "the two apps"
     },
@@ -7110,7 +7110,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "web_readme_admin_panel",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "admin panel"
     },
@@ -7121,7 +7121,7 @@
       "source_location": "L100",
       "_origin": "ast",
       "id": "web_readme_ota_update",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "ota update"
     },
@@ -7132,7 +7132,7 @@
       "source_location": "L162",
       "_origin": "ast",
       "id": "web_readme_remote_management",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "remote management"
     },
@@ -7143,7 +7143,7 @@
       "source_location": "L198",
       "_origin": "ast",
       "id": "web_readme_member_log",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "member log"
     },
@@ -7154,7 +7154,7 @@
       "source_location": "L225",
       "_origin": "ast",
       "id": "web_readme_member_version_monitoring",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "member version monitoring"
     },
@@ -7165,7 +7165,7 @@
       "source_location": "L248",
       "_origin": "ast",
       "id": "web_readme_live_tracking_member_history_reverse_geocoding",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "live tracking, member history & reverse geocoding"
     },
@@ -7176,7 +7176,7 @@
       "source_location": "L307",
       "_origin": "ast",
       "id": "web_readme_force_location_force_override",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "force location (force override)"
     },
@@ -7187,7 +7187,7 @@
       "source_location": "L355",
       "_origin": "ast",
       "id": "web_readme_outlet_management",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "outlet management"
     },
@@ -7198,7 +7198,7 @@
       "source_location": "L593",
       "_origin": "ast",
       "id": "web_readme_backend_api",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "backend api"
     },
@@ -7209,7 +7209,7 @@
       "source_location": "L614",
       "_origin": "ast",
       "id": "web_readme_why_the_admin_panel_s_shared_php_isn_t_in_one_includes_style_folder",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "why the admin panel's shared php isn't in one `includes/`-style folder"
     },
@@ -7220,7 +7220,7 @@
       "source_location": "L624",
       "_origin": "ast",
       "id": "web_readme_deployment",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "deployment"
     },
@@ -7231,7 +7231,7 @@
       "source_location": "L643",
       "_origin": "ast",
       "id": "web_readme_database",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "database"
     },
@@ -7242,7 +7242,7 @@
       "source_location": "L690",
       "_origin": "ast",
       "id": "web_readme_server_load_scalability",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "server load & scalability"
     },
@@ -7253,7 +7253,7 @@
       "source_location": "L750",
       "_origin": "ast",
       "id": "web_readme_query_index_efficiency_production_server_database_audit",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "query & index efficiency (production server & database audit)"
     },
@@ -7264,7 +7264,7 @@
       "source_location": "L849",
       "_origin": "ast",
       "id": "web_readme_troubleshooting",
-      "community": 4,
+      "community": 8,
       "community_name": "TAMS Web",
       "norm_label": "troubleshooting"
     }

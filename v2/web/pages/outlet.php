@@ -213,7 +213,7 @@ require __DIR__ . '/../layouts/header.php';
 
 <!-- Merge modal -->
 <div class="modal-overlay" id="outletMergeModalOverlay">
-    <div class="modal modal--sm">
+    <div class="modal modal--lg">
         <div class="modal__header">
             <h2 class="modal__title">Merge Outlet</h2>
             <button type="button" class="modal__close" data-close-modal aria-label="Close">
@@ -221,7 +221,7 @@ require __DIR__ . '/../layouts/header.php';
             </button>
         </div>
         <div class="modal__body">
-            <p class="modal__confirm-text" style="margin-bottom: var(--space-4);">Merging <strong id="mergeSourceName"></strong> into another outlet. Its visit history is preserved; the surviving outlet keeps its own assigned Member unchanged.</p>
+            <p class="modal__confirm-text" style="margin-bottom: var(--space-4);">Merging <strong id="mergeSourceName"></strong> into another outlet. Visit history will be transferred to the selected destination. The current outlet will be permanently deleted, while the destination outlet and its assigned Member remain unchanged.</p>
             <div class="form-group">
                 <label class="form-label" for="mergeSearch">Search target outlet</label>
                 <input type="text" class="form-control" id="mergeSearch" placeholder="Search by name or address...">

@@ -1,7 +1,7 @@
 # Graph Report - v2  (2026-07-24)
 
 ## Corpus Check
-- 98 files · ~123,770 words
+- 98 files · ~123,782 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -14,11 +14,11 @@
 - MainViewModel
 - MemberLocationService
 - MainAppScreen.kt
-- TAMS Web
 - MemberRepository
 - UpdateManager
 - AddressSearchResult
 - outlet.js
+- TAMS Web
 - FakeOfflineLocationDao
 - functions.php
 - MemberRepositoryTest
@@ -91,25 +91,25 @@ Nodes (21): AlarmManager, android, ActivityLogRepository, SharedPreferences, Rem
 Cohesion: 0.11
 Nodes (40): HistoryPointDto, HistoryResponseDto, MemberCurrentLocationDto, ActiveMemberListItem(), ActiveMemberScreen(), AdminDashboard(), AdminHistoryScreen(), AdminMapScreen() (+32 more)
 
-### Community 4 - "TAMS Web"
-Cohesion: 0.07
-Nodes (25): App workflow, Architecture & Reliability Principles, Background Tracking Reliability, Folder structure, Package layout (`app/src/main/java/com/trubus/tams/`), Remote Management, TAMS Android, Troubleshooting (+17 more)
-
-### Community 5 - "MemberRepository"
+### Community 4 - "MemberRepository"
 Cohesion: 0.12
 Nodes (13): UserDto, Response, Result, SharedPreferences, MemberRepository, SessionInvalidException, TrackingNotAllowedException, BootCompletedReceiver (+5 more)
 
-### Community 6 - "UpdateManager"
+### Community 5 - "UpdateManager"
 Cohesion: 0.11
 Nodes (18): VersionInfoDto, Result, UpdateRepository, Available, DownloadFailed, Downloading, Intent, SharedPreferences (+10 more)
 
-### Community 7 - "AddressSearchResult"
+### Community 6 - "AddressSearchResult"
 Cohesion: 0.12
 Nodes (9): AddressSearchService, CacheEntry, ForwardGeocodingProvider, AddressSearchResult, NominatimSearchService, PhotonSearchService, AddressSearchServiceTest, FakeProvider (+1 more)
 
-### Community 8 - "outlet.js"
+### Community 7 - "outlet.js"
 Cohesion: 0.11
 Nodes (24): applySearchNow(), approveOutlet(), assignedMemberText(), capitalize(), clearErrors(), ensurePickerMap(), formatDistance(), formatDwell() (+16 more)
+
+### Community 8 - "TAMS Web"
+Cohesion: 0.07
+Nodes (25): App workflow, Architecture & Reliability Principles, Background Tracking Reliability, Folder structure, Package layout (`app/src/main/java/com/trubus/tams/`), Remote Management, TAMS Android, Troubleshooting (+17 more)
 
 ### Community 9 - "FakeOfflineLocationDao"
 Cohesion: 0.12
@@ -189,7 +189,7 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `MemberRepository` connect `MemberRepository` to `ApiResponse`, `MainViewModel`, `MemberLocationService`, `FakeOfflineLocationDao`, `MemberRepositoryTest`?**
   _High betweenness centrality (0.123) - this node is a cross-community bridge._
-- **Why does `MainViewModel` connect `MainViewModel` to `MemberRepository`, `MainAppScreen.kt`, `OutletScreen.kt`, `UpdateManager`?**
+- **Why does `MainViewModel` connect `MainViewModel` to `UpdateManager`, `MainAppScreen.kt`, `MemberRepository`, `OutletScreen.kt`?**
   _High betweenness centrality (0.118) - this node is a cross-community bridge._
 - **Why does `UserDto` connect `MemberRepository` to `ApiResponse`, `MainViewModel`, `MainAppScreen.kt`?**
   _High betweenness centrality (0.051) - this node is a cross-community bridge._
